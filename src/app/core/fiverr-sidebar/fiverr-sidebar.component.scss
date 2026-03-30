@@ -143,17 +143,6 @@
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--fv-accent) 45%, transparent) transparent;
-}
-
-.fiverr__panel-templates::-webkit-scrollbar {
-  width: 5px;
-}
-
-.fiverr__panel-templates::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--fv-accent) 40%, transparent);
-  border-radius: 999px;
 }
 
 .fiverr__nav-count {
