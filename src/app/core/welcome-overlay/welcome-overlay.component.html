@@ -1,0 +1,80 @@
+@if (showWelcome()) {
+  <div
+    class="pv-welcome"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="pv-welcome-title"
+    aria-describedby="pv-welcome-desc"
+  >
+    <div class="pv-welcome__panel">
+      <h2 id="pv-welcome-title" class="pv-welcome__title">Custom websites for your business</h2>
+      <div id="pv-welcome-desc" class="pv-welcome__copy">
+        <p class="pv-welcome__lead">From idea to launch — built around your business.</p>
+        <p class="pv-welcome__lead pv-welcome__lead--emph">No templates. No generic layouts.</p>
+        <p class="pv-welcome__lead">
+          Every project is custom designed and developed from scratch to give you a unique, professional
+          presence.
+        </p>
+        <p class="pv-welcome__trust">Perfect for small businesses, startups and local brands</p>
+        <p class="pv-welcome__trigger">Stand out with a modern, high-converting website.</p>
+      </div>
+      <p class="pv-welcome__pricing-label">Pricing</p>
+      <ul class="pv-welcome__pricing" aria-label="Package prices">
+        <li class="pv-welcome__row">
+          <span>Basic</span>
+          <span class="pv-welcome__eur">Starting at €95</span>
+        </li>
+        <li class="pv-welcome__row pv-welcome__row--popular">
+          <span class="pv-welcome__tier">
+            <span class="pv-welcome__tier-name">Standard</span>
+            <span class="pv-welcome__badge pv-welcome__badge--popular">Most popular</span>
+            <span class="pv-welcome__tier-note">Best value for most businesses</span>
+          </span>
+          <span class="pv-welcome__eur">€195</span>
+        </li>
+        <li class="pv-welcome__row pv-welcome__row--premium">
+          <span class="pv-welcome__tier">
+            <span class="pv-welcome__tier-name">Premium</span>
+            <span class="pv-welcome__badge pv-welcome__badge--premium">Complete website</span>
+          </span>
+          <span class="pv-welcome__eur">€295</span>
+        </li>
+      </ul>
+      <ul class="pv-welcome__ticks" aria-label="Included with every package">
+        <li><span class="pv-welcome__tick" aria-hidden="true">✔</span> Fast delivery (24–72h)</li>
+        <li><span class="pv-welcome__tick" aria-hidden="true">✔</span> Fully custom (no templates)</li>
+        <li><span class="pv-welcome__tick" aria-hidden="true">✔</span> Mobile optimized</li>
+        <li>
+          <span class="pv-welcome__tick" aria-hidden="true">✔</span> Designed for real business use cases
+        </li>
+      </ul>
+      <div class="pv-welcome__actions">
+        <a
+          class="pv-welcome__btn pv-welcome__btn--primary"
+          [href]="studio.fiverrUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          (click)="dismiss()"
+        >
+          <span class="pv-welcome__btn-text">Order on Fiverr</span>
+          <span class="pv-welcome__btn-arrow" aria-hidden="true">→</span>
+        </a>
+        <button type="button" class="pv-welcome__btn pv-welcome__btn--ghost" (click)="dismiss()">
+          Continue to demo
+        </button>
+      </div>
+      <div class="pv-welcome__notice" role="note">
+        <span class="pv-welcome__notice-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3.2 2.1" />
+          </svg>
+        </span>
+        <p class="pv-welcome__notice-text">
+          Limited availability – I work on a few projects at a time.
+        </p>
+      </div>
+      <p class="pv-welcome__hint">Or explore the demo below</p>
+    </div>
+  </div>
+}

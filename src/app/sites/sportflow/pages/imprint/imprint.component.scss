@@ -1,0 +1,65 @@
+.page {
+  padding-block: clamp(2rem, 6vw, 3.5rem);
+}
+
+.page__head {
+  max-width: 44rem;
+  margin-bottom: clamp(2rem, 5vw, 2.75rem);
+}
+
+.page__eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sf-accent);
+}
+
+.page__title {
+  margin: 0;
+  font-family: var(--sf-font-display);
+  font-weight: 700;
+  font-size: clamp(1.65rem, 1.35rem + 1vw, 2.1rem);
+  letter-spacing: -0.02em;
+}
+
+.page__intro {
+  margin: 0.85rem 0 0;
+  color: var(--sf-muted);
+}
+
+.legal {
+  max-width: 44rem;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  border-radius: var(--sf-radius);
+  border: 1px solid var(--sf-border);
+  background: var(--sf-surface);
+}
+
+.legal__section + .legal__section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--sf-border);
+}
+
+.legal__h {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.legal__p {
+  margin: 0;
+  color: var(--sf-muted);
+  font-size: 0.95rem;
+}
+
+.legal__p strong {
+  color: var(--sf-text);
+}
+
+.page__back {
+  margin: 2rem 0 0;
+  font-size: 0.95rem;
+}

@@ -1,0 +1,10 @@
+node_modules
+dist
+.angular
+.git
+.vscode
+.idea
+**/.DS_Store
+**/Thumbs.db
+npm-debug.log
+coverage

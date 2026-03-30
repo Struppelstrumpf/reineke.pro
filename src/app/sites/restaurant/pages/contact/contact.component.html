@@ -1,0 +1,125 @@
+<div class="page rt-container">
+  <header class="page__intro">
+    <h1 class="page__h">Reservations &amp; inquiries</h1>
+    <p class="page__deck">
+      Send party size, preferred date, and any dietary notes. This demo form validates in the browser only
+      — no data is stored or emailed.
+    </p>
+  </header>
+
+  <div class="page__split">
+    @if (submitted()) {
+      <div class="card card--ok" role="status">
+        <h2 class="card__h">We’ve got your note (demo)</h2>
+        <p class="card__p">
+          A live site would confirm by email or SMS. Feel free to submit another test message.
+        </p>
+        <button type="button" class="btn btn--ghost" (click)="submitted.set(false)">New request</button>
+      </div>
+    } @else {
+      <form class="card form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="form__group">
+          <label class="form__label" for="r-name">Name</label>
+          <input
+            id="r-name"
+            class="form__input"
+            type="text"
+            formControlName="name"
+            autocomplete="name"
+            [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
+          />
+          @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+            <span class="form__hint form__hint--err">Please add your name.</span>
+          }
+          @if (form.controls.name.touched && form.controls.name.hasError('minlength')) {
+            <span class="form__hint form__hint--err">At least 2 characters.</span>
+          }
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="r-email">Email</label>
+          <input
+            id="r-email"
+            class="form__input"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
+          />
+          @if (form.controls.email.touched && form.controls.email.hasError('required')) {
+            <span class="form__hint form__hint--err">Email required.</span>
+          }
+          @if (form.controls.email.touched && form.controls.email.hasError('email')) {
+            <span class="form__hint form__hint--err">Check the format.</span>
+          }
+        </div>
+
+        <div class="form__row">
+          <div class="form__group form__group--half">
+            <label class="form__label" for="r-guests">Guests</label>
+            <select id="r-guests" class="form__input form__select" formControlName="guests">
+              @for (n of ['1', '2', '3', '4', '5', '6', '7', '8', '9+']; track n) {
+                <option [value]="n">{{ n }}</option>
+              }
+            </select>
+          </div>
+          <div class="form__group form__group--half">
+            <label class="form__label" for="r-date">Preferred date</label>
+            <input
+              id="r-date"
+              class="form__input"
+              type="date"
+              formControlName="date"
+              [attr.aria-invalid]="form.controls.date.invalid && form.controls.date.touched"
+            />
+          </div>
+        </div>
+        @if (form.controls.date.touched && form.controls.date.hasError('required')) {
+          <span class="form__hint form__hint--err">Pick a date.</span>
+        }
+
+        <div class="form__group">
+          <label class="form__label" for="r-msg">Message</label>
+          <textarea
+            id="r-msg"
+            class="form__input form__textarea"
+            rows="5"
+            formControlName="message"
+            [attr.aria-invalid]="form.controls.message.invalid && form.controls.message.touched"
+          ></textarea>
+          @if (form.controls.message.touched && form.controls.message.hasError('required')) {
+            <span class="form__hint form__hint--err">Tell us occasion &amp; time window.</span>
+          }
+          @if (form.controls.message.touched && form.controls.message.hasError('minlength')) {
+            <span class="form__hint form__hint--err">A bit more detail helps (15+ characters).</span>
+          }
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="r-allergy">Allergies / no-alcohol (optional)</label>
+          <input id="r-allergy" class="form__input" type="text" formControlName="allergies" />
+        </div>
+
+        <button type="submit" class="btn btn--primary">Send request</button>
+      </form>
+    }
+
+    <aside class="card aside" aria-label="Restaurant info">
+      <h2 class="aside__h">Find us</h2>
+      <p class="aside__p">
+        Lindenstraße 8<br />
+        10969 Berlin<br />
+        Germany
+      </p>
+      <h2 class="aside__h">Hours</h2>
+      <p class="aside__p">
+        Tue–Thu · 18:00–23:00<br />
+        Fri–Sat · 18:00–00:00<br />
+        Closed Sun–Mon
+      </p>
+      <h2 class="aside__h">Phone</h2>
+      <p class="aside__p"><a href="tel:+493000000000">+49 30 0000 0000</a></p>
+      <p class="aside__fine"><a routerLink="../imprint">Imprint</a></p>
+    </aside>
+  </div>
+</div>

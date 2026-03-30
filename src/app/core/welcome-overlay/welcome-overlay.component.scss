@@ -1,0 +1,423 @@
+:host {
+  display: contents;
+}
+
+.pv-welcome {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 150;
+  left: calc(var(--pv-fiverr-panel-w) + var(--pv-fiverr-handle-w));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  box-sizing: border-box;
+  background: color-mix(in srgb, var(--sf-bg) 42%, transparent);
+  backdrop-filter: blur(10px) saturate(0.92);
+  -webkit-backdrop-filter: blur(10px) saturate(0.92);
+  animation: pv-welcome-backdrop-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+:host-context(.app-root:has(.fiverr.fiverr--collapsed)) .pv-welcome {
+  left: var(--pv-fiverr-handle-w);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pv-welcome {
+    animation: none;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .pv-welcome__panel {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .pv-welcome__btn--primary:hover .pv-welcome__btn-arrow {
+    transform: translateY(0.02em);
+  }
+}
+
+@keyframes pv-welcome-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.pv-welcome__panel {
+  width: min(26rem, 100%);
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  border-radius: var(--sf-radius);
+  border: 1px solid var(--sf-border);
+  background: color-mix(in srgb, var(--sf-surface-solid) 92%, transparent);
+  box-shadow: var(--sf-shadow);
+  color: var(--sf-text);
+  font-family: var(--sf-font-sans);
+  animation: pv-welcome-panel-in 0.48s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both;
+}
+
+@keyframes pv-welcome-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.55rem) scale(0.988);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.pv-welcome__title {
+  margin: 0 0 0.65rem;
+  font-family: var(--sf-font-display);
+  font-size: clamp(1.35rem, 1.1rem + 1.2vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  background: linear-gradient(110deg, var(--sf-accent), var(--sf-warm));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pv-welcome__copy {
+  margin: 0 0 1rem;
+}
+
+.pv-welcome__lead {
+  margin: 0 0 0.45rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--sf-muted);
+}
+
+.pv-welcome__lead:last-of-type {
+  margin-bottom: 0.55rem;
+}
+
+.pv-welcome__lead--emph {
+  margin: 0.35rem 0 0.45rem;
+  font-weight: 600;
+  color: var(--sf-text);
+  letter-spacing: -0.01em;
+}
+
+.pv-welcome__trust {
+  margin: 0.55rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--sf-muted) 85%, var(--sf-accent));
+  font-weight: 500;
+}
+
+.pv-welcome__trigger {
+  margin: 0.5rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--sf-text);
+  letter-spacing: -0.015em;
+}
+
+.pv-welcome__pricing-label {
+  margin: 0 0 0.4rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sf-accent);
+}
+
+.pv-welcome__pricing {
+  list-style: none;
+  margin: 0 0 0.65rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.pv-welcome__ticks {
+  list-style: none;
+  margin: 0 0 1.55rem;
+  padding: 0 0 0.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  font-size: 0.74rem;
+  line-height: 1.38;
+  color: var(--sf-muted);
+  font-family: var(--sf-font-sans);
+}
+
+.pv-welcome__ticks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.pv-welcome__tick {
+  flex-shrink: 0;
+  color: var(--sf-accent);
+  font-size: 0.65rem;
+  line-height: 1.42;
+  margin-top: 0.05rem;
+}
+
+.pv-welcome__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--sf-radius-sm);
+  border: 1px solid var(--sf-border);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--sf-text);
+}
+
+.pv-welcome__row--popular {
+  padding: 0.52rem 0.65rem;
+  border-color: color-mix(in srgb, var(--sf-accent) 42%, var(--sf-border));
+  background: color-mix(in srgb, var(--sf-accent) 9%, rgba(255, 255, 255, 0.03));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sf-accent) 18%, transparent);
+}
+
+.pv-welcome__row--premium {
+  padding: 0.52rem 0.65rem;
+  border-color: color-mix(in srgb, var(--sf-warm) 55%, var(--sf-border));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--sf-warm) 10%, transparent),
+    rgba(255, 255, 255, 0.02)
+  );
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sf-warm) 22%, transparent);
+}
+
+.pv-welcome__tier {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.22rem;
+  min-width: 0;
+}
+
+.pv-welcome__tier-name {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.pv-welcome__tier-note {
+  margin: 0.05rem 0 0;
+  font-size: 0.62rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--sf-muted) 70%, var(--sf-accent));
+  letter-spacing: 0.01em;
+  max-width: 12.5rem;
+}
+
+.pv-welcome__row--popular,
+.pv-welcome__row--premium {
+  align-items: flex-start;
+}
+
+.pv-welcome__row--popular .pv-welcome__eur,
+.pv-welcome__row--premium .pv-welcome__eur {
+  align-self: center;
+}
+
+.pv-welcome__badge {
+  display: inline-block;
+  padding: 0.12rem 0.38rem;
+  border-radius: 999px;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.pv-welcome__badge--popular {
+  color: var(--sf-bg);
+  background: linear-gradient(100deg, var(--sf-accent), color-mix(in srgb, var(--sf-accent) 70%, #5ff5ea));
+}
+
+.pv-welcome__badge--premium {
+  text-transform: none;
+  letter-spacing: 0.03em;
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--sf-bg) 25%, #1a1208);
+  background: linear-gradient(100deg, var(--sf-warm), color-mix(in srgb, var(--sf-warm) 75%, #fcd34d));
+}
+
+.pv-welcome__eur {
+  font-weight: 700;
+  color: var(--sf-accent);
+  white-space: nowrap;
+}
+
+.pv-welcome__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.pv-welcome__btn {
+  flex: 1 1 calc(50% - 0.25rem);
+  min-width: 8.5rem;
+  min-height: 2.65rem;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  font-family: var(--sf-font-sans);
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition:
+    filter 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.28s ease;
+}
+
+/* Secondary: outlined, darker — keeps focus on Order on Fiverr */
+.pv-welcome__btn--ghost {
+  border: 1px solid color-mix(in srgb, var(--sf-border) 70%, rgba(0, 0, 0, 0.45));
+  background: color-mix(in srgb, var(--sf-surface-solid) 70%, transparent);
+  color: color-mix(in srgb, var(--sf-text) 72%, var(--sf-muted));
+  box-shadow: none;
+}
+
+.pv-welcome__btn--ghost:hover {
+  border-color: color-mix(in srgb, var(--sf-border) 55%, var(--sf-accent));
+  background: color-mix(in srgb, var(--sf-surface-solid) 55%, transparent);
+  color: var(--sf-text);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.pv-welcome__btn-arrow {
+  font-size: 1.05em;
+  font-weight: 800;
+  line-height: 1;
+  transform: translateY(0.02em);
+  transition: transform 0.22s ease;
+}
+
+.pv-welcome__btn--primary:hover .pv-welcome__btn-arrow {
+  transform: translate(0.12em, 0.02em);
+}
+
+/* Same CTA look as .fiverr__sidebar “Get your Website!” (theme accent + gold mix) */
+.pv-welcome__btn--primary {
+  gap: 0.42rem;
+  border: none;
+  letter-spacing: 0.02em;
+  color: #071016;
+  background: linear-gradient(
+    115deg,
+    var(--sf-accent),
+    color-mix(in srgb, var(--sf-accent) 55%, #fff) 42%,
+    color-mix(in srgb, var(--sf-accent) 25%, #fcd34d)
+  );
+  box-shadow:
+    0 6px 24px color-mix(in srgb, var(--sf-accent) 32%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--sf-accent) 25%, transparent),
+    0 0 40px color-mix(in srgb, var(--sf-accent) 35%, transparent),
+    0 0 72px color-mix(in srgb, var(--sf-accent) 18%, transparent);
+}
+
+.pv-welcome__btn--primary:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  color: #071016;
+  box-shadow:
+    0 8px 28px color-mix(in srgb, var(--sf-accent) 38%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--sf-accent) 30%, transparent),
+    0 0 48px color-mix(in srgb, var(--sf-accent) 42%, transparent),
+    0 0 88px color-mix(in srgb, var(--sf-accent) 22%, transparent);
+}
+
+.pv-welcome__btn:focus-visible {
+  outline: 2px solid var(--sf-accent);
+  outline-offset: 3px;
+}
+
+.pv-welcome__notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--sf-radius-sm);
+  border: 1px solid var(--sf-border);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.pv-welcome__notice-icon {
+  flex-shrink: 0;
+  width: 1.2rem;
+  height: 1.2rem;
+  color: var(--sf-accent);
+  margin-top: 0.05rem;
+}
+
+.pv-welcome__notice-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pv-welcome__notice-text {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--sf-muted);
+}
+
+.pv-welcome__hint {
+  margin: 0.65rem 0 0;
+  font-size: 0.72rem;
+  text-align: center;
+  color: color-mix(in srgb, var(--sf-muted) 92%, var(--sf-accent));
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 520px) {
+  .pv-welcome {
+    padding: 0.85rem;
+  }
+
+  .pv-welcome__lead {
+    font-size: 0.86rem;
+  }
+
+  .pv-welcome__trust {
+    font-size: 0.8rem;
+  }
+
+  .pv-welcome__btn {
+    flex: 1 1 100%;
+    min-width: unset;
+  }
+}

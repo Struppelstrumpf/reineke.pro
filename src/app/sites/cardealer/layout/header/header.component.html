@@ -1,0 +1,52 @@
+<header class="header" [class.header--open]="menuOpen()">
+  <div class="header__inner cd-container">
+    <a [routerLink]="base" class="header__logo" (click)="closeMenu()">
+      <span class="header__icon" aria-hidden="true"></span>
+      <span class="header__name">Cardealer</span>
+    </a>
+
+    <button
+      type="button"
+      class="header__toggle"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="cd-primary-nav"
+      (click)="toggleMenu()"
+    >
+      <span class="header__toggle-line" aria-hidden="true"></span>
+      <span class="header__toggle-line" aria-hidden="true"></span>
+      <span class="header__toggle-line" aria-hidden="true"></span>
+      <span class="visually-hidden">{{ menuOpen() ? 'Close menu' : 'Open menu' }}</span>
+    </button>
+
+    <nav id="cd-primary-nav" class="nav" aria-label="Primary">
+      <ul class="nav__list">
+        <li>
+          <a
+            [routerLink]="base"
+            routerLinkActive="nav__link--active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="nav__link"
+            (click)="closeMenu()"
+            >Home</a
+          >
+        </li>
+        <li>
+          <button type="button" class="nav__link nav__link--btn" (click)="goSection('stock')">Stock</button>
+        </li>
+        <li>
+          <button type="button" class="nav__link nav__link--btn" (click)="goSection('services')">Services</button>
+        </li>
+        <li>
+          <a [routerLink]="[base, 'contact']" routerLinkActive="nav__link--active" class="nav__link" (click)="closeMenu()"
+            >Contact</a
+          >
+        </li>
+        <li>
+          <a [routerLink]="[base, 'imprint']" routerLinkActive="nav__link--active" class="nav__link nav__link--fine" (click)="closeMenu()"
+            >Imprint</a
+          >
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

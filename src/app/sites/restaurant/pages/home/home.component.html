@@ -1,0 +1,103 @@
+<section class="hero rt-container" aria-labelledby="hero-heading">
+  <div class="hero__wrap">
+    <div class="hero__words">
+      <p class="hero__kicker">Tuesday – Saturday · dinner from 18:00</p>
+      <h1 id="hero-heading" class="hero__h1">Fire, patience, and a table for two (or twelve)</h1>
+      <p class="hero__deck">
+        Seasonal plates from nearby farms, a concise wine list, and a kitchen that lets ingredients do the
+        talking — loudly enough to hear over the room.
+      </p>
+      <div class="hero__cta">
+        <a routerLink="contact" class="btn btn--primary">Reserve a table</a>
+        <button type="button" class="btn btn--ghost" (click)="toMenu()">See tonight’s picks</button>
+      </div>
+    </div>
+    <figure class="hero__fig">
+      <picture>
+        <source
+          type="image/jpeg"
+          srcset="
+            https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=640&q=75 640w,
+            https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=960&q=75 960w,
+            https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1280&q=75 1280w,
+            https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=75 1600w
+          "
+          sizes="(max-width: 768px) 100vw, min(520px, 45vw)"
+        />
+        <img
+          class="hero__photo"
+          src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1280&q=80"
+          width="1280"
+          height="853"
+          alt="Warmly lit restaurant interior with guests dining"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </picture>
+      <figcaption class="hero__cap">Our main room — walk-ins welcome after 21:00 when the pass quiets down.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="menu" class="section menu rt-container" aria-labelledby="menu-heading">
+  <div class="section__top">
+    <div class="section__deco" aria-hidden="true"></div>
+    <div>
+      <h2 id="menu-heading" class="section__h">From the pass</h2>
+      <p class="section__lead">
+        A rotating snapshot — allergies and swaps kindly handled if you flag them when you book.
+      </p>
+    </div>
+  </div>
+  <ul class="menu__grid">
+    @for (d of plates; track d.name) {
+      <li class="dish">
+        <div class="dish__pic">
+          <img
+            [src]="d.img"
+            [width]="d.w"
+            [height]="d.h"
+            [alt]="d.name + ' dish photograph'"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="dish__info">
+          <h3 class="dish__name">{{ d.name }}</h3>
+          <p class="dish__line">{{ d.line }}</p>
+          <p class="dish__price">{{ d.price }}</p>
+        </div>
+      </li>
+    }
+  </ul>
+</section>
+
+<section id="visit" class="section visit" aria-labelledby="visit-heading">
+  <div class="rt-container">
+    <h2 id="visit-heading" class="section__h section__h--center">Before you arrive</h2>
+    <p class="section__lead section__lead--center">
+      We keep the experience unfussy — here is what to expect in the room.
+    </p>
+    <ul class="visit__grid">
+      @for (v of visit; track v.title) {
+        <li class="visit__card">
+          <h3 class="visit__h">{{ v.title }}</h3>
+          <p class="visit__p">{{ v.copy }}</p>
+        </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<section class="section book rt-container" aria-labelledby="book-heading">
+  <div class="book__panel">
+    <div class="book__copy">
+      <h2 id="book-heading" class="book__h">Celebrating something?</h2>
+      <p class="book__p">
+        Private corner for six, cake service, or a paired set menu — note it in your message and we’ll echo
+        back options and deposit terms.
+      </p>
+    </div>
+    <a routerLink="contact" class="btn btn--accent">Plan an evening</a>
+  </div>
+</section>

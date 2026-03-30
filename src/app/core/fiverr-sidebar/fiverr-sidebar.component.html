@@ -1,0 +1,114 @@
+<aside
+  class="fiverr"
+  [class.fiverr--collapsed]="!open()"
+  [class.fiverr--sportflow]="currentSite().id === 'sportflow'"
+  [class.fiverr--cardealer]="currentSite().id === 'cardealer'"
+  [class.fiverr--restaurant]="currentSite().id === 'restaurant'"
+  aria-label="Reineke Fuchs studio preview"
+>
+  @if (open()) {
+    <div id="fiverr-panel-pv" class="fiverr__panel">
+      <div class="fiverr__panel-body">
+      <div class="fiverr__brand">
+        <div class="fiverr__logo" aria-hidden="true">
+          <img
+            class="fiverr__logo-img"
+            src="/reineke-fox-icon.svg"
+            width="48"
+            height="48"
+            alt=""
+            decoding="async"
+          />
+        </div>
+        <div class="fiverr__brand-copy">
+          <span class="fiverr__brand-name">Reineke Fuchs</span>
+          <span class="fiverr__brand-line"></span>
+          <span class="fiverr__brand-sub">Webdesign Studio</span>
+        </div>
+      </div>
+
+      <p class="fiverr__studio-role">{{ studio.role }}</p>
+
+      <div class="fiverr__current" aria-current="page">
+        <span class="fiverr__current-label">You are viewing</span>
+        <span class="fiverr__current-name">{{ currentSite().label }}</span>
+        <span class="fiverr__current-hint">{{ currentSite().hint }}</span>
+      </div>
+
+      <p class="fiverr__nav-label">More previews</p>
+      <ul class="fiverr__nav">
+        @for (site of otherSites(); track site.id) {
+          <li>
+            <a class="fiverr__link" [routerLink]="site.href">
+              <span class="fiverr__link-title">{{ site.label }}</span>
+              <span class="fiverr__link-hint">{{ site.hint }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+
+      <div class="fiverr__divider" role="presentation"></div>
+
+      <p class="fiverr__badge">Preise</p>
+      <ul class="fiverr__pricing" aria-label="Paketpreise">
+        <li class="fiverr__pricing-row">
+          <span class="fiverr__pricing-name">Basic</span>
+          <span class="fiverr__pricing-amount">Starting at €95</span>
+        </li>
+        <li class="fiverr__pricing-row">
+          <span class="fiverr__pricing-name">Standard</span>
+          <span class="fiverr__pricing-amount">€195</span>
+        </li>
+        <li class="fiverr__pricing-row">
+          <span class="fiverr__pricing-name">Premium</span>
+          <span class="fiverr__pricing-amount">€295</span>
+        </li>
+      </ul>
+      <ul class="fiverr__list fiverr__list--compact">
+        <li><span class="fiverr__tick" aria-hidden="true">✔</span> Fast delivery (24–48h)</li>
+        <li><span class="fiverr__tick" aria-hidden="true">✔</span> Custom design (no templates)</li>
+        <li><span class="fiverr__tick" aria-hidden="true">✔</span> Mobile optimized</li>
+        <li><span class="fiverr__tick" aria-hidden="true">✔</span> SEO ready</li>
+        <li><span class="fiverr__tick" aria-hidden="true">✔</span> English &amp; German</li>
+        <li><span class="fiverr__tick" aria-hidden="true">✔</span> Clean, modern UI</li>
+      </ul>
+      </div>
+      <div class="fiverr__panel-foot">
+        <p class="fiverr__note">Commission a similar build on Fiverr.</p>
+        <a
+          class="fiverr__cta"
+          [href]="studio.fiverrUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Get your Website!
+        </a>
+      </div>
+    </div>
+  }
+
+  <button
+    type="button"
+    class="fiverr__handle"
+    (click)="toggle()"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="'fiverr-panel-pv'"
+    title="{{ open() ? 'Hide panel' : 'Show studio panel' }}"
+  >
+    <span class="fiverr__handle-inner">
+      <span class="fiverr__handle-fox" aria-hidden="true">
+        <img
+          class="fiverr__handle-fox-img"
+          src="/reineke-fox-icon.svg"
+          width="24"
+          height="24"
+          alt=""
+          decoding="async"
+        />
+      </span>
+      <span class="fiverr__handle-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">{{ open() ? 'Collapse panel' : 'Expand panel' }}</span>
+      <span class="fiverr__handle-label" aria-hidden="true">Studio</span>
+    </span>
+  </button>
+</aside>

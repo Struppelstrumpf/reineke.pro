@@ -1,0 +1,56 @@
+<header class="header" [class.header--open]="menuOpen()">
+  <div class="header__inner sf-container">
+    <a [routerLink]="base" class="header__logo" (click)="closeMenu()">
+      <span class="header__mark" aria-hidden="true"></span>
+      <span class="header__wordmark">SportFlow</span>
+    </a>
+
+    <button
+      type="button"
+      class="header__toggle"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="primary-nav"
+      (click)="toggleMenu()"
+    >
+      <span class="header__toggle-bar" aria-hidden="true"></span>
+      <span class="header__toggle-bar" aria-hidden="true"></span>
+      <span class="header__toggle-bar" aria-hidden="true"></span>
+      <span class="visually-hidden">{{ menuOpen() ? 'Close menu' : 'Open menu' }}</span>
+    </button>
+
+    <nav id="primary-nav" class="nav" aria-label="Primary">
+      <ul class="nav__list">
+        <li>
+          <a
+            [routerLink]="base"
+            routerLinkActive="nav__link--active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="nav__link"
+            (click)="closeMenu()"
+            >Home</a
+          >
+        </li>
+        <li>
+          <button type="button" class="nav__link nav__link--btn" (click)="goSection('products')">
+            Bottles
+          </button>
+        </li>
+        <li>
+          <button type="button" class="nav__link nav__link--btn" (click)="goSection('features')">
+            Why SportFlow
+          </button>
+        </li>
+        <li>
+          <a [routerLink]="[base, 'contact']" routerLinkActive="nav__link--active" class="nav__link" (click)="closeMenu()"
+            >Contact</a
+          >
+        </li>
+        <li>
+          <a [routerLink]="[base, 'imprint']" routerLinkActive="nav__link--active" class="nav__link nav__link--muted" (click)="closeMenu()"
+            >Imprint</a
+          >
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

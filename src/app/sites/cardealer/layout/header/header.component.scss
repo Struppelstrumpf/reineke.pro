@@ -1,0 +1,194 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  min-height: var(--cd-header-h);
+  border-bottom: 1px solid var(--cd-border);
+  background: color-mix(in srgb, var(--cd-bg) 82%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.header__inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  min-height: var(--cd-header-h);
+  padding-block: 0.55rem;
+}
+
+.header__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--cd-text);
+  text-decoration: none;
+  font-weight: 700;
+  font-family: var(--cd-display);
+  font-size: clamp(1.05rem, 1rem + 0.3vw, 1.25rem);
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+.header__logo:hover {
+  color: var(--cd-text);
+  text-decoration: none;
+}
+
+.header__icon {
+  width: 2.25rem;
+  height: 1.35rem;
+  border-left: 3px solid var(--cd-accent);
+  border-bottom: 3px solid var(--cd-gold);
+  background: linear-gradient(135deg, transparent 45%, var(--cd-accent-glow));
+}
+
+.header__toggle {
+  display: none;
+  grid-column: 3;
+  justify-self: end;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--cd-border);
+  border-radius: var(--cd-radius-sm);
+  background: var(--cd-surface);
+  cursor: pointer;
+  z-index: 2;
+}
+
+.header__toggle-line {
+  display: block;
+  width: 1.15rem;
+  height: 2px;
+  background: var(--cd-text);
+  margin: 2px 0;
+  transition:
+    transform var(--cd-ease),
+    opacity var(--cd-ease);
+}
+
+.header--open .header__toggle-line:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.header--open .header__toggle-line:nth-child(2) {
+  opacity: 0;
+}
+
+.header--open .header__toggle-line:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.nav {
+  grid-column: 2;
+  justify-self: end;
+}
+
+.nav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(0.15rem, 1vw, 0.25rem) clamp(0.35rem, 1.8vw, 1rem);
+}
+
+.nav__link {
+  display: inline-block;
+  padding: 0.5rem 0.6rem;
+  color: var(--cd-muted);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: clamp(0.8125rem, 0.78rem + 0.15vw, 0.9375rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-bottom: 2px solid transparent;
+  transition: color var(--cd-ease), border-color var(--cd-ease);
+}
+
+.nav__link:hover {
+  color: var(--cd-text);
+  text-decoration: none;
+  border-bottom-color: rgba(251, 146, 60, 0.4);
+}
+
+.nav__link--active {
+  color: var(--cd-text);
+  border-bottom-color: var(--cd-accent);
+}
+
+.nav__link--fine {
+  opacity: 0.88;
+}
+
+.nav__link--btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  text-align: inherit;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .header__inner {
+    grid-template-columns: 1fr auto;
+  }
+
+  .header__toggle {
+    display: flex;
+  }
+
+  .nav {
+    position: fixed;
+    inset: 0;
+    top: var(--cd-header-h);
+    grid-column: unset;
+    justify-self: stretch;
+    padding: var(--cd-space);
+    background: color-mix(in srgb, var(--cd-bg) 97%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--cd-border);
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      transform var(--cd-ease),
+      opacity var(--cd-ease),
+      visibility var(--cd-ease);
+    pointer-events: none;
+  }
+
+  .header--open .nav {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .nav__list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.2rem;
+  }
+
+  .nav__link {
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--cd-border);
+  }
+
+  .nav__link:hover,
+  .nav__link--active {
+    border-bottom-color: var(--cd-accent);
+    background: rgba(251, 146, 60, 0.06);
+  }
+}

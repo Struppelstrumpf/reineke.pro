@@ -1,0 +1,13 @@
+<footer class="footer">
+  <div class="rt-container footer__grid">
+    <div class="footer__about">
+      <span class="footer__name">Ember &amp; Oak</span>
+      <p class="footer__blurb">Short menu, long tables, and wine chosen to match the wood oven — not the spreadsheet.</p>
+    </div>
+    <nav class="footer__links" aria-label="Footer">
+      <a [routerLink]="[base, 'contact']" class="footer__a">Reservations</a>
+      <a [routerLink]="[base, 'imprint']" class="footer__a">Imprint</a>
+    </nav>
+    <p class="footer__legal">© {{ year }} Ember &amp; Oak · Demo site</p>
+  </div>
+</footer>

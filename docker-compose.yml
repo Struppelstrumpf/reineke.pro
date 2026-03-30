@@ -1,0 +1,11 @@
+# Local or server: docker compose up -d
+# Image from GHCR after CI (replace tag if needed):
+#   image: ghcr.io/struppelstrumpf/reineke.pro:latest
+
+services:
+  web:
+    build: .
+    image: ghcr.io/struppelstrumpf/reineke.pro:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped

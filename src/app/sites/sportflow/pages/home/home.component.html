@@ -1,0 +1,120 @@
+<section class="hero sf-container" aria-labelledby="hero-heading">
+  <div class="hero__grid">
+    <div class="hero__copy">
+      <p class="hero__eyebrow">Small-batch sports bottles</p>
+      <h1 id="hero-heading" class="hero__title">
+        Hydration that keeps up with <span class="hero__accent">your pace</span>
+      </h1>
+      <p class="hero__lead">
+        Insulated bottles for training floors, trails, and your daily commute — engineered for grip,
+        pour, and zero leaks.
+      </p>
+      <div class="hero__actions">
+        <button type="button" class="btn btn--primary" (click)="toProducts()">View bottles</button>
+        <a routerLink="contact" class="btn btn--ghost">Wholesale inquiry</a>
+      </div>
+      <dl class="hero__stats">
+        <div>
+          <dt class="visually-hidden">Cold retention</dt>
+          <dd><span class="hero__stat">24h</span> cold</dd>
+        </div>
+        <div>
+          <dt class="visually-hidden">Hot retention</dt>
+          <dd><span class="hero__stat">12h</span> hot</dd>
+        </div>
+        <div>
+          <dt class="visually-hidden">Warranty</dt>
+          <dd><span class="hero__stat">5yr</span> lid</dd>
+        </div>
+      </dl>
+    </div>
+    <div class="hero__media">
+      <div class="hero__frame" aria-hidden="true"></div>
+      <picture class="hero__picture">
+        <source
+          srcset="
+            https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=640&q=75 640w,
+            https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=960&q=75 960w,
+            https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1280&q=75 1280w,
+            https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1600&q=75 1600w
+          "
+          sizes="(max-width: 768px) 100vw, 52vw"
+        />
+        <img
+          class="hero__img"
+          src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1280&q=80"
+          width="1280"
+          height="853"
+          alt="Athlete training with focus in a gym setting"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </picture>
+    </div>
+  </div>
+</section>
+
+<section id="products" class="section products sf-container" aria-labelledby="products-heading">
+  <div class="section__head">
+    <h2 id="products-heading" class="section__title">Bottles in rotation</h2>
+    <p class="section__sub">Three silhouettes — same obsession with finish, seal, and balance.</p>
+  </div>
+  <ul class="products__grid">
+    @for (p of products; track p.name) {
+      <li class="product-card">
+        <div class="product-card__media">
+          <img
+            [src]="p.img"
+            [width]="p.width"
+            [height]="p.height"
+            [alt]="p.name + ' sports bottle product photo'"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="product-card__body">
+          <span class="product-card__tag">{{ p.tag }}</span>
+          <h3 class="product-card__name">{{ p.name }}</h3>
+          <p class="product-card__desc">{{ p.desc }}</p>
+          <div class="product-card__row">
+            <span class="product-card__price">{{ p.price }}</span>
+            <span class="product-card__hint">Volume pricing on request</span>
+          </div>
+        </div>
+      </li>
+    }
+  </ul>
+</section>
+
+<section id="features" class="section features" aria-labelledby="features-heading">
+  <div class="sf-container">
+    <div class="section__head">
+      <h2 id="features-heading" class="section__title">Why teams pick SportFlow</h2>
+      <p class="section__sub">
+        Details you feel on mile twelve — not marketing noise.
+      </p>
+    </div>
+    <ul class="features__grid">
+      @for (f of features; track f.title) {
+        <li class="feature">
+          <span class="feature__icon" aria-hidden="true"></span>
+          <h3 class="feature__title">{{ f.title }}</h3>
+          <p class="feature__text">{{ f.text }}</p>
+        </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<section class="section cta sf-container" aria-labelledby="cta-heading">
+  <div class="cta__panel">
+    <div class="cta__copy">
+      <h2 id="cta-heading" class="cta__title">Stock for your studio or team?</h2>
+      <p class="cta__text">
+        We ship palettes within the EU with co-branded laser options. Tell us quantity and timeline —
+        we reply within one business day.
+      </p>
+    </div>
+    <a routerLink="contact" class="btn btn--light">Start a brief</a>
+  </div>
+</section>

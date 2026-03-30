@@ -1,0 +1,98 @@
+<div class="page cd-container">
+  <header class="page__hero">
+    <h1 class="page__title">Contact</h1>
+    <p class="page__lead">
+      Test drives, part-exchange numbers, or finance questions — use the form below. This demo does not
+      POST to a server; it validates locally for portfolio use.
+    </p>
+  </header>
+
+  <div class="page__grid">
+    @if (submitted()) {
+      <div class="panel panel--ok" role="status">
+        <h2 class="panel__h">Request logged (demo)</h2>
+        <p class="panel__p">
+          In production this would reach your CRM or inbox. You can ship another message if needed.
+        </p>
+        <button type="button" class="btn btn--ghost" (click)="submitted.set(false)">New message</button>
+      </div>
+    } @else {
+      <form class="panel form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="form__field">
+          <label class="form__label" for="q-name">Full name</label>
+          <input
+            id="q-name"
+            class="form__control"
+            type="text"
+            formControlName="name"
+            autocomplete="name"
+            [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
+          />
+          @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+            <span class="form__err">Name is required.</span>
+          }
+          @if (form.controls.name.touched && form.controls.name.hasError('minlength')) {
+            <span class="form__err">Please enter at least 2 characters.</span>
+          }
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="q-email">Email</label>
+          <input
+            id="q-email"
+            class="form__control"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
+          />
+          @if (form.controls.email.touched && form.controls.email.hasError('required')) {
+            <span class="form__err">Email is required.</span>
+          }
+          @if (form.controls.email.touched && form.controls.email.hasError('email')) {
+            <span class="form__err">Enter a valid email.</span>
+          }
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="q-interest">I am interested in</label>
+          <select id="q-interest" class="form__control form__select" formControlName="interest">
+            <option value="stock">A vehicle in stock</option>
+            <option value="px">Part-exchange valuation</option>
+            <option value="finance">Finance options</option>
+            <option value="other">Something else</option>
+          </select>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="q-msg">Message</label>
+          <textarea
+            id="q-msg"
+            class="form__control form__area"
+            rows="6"
+            formControlName="message"
+            [attr.aria-invalid]="form.controls.message.invalid && form.controls.message.touched"
+          ></textarea>
+          @if (form.controls.message.touched && form.controls.message.hasError('required')) {
+            <span class="form__err">Please add a short message.</span>
+          }
+          @if (form.controls.message.touched && form.controls.message.hasError('minlength')) {
+            <span class="form__err">At least 20 characters help us respond.</span>
+          }
+        </div>
+
+        <button type="submit" class="btn btn--primary">Send</button>
+      </form>
+    }
+
+    <aside class="panel aside" aria-label="Dealership">
+      <h2 class="aside__h">Sales desk</h2>
+      <p class="aside__p">Mon–Sat · 09:00–18:00 · Sunday by appointment</p>
+      <h2 class="aside__h">Phone</h2>
+      <p class="aside__p"><a href="tel:+493000000000">+49 30 0000 0000</a></p>
+      <h2 class="aside__h">Email</h2>
+      <p class="aside__p"><a href="mailto:sales@cardealer.example">sales&#64;cardealer.example</a></p>
+      <p class="aside__fine"><a routerLink="../imprint">Legal / Imprint</a></p>
+    </aside>
+  </div>
+</div>

@@ -1,0 +1,113 @@
+<section class="hero cd-container" aria-labelledby="hero-heading">
+  <div class="hero__layout">
+    <div class="hero__content">
+      <p class="hero__label">Showroom · Approved used</p>
+      <h1 id="hero-heading" class="hero__title">
+        Drive away with <span class="hero__hl">confidence</span>
+      </h1>
+      <p class="hero__lead">
+        Hand-picked stock, transparent paperwork, and finance options explained in plain English — not fine
+        print buried on page nine.
+      </p>
+      <div class="hero__actions">
+        <button type="button" class="btn btn--primary" (click)="toStock()">Browse stock</button>
+        <a routerLink="contact" class="btn btn--ghost">Book a test drive</a>
+      </div>
+      <ul class="hero__badges" aria-label="Quick facts">
+        <li class="hero__badge">48h reserve</li>
+        <li class="hero__badge">Warranty ready</li>
+        <li class="hero__badge">Part-exchange</li>
+      </ul>
+    </div>
+    <div class="hero__visual">
+      <div class="hero__cut" aria-hidden="true"></div>
+      <picture class="hero__picture">
+        <source
+          srcset="
+            https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=640&q=75 640w,
+            https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=960&q=75 960w,
+            https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1280&q=75 1280w,
+            https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=75 1600w
+          "
+          sizes="(max-width: 768px) 100vw, 48vw"
+        />
+        <img
+          class="hero__img"
+          src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1280&q=80"
+          width="1280"
+          height="853"
+          alt="Premium vehicle in a modern dealership lighting setup"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </picture>
+    </div>
+  </div>
+</section>
+
+<section id="stock" class="section stock cd-container" aria-labelledby="stock-heading">
+  <header class="section__intro">
+    <h2 id="stock-heading" class="section__title">This week on the floor</h2>
+    <p class="section__text">
+      A snapshot of current listings — mileage and equipment verified. Full history on request before you
+      travel.
+    </p>
+  </header>
+  <ul class="stock__grid">
+    @for (v of vehicles; track v.name) {
+      <li class="vehicle">
+        <div class="vehicle__media">
+          <img
+            [src]="v.img"
+            [width]="v.w"
+            [height]="v.h"
+            [alt]="v.name + ' vehicle photograph'"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="vehicle__body">
+          <p class="vehicle__meta">{{ v.meta }}</p>
+          <h3 class="vehicle__name">{{ v.name }}</h3>
+          <p class="vehicle__note">{{ v.note }}</p>
+          <div class="vehicle__row">
+            <span class="vehicle__price">{{ v.price }}</span>
+            <a routerLink="contact" class="vehicle__cta">Enquire</a>
+          </div>
+        </div>
+      </li>
+    }
+  </ul>
+</section>
+
+<section id="services" class="section services" aria-labelledby="services-heading">
+  <div class="cd-container">
+    <header class="section__intro">
+      <h2 id="services-heading" class="section__title">How we sell cars</h2>
+      <p class="section__text">
+        No pressure lounge scripts — just specs, costs, and timelines so you can decide quietly.
+      </p>
+    </header>
+    <ol class="services__list">
+      @for (s of services; track s.title; let i = $index) {
+        <li class="service">
+          <span class="service__index" aria-hidden="true">{{ i + 1 }}</span>
+          <h3 class="service__title">{{ s.title }}</h3>
+          <p class="service__text">{{ s.text }}</p>
+        </li>
+      }
+    </ol>
+  </div>
+</section>
+
+<section class="section cta cd-container" aria-labelledby="cta-heading">
+  <div class="cta__wrap">
+    <div class="cta__textblock">
+      <h2 id="cta-heading" class="cta__title">Need a valuation on your current car?</h2>
+      <p class="cta__desc">
+        Send reg plate and mileage — we reply with a range and what would firm up after inspection.
+      </p>
+    </div>
+    <a routerLink="contact" class="btn btn--light">Get a figure</a>
+  </div>
+</section>

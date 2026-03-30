@@ -1,0 +1,11 @@
+.app-root {
+  min-height: 100dvh;
+  background-color: var(--pv-shelf-bg);
+  /* Main content starts right of the fixed dock when open */
+  padding-left: calc(var(--pv-fiverr-panel-w) + var(--pv-fiverr-handle-w));
+  transition: padding-left 0.28s ease;
+}
+
+.app-root:has(.fiverr.fiverr--collapsed) {
+  padding-left: var(--pv-fiverr-handle-w);
+}

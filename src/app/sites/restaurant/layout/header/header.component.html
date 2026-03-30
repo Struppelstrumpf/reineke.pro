@@ -1,0 +1,59 @@
+<header class="header" [class.header--open]="menuOpen()">
+  <div class="header__inner rt-container">
+    <a [routerLink]="base" class="header__brand" (click)="closeMenu()">
+      <span class="header__flame" aria-hidden="true"></span>
+      <span class="header__title">
+        <span class="header__name">Ember &amp; Oak</span>
+        <span class="header__tag">Kitchen · Wine</span>
+      </span>
+    </a>
+
+    <button
+      type="button"
+      class="header__burger"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="rt-nav"
+      (click)="toggleMenu()"
+    >
+      <span class="header__bun" aria-hidden="true"></span>
+      <span class="header__bun" aria-hidden="true"></span>
+      <span class="header__bun" aria-hidden="true"></span>
+      <span class="visually-hidden">{{ menuOpen() ? 'Close menu' : 'Open menu' }}</span>
+    </button>
+
+    <nav id="rt-nav" class="nav" aria-label="Primary">
+      <ul class="nav__list">
+        <li>
+          <a
+            [routerLink]="base"
+            routerLinkActive="nav__link--on"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="nav__link"
+            (click)="closeMenu()"
+            >Home</a
+          >
+        </li>
+        <li>
+          <button type="button" class="nav__link nav__link--btn" (click)="goSection('menu')">Menu</button>
+        </li>
+        <li>
+          <button type="button" class="nav__link nav__link--btn" (click)="goSection('visit')">Visit</button>
+        </li>
+        <li>
+          <a [routerLink]="[base, 'contact']" routerLinkActive="nav__link--on" class="nav__link" (click)="closeMenu()"
+            >Contact</a
+          >
+        </li>
+        <li>
+          <a
+            [routerLink]="[base, 'imprint']"
+            routerLinkActive="nav__link--on"
+            class="nav__link nav__link--soft"
+            (click)="closeMenu()"
+            >Imprint</a
+          >
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

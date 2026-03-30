@@ -1,0 +1,141 @@
+.page {
+  padding-block: clamp(2rem, 6vw, 3.5rem);
+}
+
+.page__hero {
+  max-width: 44rem;
+  margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.page__title {
+  margin: 0;
+  font-family: var(--sf-font-display);
+  font-weight: 800;
+  font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+  letter-spacing: -0.03em;
+}
+
+.page__lead {
+  margin: 0.85rem 0 0;
+  color: var(--sf-muted);
+  max-width: 50ch;
+}
+
+.page__grid {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 1.75rem);
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 900px) {
+  .page__grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  }
+}
+
+.panel {
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  border-radius: var(--sf-radius);
+  border: 1px solid var(--sf-border);
+  background: var(--sf-surface);
+  min-width: 0;
+}
+
+.panel--success {
+  border-color: rgba(46, 230, 214, 0.35);
+  background: linear-gradient(180deg, rgba(46, 230, 214, 0.1), rgba(7, 11, 18, 0.4));
+}
+
+.panel__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+.panel__text {
+  margin: 0 0 1.25rem;
+  color: var(--sf-muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.form__row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.form__label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.form__input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--sf-radius-sm);
+  border: 1px solid var(--sf-border);
+  background: rgba(7, 11, 18, 0.65);
+  color: var(--sf-text);
+  font: inherit;
+  transition: border-color var(--sf-transition), box-shadow var(--sf-transition);
+}
+
+.form__input:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.form__input:focus {
+  outline: none;
+  border-color: rgba(46, 230, 214, 0.55);
+  box-shadow: 0 0 0 3px var(--sf-accent-dim);
+}
+
+.form__textarea {
+  resize: vertical;
+  min-height: 8rem;
+}
+
+.form__select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239aa4b8' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6L8 9.5 11.5 6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.25rem;
+}
+
+.form__error {
+  font-size: 0.8rem;
+  color: #ff8a7a;
+}
+
+.aside__title {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sf-accent);
+}
+
+.aside__title:not(:first-child) {
+  margin-top: 1.35rem;
+}
+
+.aside__text {
+  margin: 0;
+  color: var(--sf-muted);
+  font-size: 0.95rem;
+}
+
+.aside__fine {
+  margin: 1.5rem 0 0;
+  font-size: 0.8rem;
+  color: var(--sf-muted);
+}
