@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   template: `
     <iframe
       class="pizzeria-demo-frame"
-      title="Pizzeria-Landingpage — Portfolio-Design-Demo (fiktive Daten)"
+      title="Pizzeria landing page — portfolio design demo (fictional business)"
       src="/pizzeria-demo/index.html"
       loading="lazy"
       referrerpolicy="no-referrer-when-downgrade"

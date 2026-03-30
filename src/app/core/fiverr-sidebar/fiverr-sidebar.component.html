@@ -31,11 +31,11 @@
 
           <p class="fiverr__studio-role">{{ studio.role }}</p>
 
-          <p class="fiverr__badge">Preise</p>
-          <ul class="fiverr__pricing fiverr__pricing--tight" aria-label="Paketpreise">
+          <p class="fiverr__badge">Pricing</p>
+          <ul class="fiverr__pricing fiverr__pricing--tight" aria-label="Package pricing">
             <li class="fiverr__pricing-row">
               <span class="fiverr__pricing-name">Basic</span>
-              <span class="fiverr__pricing-amount">ab €95</span>
+              <span class="fiverr__pricing-amount">from €95</span>
             </li>
             <li class="fiverr__pricing-row">
               <span class="fiverr__pricing-name">Standard</span>
@@ -47,7 +47,7 @@
             </li>
           </ul>
 
-          <ul class="fiverr__list fiverr__list--compact fiverr__list--grid" aria-label="Leistungen">
+          <ul class="fiverr__list fiverr__list--compact fiverr__list--grid" aria-label="What you get">
             <li><span class="fiverr__tick" aria-hidden="true">✔</span> 24–48h</li>
             <li><span class="fiverr__tick" aria-hidden="true">✔</span> Custom UI</li>
             <li><span class="fiverr__tick" aria-hidden="true">✔</span> Mobile</li>
@@ -61,16 +61,16 @@
           class="fiverr__panel-templates"
           tabindex="0"
           role="region"
-          aria-label="Vorlagen wechseln"
+          aria-label="Switch preview template"
         >
           <div class="fiverr__current" aria-current="page">
-            <span class="fiverr__current-label">Aktiv</span>
+            <span class="fiverr__current-label">Active</span>
             <span class="fiverr__current-name">{{ currentSite().label }}</span>
             <span class="fiverr__current-hint">{{ currentSite().hint }}</span>
           </div>
 
           <p class="fiverr__nav-label">
-            Weitere Vorlagen
+            More templates
             <span class="fiverr__nav-count">({{ otherSites().length }})</span>
           </p>
           <ul class="fiverr__nav">

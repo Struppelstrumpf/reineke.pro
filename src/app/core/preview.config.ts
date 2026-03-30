@@ -6,7 +6,7 @@ export type PreviewSiteId = 'sportflow' | 'cardealer' | 'restaurant' | 'pizzeria
 
 export const PREVIEW_STUDIO = {
   name: 'Reineke Fuchs',
-  role: 'Webdesign Studio · Fiverr previews',
+  role: 'Web design studio · Fiverr previews',
   fiverrUrl: 'https://www.fiverr.com/s/7Y9ZkYe',
 } as const;
 
@@ -36,8 +36,8 @@ export const PREVIEW_SITES: ReadonlyArray<{
   },
   {
     id: 'pizzeria',
-    label: 'Pizzeria Demo',
-    hint: 'Video-Hero · Live-Öffnungszeiten · Showcase',
+    label: 'La Fornace (demo)',
+    hint: 'Video hero · hours widget · showcase',
     href: '/pizzeria-demo',
   },
 ];
