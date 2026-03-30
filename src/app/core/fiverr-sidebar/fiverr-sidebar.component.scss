@@ -98,17 +98,148 @@
 .fiverr__panel-body {
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  padding: 1.1rem 1.15rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 1.05rem 1.1rem 0.65rem;
 }
 
-.fiverr__panel-body::-webkit-scrollbar {
+.fiverr__panel-pinned {
+  flex-shrink: 0;
+}
+
+.fiverr__compact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem 0.65rem;
+  align-items: start;
+  margin-bottom: 0.55rem;
+}
+
+@media (max-width: 360px) {
+  .fiverr__compact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fiverr__compact-block {
+  min-width: 0;
+}
+
+.fiverr__pricing--tight {
+  gap: 0.22rem;
+  margin-bottom: 0;
+}
+
+.fiverr__pricing--tight .fiverr__pricing-row {
+  padding: 0.35rem 0.5rem;
+}
+
+.fiverr__deploy {
+  margin: 0;
+  border-radius: 10px;
+  border: 1px solid var(--fv-border);
+  background: rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.fiverr__deploy-summary {
+  padding: 0.45rem 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fv-muted);
+  cursor: pointer;
+  list-style: none;
+}
+
+.fiverr__deploy-summary::-webkit-details-marker {
   display: none;
-  width: 0;
-  height: 0;
+}
+
+.fiverr__deploy[open] .fiverr__deploy-summary {
+  border-bottom: 1px solid color-mix(in srgb, var(--fv-border) 80%, transparent);
+}
+
+.fiverr__deploy-code {
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  font-size: 0.58rem;
+  line-height: 1.35;
+  font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+  color: color-mix(in srgb, var(--fv-text) 88%, var(--fv-accent));
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 6.5rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.fiverr__deploy-copy {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.4rem 0.55rem;
+  border: none;
+  border-top: 1px solid color-mix(in srgb, var(--fv-border) 80%, transparent);
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--fv-text);
+  background: color-mix(in srgb, var(--fv-accent) 12%, transparent);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.fiverr__deploy-copy:hover {
+  background: color-mix(in srgb, var(--fv-accent) 22%, transparent);
+}
+
+.fiverr__list--grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.08rem 0.35rem;
+  margin: 0;
+}
+
+.fiverr__list--grid li {
+  margin-bottom: 0;
+}
+
+.fiverr__panel-templates {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 0.55rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid color-mix(in srgb, var(--fv-border) 70%, transparent);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--fv-accent) 45%, transparent) transparent;
+}
+
+.fiverr__panel-templates::-webkit-scrollbar {
+  width: 5px;
+}
+
+.fiverr__panel-templates::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--fv-accent) 40%, transparent);
+  border-radius: 999px;
+}
+
+.fiverr__nav-count {
+  font-weight: 600;
+  color: var(--fv-muted);
+  letter-spacing: 0.04em;
+}
+
+.fiverr__panel-templates .fiverr__current {
+  margin-bottom: 0.75rem;
+}
+
+.fiverr__panel-templates .fiverr__nav {
+  margin-bottom: 0.25rem;
 }
 
 .fiverr__panel-foot {
