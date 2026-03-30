@@ -112,92 +112,13 @@
   flex-shrink: 0;
 }
 
-.fiverr__compact-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.55rem 0.65rem;
-  align-items: start;
-  margin-bottom: 0.55rem;
-}
-
-@media (max-width: 360px) {
-  .fiverr__compact-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.fiverr__compact-block {
-  min-width: 0;
-}
-
 .fiverr__pricing--tight {
   gap: 0.22rem;
-  margin-bottom: 0;
+  margin-bottom: 0.55rem;
 }
 
 .fiverr__pricing--tight .fiverr__pricing-row {
   padding: 0.35rem 0.5rem;
-}
-
-.fiverr__deploy {
-  margin: 0;
-  border-radius: 10px;
-  border: 1px solid var(--fv-border);
-  background: rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-}
-
-.fiverr__deploy-summary {
-  padding: 0.45rem 0.55rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--fv-muted);
-  cursor: pointer;
-  list-style: none;
-}
-
-.fiverr__deploy-summary::-webkit-details-marker {
-  display: none;
-}
-
-.fiverr__deploy[open] .fiverr__deploy-summary {
-  border-bottom: 1px solid color-mix(in srgb, var(--fv-border) 80%, transparent);
-}
-
-.fiverr__deploy-code {
-  margin: 0;
-  padding: 0.45rem 0.55rem;
-  font-size: 0.58rem;
-  line-height: 1.35;
-  font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
-  color: color-mix(in srgb, var(--fv-text) 88%, var(--fv-accent));
-  white-space: pre-wrap;
-  word-break: break-word;
-  max-height: 6.5rem;
-  overflow-y: auto;
-  scrollbar-width: thin;
-}
-
-.fiverr__deploy-copy {
-  display: block;
-  width: 100%;
-  margin: 0;
-  padding: 0.4rem 0.55rem;
-  border: none;
-  border-top: 1px solid color-mix(in srgb, var(--fv-border) 80%, transparent);
-  font-family: inherit;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--fv-text);
-  background: color-mix(in srgb, var(--fv-accent) 12%, transparent);
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.fiverr__deploy-copy:hover {
-  background: color-mix(in srgb, var(--fv-accent) 22%, transparent);
 }
 
 .fiverr__list--grid {

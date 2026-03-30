@@ -31,44 +31,21 @@
 
           <p class="fiverr__studio-role">{{ studio.role }}</p>
 
-          <div class="fiverr__compact-grid">
-            <div class="fiverr__compact-block">
-              <p class="fiverr__badge">Preise</p>
-              <ul class="fiverr__pricing fiverr__pricing--tight" aria-label="Paketpreise">
-                <li class="fiverr__pricing-row">
-                  <span class="fiverr__pricing-name">Basic</span>
-                  <span class="fiverr__pricing-amount">ab €95</span>
-                </li>
-                <li class="fiverr__pricing-row">
-                  <span class="fiverr__pricing-name">Standard</span>
-                  <span class="fiverr__pricing-amount">€195</span>
-                </li>
-                <li class="fiverr__pricing-row">
-                  <span class="fiverr__pricing-name">Premium</span>
-                  <span class="fiverr__pricing-amount">€295</span>
-                </li>
-              </ul>
-            </div>
-
-            <div class="fiverr__compact-block">
-              <p class="fiverr__badge">Server-Update</p>
-              <details class="fiverr__deploy" open>
-                <summary class="fiverr__deploy-summary">Docker / GHCR</summary>
-                <pre class="fiverr__deploy-code" aria-label="Docker-Befehle">{{ deploySnippet }}</pre>
-                <button
-                  type="button"
-                  class="fiverr__deploy-copy"
-                  (click)="copyDeploySnippet()"
-                >
-                  @if (deployCopied()) {
-                    Kopiert
-                  } @else {
-                    Alles kopieren
-                  }
-                </button>
-              </details>
-            </div>
-          </div>
+          <p class="fiverr__badge">Preise</p>
+          <ul class="fiverr__pricing fiverr__pricing--tight" aria-label="Paketpreise">
+            <li class="fiverr__pricing-row">
+              <span class="fiverr__pricing-name">Basic</span>
+              <span class="fiverr__pricing-amount">ab €95</span>
+            </li>
+            <li class="fiverr__pricing-row">
+              <span class="fiverr__pricing-name">Standard</span>
+              <span class="fiverr__pricing-amount">€195</span>
+            </li>
+            <li class="fiverr__pricing-row">
+              <span class="fiverr__pricing-name">Premium</span>
+              <span class="fiverr__pricing-amount">€295</span>
+            </li>
+          </ul>
 
           <ul class="fiverr__list fiverr__list--compact fiverr__list--grid" aria-label="Leistungen">
             <li><span class="fiverr__tick" aria-hidden="true">✔</span> 24–48h</li>

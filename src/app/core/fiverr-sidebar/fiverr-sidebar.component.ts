@@ -44,27 +44,8 @@ export class FiverrSidebarComponent {
     PREVIEW_SITES.filter((s) => s.id !== this.siteId()),
   );
 
-  readonly deploySnippet =
-    'docker pull ghcr.io/struppelstrumpf/reineke.pro:latest\n' +
-    'docker stop reineke-pro\n' +
-    'docker rm reineke-pro\n' +
-    'docker run -d --name reineke-pro -p 127.0.0.1:8080:80 --restart unless-stopped ghcr.io/struppelstrumpf/reineke.pro:latest';
-
-  readonly deployCopied = signal(false);
-
   toggle(): void {
     this.open.update((v) => !v);
-  }
-
-  copyDeploySnippet(): void {
-    const t = this.deploySnippet;
-    if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) {
-      return;
-    }
-    void navigator.clipboard.writeText(t).then(() => {
-      this.deployCopied.set(true);
-      window.setTimeout(() => this.deployCopied.set(false), 2000);
-    });
   }
 
   private urlToId(url: string): PreviewSiteId {
