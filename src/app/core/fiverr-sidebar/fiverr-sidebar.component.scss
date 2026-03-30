@@ -8,9 +8,13 @@
 
   position: fixed;
   left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 200;
+  top: 0;
+  bottom: 0;
+  margin-block: auto;
+  height: max-content;
+  max-height: min(92dvh, 720px);
+  z-index: 10050;
+  isolation: isolate;
   display: flex;
   flex-direction: row;
   align-items: stretch;
