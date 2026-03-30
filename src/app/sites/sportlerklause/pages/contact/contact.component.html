@@ -1,0 +1,124 @@
+<div class="page sk-container">
+  <header class="page__intro">
+    <h1 class="page__h">Kontakt &amp; Anfragen</h1>
+    <p class="page__deck">
+      Demo-Formular: Es werden keine Daten gesendet oder gespeichert — nur Browser-Validierung wie auf einer
+      Live-Seite.
+    </p>
+  </header>
+
+  <div class="page__split">
+    @if (submitted()) {
+      <div class="card card--ok" role="status">
+        <h2 class="card__h">Danke — (Demo)</h2>
+        <p class="card__p">
+          In Produktion würde hier eine Bestätigung per E-Mail folgen. Du kannst eine weitere Testnachricht senden.
+        </p>
+        <button type="button" class="btn btn--ghost" (click)="submitted.set(false)">Neue Anfrage</button>
+      </div>
+    } @else {
+      <form class="card form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="form__group">
+          <label class="form__label" for="sk-name">Name</label>
+          <input
+            id="sk-name"
+            class="form__input"
+            type="text"
+            formControlName="name"
+            autocomplete="name"
+            [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
+          />
+          @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+            <span class="form__hint form__hint--err">Bitte Namen angeben.</span>
+          }
+          @if (form.controls.name.touched && form.controls.name.hasError('minlength')) {
+            <span class="form__hint form__hint--err">Mindestens 2 Zeichen.</span>
+          }
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="sk-email">E-Mail</label>
+          <input
+            id="sk-email"
+            class="form__input"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
+          />
+          @if (form.controls.email.touched && form.controls.email.hasError('required')) {
+            <span class="form__hint form__hint--err">E-Mail erforderlich.</span>
+          }
+          @if (form.controls.email.touched && form.controls.email.hasError('email')) {
+            <span class="form__hint form__hint--err">Format prüfen.</span>
+          }
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="sk-topic">Anlass (optional)</label>
+          <input id="sk-topic" class="form__input" type="text" formControlName="topic" placeholder="z. B. Gutschein, Feier, Allergien" />
+        </div>
+
+        <div class="form__row">
+          <div class="form__group form__group--half">
+            <label class="form__label" for="sk-guests">Personen</label>
+            <select id="sk-guests" class="form__input form__select" formControlName="guests">
+              @for (n of ['1', '2', '3', '4', '5', '6', '7', '8', '9+']; track n) {
+                <option [value]="n">{{ n }}</option>
+              }
+            </select>
+          </div>
+          <div class="form__group form__group--half">
+            <label class="form__label" for="sk-date">Wunschdatum</label>
+            <input
+              id="sk-date"
+              class="form__input"
+              type="date"
+              formControlName="date"
+              [attr.aria-invalid]="form.controls.date.invalid && form.controls.date.touched"
+            />
+          </div>
+        </div>
+        @if (form.controls.date.touched && form.controls.date.hasError('required')) {
+          <span class="form__hint form__hint--err">Datum wählen.</span>
+        }
+
+        <div class="form__group">
+          <label class="form__label" for="sk-msg">Nachricht</label>
+          <textarea
+            id="sk-msg"
+            class="form__input form__textarea"
+            rows="5"
+            formControlName="message"
+            [attr.aria-invalid]="form.controls.message.invalid && form.controls.message.touched"
+          ></textarea>
+          @if (form.controls.message.touched && form.controls.message.hasError('required')) {
+            <span class="form__hint form__hint--err">Bitte kurz beschreiben, worum es geht.</span>
+          }
+          @if (form.controls.message.touched && form.controls.message.hasError('minlength')) {
+            <span class="form__hint form__hint--err">Etwas ausführlicher (mind. 15 Zeichen).</span>
+          }
+        </div>
+
+        <button type="submit" class="btn btn--primary">Absenden</button>
+      </form>
+    }
+
+    <aside class="card aside" aria-label="Kontaktinfo Demo">
+      <h2 class="aside__h">Adresse (fiktiv)</h2>
+      <p class="aside__p">
+        Moorbergstraße 1<br />
+        06484 Musterstadt<br />
+        Deutschland
+      </p>
+      <h2 class="aside__h">Telefon (Platzhalter)</h2>
+      <p class="aside__p"><a href="tel:+493946000000">+49 3946 000 000</a></p>
+      <h2 class="aside__h">Öffnungszeiten</h2>
+      <p class="aside__p">
+        Mo–Do 7–14 Uhr · Fr 7–13 Uhr<br />
+        Sa–So geschlossen (Demo)
+      </p>
+      <p class="aside__fine"><a routerLink="../imprint">Impressum</a></p>
+    </aside>
+  </div>
+</div>

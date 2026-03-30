@@ -64,6 +64,17 @@
   --fv-warm-dim: rgba(212, 185, 120, 0.14);
 }
 
+.fiverr--sportlerklause {
+  --fv-surface: var(--sk-bg);
+  --fv-surface-2: var(--sk-surface-solid);
+  --fv-border: var(--sk-border);
+  --fv-text: var(--sk-text);
+  --fv-muted: var(--sk-muted);
+  --fv-accent: var(--sk-accent);
+  --fv-accent-soft: var(--sk-moss);
+  --fv-warm-dim: var(--sk-gold-dim);
+}
+
 .fiverr--pizzeria {
   --fv-surface: rgba(14, 16, 12, 0.94);
   --fv-surface-2: #141810;

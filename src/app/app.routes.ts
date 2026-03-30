@@ -69,6 +69,30 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'sportlerklause',
+    loadComponent: () =>
+      import('./sites/sportlerklause/sportlerklause-shell.component').then(
+        (m) => m.SportlerklauseShellComponent,
+      ),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./sites/sportlerklause/pages/home/home.component').then((m) => m.HomeComponent),
+      },
+      {
+        path: 'contact',
+        loadComponent: () =>
+          import('./sites/sportlerklause/pages/contact/contact.component').then((m) => m.ContactComponent),
+      },
+      {
+        path: 'imprint',
+        loadComponent: () =>
+          import('./sites/sportlerklause/pages/imprint/imprint.component').then((m) => m.ImprintComponent),
+      },
+    ],
+  },
+  {
     path: 'pizzeria-demo',
     loadComponent: () =>
       import('./core/pizzeria-demo-embed/pizzeria-demo-embed.component').then(

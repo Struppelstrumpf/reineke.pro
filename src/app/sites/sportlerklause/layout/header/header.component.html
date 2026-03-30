@@ -1,0 +1,62 @@
+<header class="header" [class.header--open]="menuOpen()">
+  <div class="header__inner sk-container">
+    <a [routerLink]="base" class="header__brand" (click)="closeMenu()">
+      <span class="header__mark" aria-hidden="true"></span>
+      <span class="header__title">
+        <span class="header__name">Sportlerklause</span>
+        <span class="header__tag">am Moorberg · Quedlinburg</span>
+      </span>
+    </a>
+
+    <button
+      type="button"
+      class="header__burger"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="sk-nav"
+      (click)="toggleMenu()"
+    >
+      <span class="header__bun" aria-hidden="true"></span>
+      <span class="header__bun" aria-hidden="true"></span>
+      <span class="header__bun" aria-hidden="true"></span>
+      <span class="visually-hidden">{{ menuOpen() ? 'Menü schließen' : 'Menü öffnen' }}</span>
+    </button>
+
+    <nav id="sk-nav" class="nav" aria-label="Hauptnavigation">
+      <ul class="nav__list">
+        <li>
+          <a
+            [routerLink]="base"
+            routerLinkActive="nav__link--on"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="nav__link"
+            (click)="closeMenu()"
+            >Start</a
+          >
+        </li>
+        <li>
+          <button type="button" class="nav__link nav__link--btn" (click)="goSection('menus')">Karten</button>
+        </li>
+        <li>
+          <button type="button" class="nav__link nav__link--btn" (click)="goSection('hours')">Zeiten</button>
+        </li>
+        <li>
+          <button type="button" class="nav__link nav__link--btn" (click)="goSection('gatherings')">Feiern</button>
+        </li>
+        <li>
+          <a [routerLink]="[base, 'contact']" routerLinkActive="nav__link--on" class="nav__link" (click)="closeMenu()"
+            >Kontakt</a
+          >
+        </li>
+        <li>
+          <a
+            [routerLink]="[base, 'imprint']"
+            routerLinkActive="nav__link--on"
+            class="nav__link nav__link--soft"
+            (click)="closeMenu()"
+            >Impressum</a
+          >
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

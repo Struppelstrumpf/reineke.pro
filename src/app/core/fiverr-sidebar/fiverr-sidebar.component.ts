@@ -54,7 +54,7 @@ export class FiverrSidebarComponent {
     if (seg === 'pizzeria-demo') {
       return 'pizzeria';
     }
-    if (seg === 'cardealer' || seg === 'restaurant') {
+    if (seg === 'cardealer' || seg === 'restaurant' || seg === 'sportlerklause') {
       return seg;
     }
     return 'sportflow';
