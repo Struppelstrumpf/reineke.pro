@@ -78,6 +78,10 @@ html:has(.site-body--restaurant) {
   --pv-shelf-bg: var(--rt-bg);
 }
 
+html:has(.site-body--pizzeria) {
+  --pv-shelf-bg: #0a0a0a;
+}
+
 @media (max-width: 520px) {
   :root {
     --pv-fiverr-panel-w: min(17rem, calc(100vw - 3.2rem));

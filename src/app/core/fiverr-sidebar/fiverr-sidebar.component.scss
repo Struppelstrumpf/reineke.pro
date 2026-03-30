@@ -60,6 +60,18 @@
   --fv-warm-dim: rgba(212, 185, 120, 0.14);
 }
 
+.fiverr--pizzeria {
+  --fv-surface: rgba(14, 16, 12, 0.94);
+  --fv-surface-2: #141810;
+  --fv-border: rgba(140, 164, 5, 0.22);
+  --fv-text: #f4f4f0;
+  --fv-muted: #9ca598;
+  --fv-accent: #a3c729;
+  --fv-accent-soft: rgba(140, 164, 5, 0.18);
+  --fv-glow: rgba(140, 164, 5, 0.2);
+  --fv-warm-dim: rgba(140, 164, 5, 0.12);
+}
+
 /* ─── Panel ─── */
 .fiverr__panel {
   width: var(--pv-fiverr-panel-w);

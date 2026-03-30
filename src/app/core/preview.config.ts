@@ -2,7 +2,7 @@
  * Reineke Fuchs — portfolio preview links (single deployment).
  * Paths are relative to site origin (e.g. https://example.com/sportflow).
  */
-export type PreviewSiteId = 'sportflow' | 'cardealer' | 'restaurant';
+export type PreviewSiteId = 'sportflow' | 'cardealer' | 'restaurant' | 'pizzeria';
 
 export const PREVIEW_STUDIO = {
   name: 'Reineke Fuchs',
@@ -33,5 +33,11 @@ export const PREVIEW_SITES: ReadonlyArray<{
     label: 'Ember & Oak',
     hint: 'Restaurant & reservations',
     href: '/restaurant',
+  },
+  {
+    id: 'pizzeria',
+    label: 'Pizzeria Demo',
+    hint: 'Video-Hero · Live-Öffnungszeiten · Showcase',
+    href: '/pizzeria-demo',
   },
 ];

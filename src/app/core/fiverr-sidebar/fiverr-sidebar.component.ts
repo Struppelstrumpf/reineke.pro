@@ -51,6 +51,9 @@ export class FiverrSidebarComponent {
   private urlToId(url: string): PreviewSiteId {
     const path = url.split('?')[0].split('#')[0];
     const seg = path.split('/').filter(Boolean)[0];
+    if (seg === 'pizzeria-demo') {
+      return 'pizzeria';
+    }
     if (seg === 'cardealer' || seg === 'restaurant') {
       return seg;
     }

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Impressum (Demo) | La Fornace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&amp;family=Great+Vibes&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .legal-page { padding: calc(var(--header-h) + 3rem) 0 4rem; min-height: 70vh; }
+    .legal-inner { width: var(--container); margin-inline: auto; max-width: 40rem; }
+    .legal-inner h1 { font-size: 2rem; margin-bottom: 1.5rem; }
+    .legal-inner h2 { font-size: 1.15rem; margin-top: 2rem; color: var(--green-bright); }
+    .legal-inner p, .legal-inner address { color: var(--muted); margin: 0.75rem 0; font-style: normal; }
+    .back { display: inline-block; margin-top: 2rem; font-weight: 600; color: var(--green-bright); text-decoration: none; }
+    .back:hover { text-decoration: underline; color: var(--white); }
+    .legal-box { background: rgba(255,255,255,.06); border: 1px solid rgba(140,164,5,.25); border-radius: var(--radius); padding: 1rem 1.15rem; margin: 1rem 0; }
+  </style>
+</head>
+<body>
+  <p class="demo-ribbon" role="note"><kbd>Design-Demo</kbd> · fiktive Angaben · kein Unternehmen</p>
+  <header class="site-header site-header--simple">
+    <div class="container header-inner">
+      <a class="logo" href="index.html"><span class="logo-script">La Fornace</span></a>
+      <nav class="nav-main" aria-label="Hauptnavigation">
+        <a href="index.html#speisekarte">Speisekarte</a>
+        <a href="index.html#oeffnungszeiten">Öffnungszeiten</a>
+        <a href="https://www.example.com" class="nav-cta" target="_blank" rel="nofollow noopener noreferrer">Bestellen (Demo)</a>
+      </nav>
+    </div>
+  </header>
+
+  <article class="legal-page">
+    <div class="legal-inner">
+      <h1>Impressum — rein demonstrativ</h1>
+      <div class="legal-box">
+        <p><strong>Wichtig:</strong> Diese Seite ist Teil eines <strong>Webdesign-Portfolios</strong>. Es gibt kein echtes Restaurant „La&nbsp;Fornace“ mit diesen Daten. Alle Angaben sind Platzhalter und dürfen nicht mit einem realen Betrieb verknüpft werden.</p>
+      </div>
+
+      <h2>Angaben gemäß § 5 TMG (Muster)</h2>
+      <address>
+        Musterfirma La Fornace GmbH<br />
+        Musterstraße 1<br />
+        12345 Musterstadt<br />
+        Deutschland
+      </address>
+
+      <h2>Kontakt (Scheindaten)</h2>
+      <p>Telefon: +49&nbsp;0&nbsp;30&nbsp;00000000<br />
+      E-Mail: <a href="mailto:demo@example.invalid">demo@example.invalid</a> (nicht zustellbar / nur Konvention)</p>
+
+      <h2>Verantwortlicher i.&nbsp;S.&nbsp;d. §§ 55 Abs.&nbsp;2 RStV</h2>
+      <p>Muster Person, Musterstraße 1, 12345 Musterstadt (fiktiv)</p>
+
+      <h2>Haftung für Inhalte</h2>
+      <p>Diese Demo-Seite enthält keine geschäftlichen Angebote. Externe Links (z.&nbsp;B. example.com) sind technische Platzhalter ohne Bezug zu einem realen Auftraggeber.</p>
+
+      <a class="back" href="index.html">← Zurück zur Demo-Startseite</a>
+    </div>
+  </article>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-copy" style="border: 0; padding: 0;">Portfolio-Demo · keine echte Impressumspflicht hier</p>
+    </div>
+  </footer>
+</body>
+</html>

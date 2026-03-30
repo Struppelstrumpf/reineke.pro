@@ -68,5 +68,12 @@ export const routes: Routes = [
       },
     ],
   },
+  {
+    path: 'pizzeria-demo',
+    loadComponent: () =>
+      import('./core/pizzeria-demo-embed/pizzeria-demo-embed.component').then(
+        (m) => m.PizzeriaDemoEmbedComponent,
+      ),
+  },
   { path: '**', redirectTo: 'sportflow' },
 ];
