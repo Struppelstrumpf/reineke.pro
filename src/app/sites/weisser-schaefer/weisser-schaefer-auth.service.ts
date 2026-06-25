@@ -6,6 +6,10 @@ import {
 
   WS_ADMIN_PASSWORD,
 
+  WS_DEMO_CUSTOMER_EMAIL,
+
+  WS_DEMO_CUSTOMER_PASSWORD,
+
   WS_ACTIVATION_KEY,
 
   WS_RESET_KEY,
@@ -242,6 +246,16 @@ export class WeisserSchaeferAuthService {
 
     return null;
 
+  }
+
+  /** Demo-Zugang für Besucher (Admin oder freigeschalteter Kunde). */
+  loginDemo(role: 'admin' | 'customer'): string | null {
+    const fresh = this.readUsersFromStorage() ?? this.loadUsers();
+    this.users.set(fresh);
+
+    const email = role === 'admin' ? WS_ADMIN_EMAIL : WS_DEMO_CUSTOMER_EMAIL;
+    const password = role === 'admin' ? WS_ADMIN_PASSWORD : WS_DEMO_CUSTOMER_PASSWORD;
+    return this.login(email, password);
   }
 
 
@@ -848,17 +862,19 @@ export class WeisserSchaeferAuthService {
 
       const withAdmin = this.ensureAdminSeed(list);
 
+      const withDemo = this.ensureDemoCustomerSeed(withAdmin);
+
       const needsMigrate = (parsed as Partial<WsUser>[]).some((raw, index) => {
         const source = String(raw.email ?? '');
-        const normalized = withAdmin[index]?.email ?? '';
+        const normalized = withDemo[index]?.email ?? '';
         return source && normalizeWsEmail(source) !== source;
       });
 
       if (needsMigrate) {
-        this.persistUsersList(withAdmin);
+        this.persistUsersList(withDemo);
       }
 
-      return withAdmin;
+      return withDemo;
 
     } catch {
 
@@ -906,6 +922,8 @@ export class WeisserSchaeferAuthService {
         createdAt: '2024-01-01T00:00:00.000Z',
 
       },
+
+      this.buildDemoCustomerSeed(),
 
     ];
 
@@ -989,6 +1007,59 @@ export class WeisserSchaeferAuthService {
 
     return seeded;
 
+  }
+
+  private buildDemoCustomerSeed(): WsUser {
+    return {
+      id: 'customer-demo-seed',
+      email: WS_DEMO_CUSTOMER_EMAIL,
+      password: WS_DEMO_CUSTOMER_PASSWORD,
+      role: 'customer',
+      status: 'approved',
+      locked: false,
+      companyName: 'Demo Fleischerei Müller',
+      contactName: 'Max Müller',
+      address: 'Harzweg 13, 06484 Quedlinburg',
+      phone: '+49 3946 123456',
+      createdAt: '2024-06-01T00:00:00.000Z',
+    };
+  }
+
+  private ensureDemoCustomerSeed(list: WsUser[]): WsUser[] {
+    const demo = this.buildDemoCustomerSeed();
+    const index = list.findIndex(
+      (u) => u.email.toLowerCase() === WS_DEMO_CUSTOMER_EMAIL.toLowerCase(),
+    );
+
+    if (index >= 0) {
+      const existing = list[index];
+      const needsPatch =
+        existing.role !== 'customer' ||
+        existing.status !== 'approved' ||
+        existing.locked === true ||
+        existing.companyName !== demo.companyName ||
+        existing.contactName !== demo.contactName ||
+        existing.address !== demo.address ||
+        existing.phone !== demo.phone;
+
+      if (!needsPatch) {
+        return list;
+      }
+
+      const patched = [...list];
+      patched[index] = {
+        ...existing,
+        ...demo,
+        id: existing.id || demo.id,
+        password: existing.password || demo.password,
+      };
+      localStorage.setItem(WS_USERS_KEY, JSON.stringify(patched));
+      return patched;
+    }
+
+    const seeded = [...list, demo];
+    localStorage.setItem(WS_USERS_KEY, JSON.stringify(seeded));
+    return seeded;
   }
 
 

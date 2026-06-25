@@ -32,6 +32,9 @@ export type WsActivationToken = {
 export const WS_ADMIN_EMAIL = 'info@reineke.pro';
 export const WS_ADMIN_PASSWORD = 'Yuki';
 
+export const WS_DEMO_CUSTOMER_EMAIL = 'demo@kunde.de';
+export const WS_DEMO_CUSTOMER_PASSWORD = 'Demo';
+
 export const WS_USERS_KEY = 'ws-demo-users';
 export const WS_SESSION_KEY = 'ws-demo-session';
 export const WS_RESET_KEY = 'ws-demo-reset-tokens';

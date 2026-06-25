@@ -25,7 +25,8 @@
 .reg__form > .ws-form__title,
 .reg__form > .ws-form__lead,
 .reg__form > .ws-form__error,
-.reg__form > .ws-form__foot {
+.reg__form > .ws-form__foot,
+.reg__form > .reg__demo-login {
   grid-column: 1 / -1;
 }
 

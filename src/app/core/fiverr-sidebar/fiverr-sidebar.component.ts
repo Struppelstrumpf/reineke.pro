@@ -49,14 +49,6 @@ export class FiverrSidebarComponent {
   readonly expandedPackage = signal<StudioPackageId | null>(null);
   readonly currentSite = computed(() => {
     const id = this.siteId();
-    if (id === 'weisser-schaefer') {
-      return {
-        id: 'weisser-schaefer' as const,
-        label: 'Weißer Schäfer (Demo)',
-        hint: 'B2B · Bestellportal · Naturdärme',
-        href: '/demo/weisser-schaefer',
-      };
-    }
     return PREVIEW_SITES.find((s) => s.id === id) ?? PREVIEW_SITES[0];
   });
   readonly otherSites = computed(() =>

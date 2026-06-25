@@ -99,6 +99,35 @@
   color: color-mix(in srgb, var(--ws-accent) 84%, var(--ws-text));
 }
 
+.ws-demo-login {
+  margin-top: 0.35rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 14px;
+  border: 1px dashed color-mix(in srgb, var(--ws-accent) 38%, var(--ws-border));
+  background: color-mix(in srgb, var(--ws-accent) 7%, transparent);
+}
+
+.ws-demo-login__label {
+  margin: 0 0 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ws-muted);
+}
+
+.ws-demo-login__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.ws-demo-login__hint {
+  margin: 0.55rem 0 0;
+  font-size: 0.72rem;
+  color: var(--ws-muted);
+}
+
 .ws-btn {
   display: inline-flex;
   align-items: center;

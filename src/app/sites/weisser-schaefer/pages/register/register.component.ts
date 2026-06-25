@@ -101,6 +101,20 @@ export class WsRegisterComponent {
     void this.router.navigateByUrl('/demo/weisser-schaefer/anmelden');
   }
 
+  loginDemo(role: 'admin' | 'customer'): void {
+    this.error.set('');
+    const err = this.auth.loginDemo(role);
+    if (err) {
+      this.error.set(err);
+      return;
+    }
+    if (role === 'customer') {
+      void this.router.navigateByUrl('/demo/weisser-schaefer/shop');
+      return;
+    }
+    void this.router.navigateByUrl('/demo/weisser-schaefer/verwaltung');
+  }
+
   private composedContactName(): string {
     const contact = this.contactName().trim();
     const salutation = this.salutation().trim();

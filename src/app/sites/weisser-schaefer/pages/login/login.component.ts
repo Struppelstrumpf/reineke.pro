@@ -27,8 +27,23 @@ export class WsLoginComponent {
       this.error.set(err);
       return;
     }
+    this.navigateAfterLogin();
+  }
+
+  loginDemo(role: 'admin' | 'customer'): void {
+    this.error.set('');
+    const err = this.auth.loginDemo(role);
+    if (err) {
+      this.error.set(err);
+      return;
+    }
+    this.navigateAfterLogin(role);
+  }
+
+  private navigateAfterLogin(roleHint?: 'admin' | 'customer'): void {
     const user = this.auth.currentUser();
-    if (user?.role === 'customer') {
+    const role = roleHint ?? user?.role;
+    if (role === 'customer') {
       void this.router.navigateByUrl('/demo/weisser-schaefer/shop');
       return;
     }

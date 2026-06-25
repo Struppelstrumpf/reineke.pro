@@ -188,6 +188,20 @@
       }
 
       <button type="submit" class="ws-btn reg__submit">Registrieren</button>
+
+      <section class="ws-demo-login reg__demo-login" aria-label="Demo-Zugänge">
+        <p class="ws-demo-login__label">Demo testen</p>
+        <div class="ws-demo-login__actions">
+          <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="loginDemo('admin')">
+            Admin login
+          </button>
+          <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="loginDemo('customer')">
+            Kunde login
+          </button>
+        </div>
+        <p class="ws-demo-login__hint">Testzugänge — nur für die Demo-Vorschau.</p>
+      </section>
+
       <p class="ws-form__foot">
         Bereits Kunde?
         <a class="ws-link" routerLink="/demo/weisser-schaefer/anmelden">Anmelden</a>

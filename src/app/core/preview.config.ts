@@ -24,4 +24,10 @@ export const PREVIEW_SITES: ReadonlyArray<{
     hint: 'Video-Hero · Öffnungszeiten · Showcase',
     href: '/pizzeria-demo',
   },
+  {
+    id: 'weisser-schaefer',
+    label: 'Weißer Schäfer (Demo)',
+    hint: 'B2B · Bestellportal · Naturdärme',
+    href: '/demo/weisser-schaefer',
+  },
 ];
