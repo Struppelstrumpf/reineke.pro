@@ -147,6 +147,11 @@
               <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="printDeliveryNote(order.id)">
                 Lieferschein
               </button>
+              @if (ordersView() === 'active') {
+                <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="startShipment(order.id)">
+                  Versenden
+                </button>
+              }
               @if (ordersView() === 'archive') {
                 <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="restoreOrder(order.id)">
                   Wiederherstellen
@@ -205,6 +210,9 @@
                   <div class="admin__row-actions">
                     <button type="button" class="ws-btn ws-btn--sm" (click)="printOrder(order.id)">Etikett</button>
                     <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="printDeliveryNote(order.id)">Lieferschein</button>
+                    @if (ordersView() === 'active') {
+                      <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="startShipment(order.id)">Versenden</button>
+                    }
                     @if (ordersView() === 'archive') {
                       <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="restoreOrder(order.id)">
                         ↩
@@ -515,6 +523,40 @@
           >
             {{ userDialogConfirmLabel() }}
           </button>
+        </div>
+      </section>
+    </div>
+  }
+
+  @if (shipDialogOrder(); as order) {
+    <div class="admin__confirm-backdrop" (click)="cancelShipment()">
+      <section class="admin__confirm ws-card admin__ship-confirm" (click)="$event.stopPropagation()" aria-label="Versand bestätigen">
+        <h3>Bestellung als versendet markieren?</h3>
+        <p class="admin__ship-lead">
+          Prüfen Sie die Versanddaten. Die Empfängeradresse wurde zum Einfügen bei UPS kopiert.
+        </p>
+        <div class="admin__ship-box">
+          <p class="admin__ship-line"><span>Bestellung</span><strong>{{ order.id }}</strong></p>
+          <p class="admin__ship-line"><span>Firma</span><strong>{{ order.customer }}</strong></p>
+          @if (order.customerAddress) {
+            <p class="admin__ship-line"><span>Anschrift</span><strong>{{ order.customerAddress }}</strong></p>
+          }
+          @if (order.customerPhone) {
+            <p class="admin__ship-line"><span>Telefon</span><strong>{{ order.customerPhone }}</strong></p>
+          }
+        </div>
+        <p class="admin__ship-items-title">Wareninhalt</p>
+        <ul class="admin__ship-items">
+          @for (line of order.lines; track line.productId) {
+            <li>{{ line.qty }}× {{ line.name }}@if (line.unit) { ({{ line.unit }}) }</li>
+          }
+        </ul>
+        @if (order.note) {
+          <p class="admin__ship-note">Hinweis: {{ order.note }}</p>
+        }
+        <div class="admin__confirm-actions">
+          <button type="button" class="ws-btn ws-btn--ghost" (click)="cancelShipment()">Nein</button>
+          <button type="button" class="ws-btn" (click)="confirmShipment()">Ja, als versendet markieren</button>
         </div>
       </section>
     </div>

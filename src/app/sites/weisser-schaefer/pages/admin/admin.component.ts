@@ -110,6 +110,12 @@ export class WsAdminComponent {
   readonly appDownloadUrlDraft = signal(WS_PRINT_APP_DOWNLOAD_URL);
   readonly agentToken = signal('');
   readonly serverOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+  readonly shipDialogOrderId = signal<string | null>(null);
+  readonly shipDialogOrder = computed(() => {
+    const id = this.shipDialogOrderId();
+    return id ? this.session.orderById(id) ?? null : null;
+  });
+  private readonly upsShipUrl = 'https://www.ups.com/ship';
 
   readonly staffEmail = signal('');
   readonly staffName = signal('');
@@ -413,6 +419,39 @@ export class WsAdminComponent {
       return;
     }
     this.openDeliveryNotes(orders);
+  }
+
+  startShipment(orderId: string): void {
+    const order = this.session.orderById(orderId);
+    if (!order) {
+      return;
+    }
+    // Empfängerdaten zum schnellen Einfügen bei UPS in die Zwischenablage legen.
+    const addressLines = [
+      order.customer,
+      order.customerAddress ?? '',
+      order.customerPhone ? `Tel. ${order.customerPhone}` : '',
+    ]
+      .filter((line) => line.trim().length > 0)
+      .join('\n');
+    this.copyToClipboard(addressLines);
+
+    window.open(this.upsShipUrl, '_blank', 'noopener');
+    this.shipDialogOrderId.set(orderId);
+  }
+
+  cancelShipment(): void {
+    this.shipDialogOrderId.set(null);
+  }
+
+  confirmShipment(): void {
+    const id = this.shipDialogOrderId();
+    if (!id) {
+      return;
+    }
+    this.session.updateOrderStatus(id, 'versendet');
+    this.shipDialogOrderId.set(null);
+    this.session.showToast(`Bestellung ${id} als versendet markiert`);
   }
 
   private openDeliveryNotes(orders: WsOrder[]): void {

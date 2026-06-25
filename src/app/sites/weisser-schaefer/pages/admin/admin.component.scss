@@ -4,6 +4,69 @@
   flex-wrap: wrap;
 }
 
+.admin__ship-confirm {
+  width: min(100%, 34rem);
+  text-align: left;
+}
+
+.admin__ship-lead {
+  margin: 0 0 0.8rem;
+  font-size: 0.84rem;
+  color: var(--ws-muted);
+}
+
+.admin__ship-box {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid var(--ws-border);
+  background: color-mix(in srgb, var(--ws-surface-2) 70%, transparent);
+  margin-bottom: 0.85rem;
+}
+
+.admin__ship-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0;
+  font-size: 0.86rem;
+}
+
+.admin__ship-line span {
+  color: var(--ws-muted);
+  flex: 0 0 auto;
+}
+
+.admin__ship-line strong {
+  text-align: right;
+}
+
+.admin__ship-items-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ws-muted);
+}
+
+.admin__ship-items {
+  margin: 0 0 0.85rem;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.18rem;
+  font-size: 0.88rem;
+  max-height: 11rem;
+  overflow: auto;
+}
+
+.admin__ship-note {
+  margin: 0 0 0.85rem;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--ws-muted);
+}
+
 .admin__cloud-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
