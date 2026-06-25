@@ -95,6 +95,11 @@
           <button type="button" class="ws-chip" [class.is-active]="statusFilter() === 'in Bearbeitung'" (click)="setStatusFilter('in Bearbeitung')">In Arbeit</button>
         </div>
       }
+      @if (filteredOrders().length > 0) {
+        <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="printAllDeliveryNotes()">
+          Lieferscheine (alle)
+        </button>
+      }
     </div>
 
     @if (filteredOrders().length === 0) {
@@ -138,6 +143,9 @@
             <div class="admin__order-actions">
               <button type="button" class="ws-btn ws-btn--sm admin__print-btn" (click)="printOrder(order.id)">
                 Etikett
+              </button>
+              <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="printDeliveryNote(order.id)">
+                Lieferschein
               </button>
               @if (ordersView() === 'archive') {
                 <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="restoreOrder(order.id)">
@@ -194,12 +202,15 @@
                   }
                 </td>
                 <td>
-                  <button type="button" class="ws-btn ws-btn--sm" (click)="printOrder(order.id)">Etikett</button>
-                  @if (ordersView() === 'archive') {
-                    <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="restoreOrder(order.id)">
-                      ↩
-                    </button>
-                  }
+                  <div class="admin__row-actions">
+                    <button type="button" class="ws-btn ws-btn--sm" (click)="printOrder(order.id)">Etikett</button>
+                    <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="printDeliveryNote(order.id)">Lieferschein</button>
+                    @if (ordersView() === 'archive') {
+                      <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="restoreOrder(order.id)">
+                        ↩
+                      </button>
+                    }
+                  </div>
                 </td>
               </tr>
             }

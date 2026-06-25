@@ -21,6 +21,7 @@ import { WsInventoryAdminComponent } from '../../components/ws-inventory-admin.c
 import { WsLabelPreviewComponent } from '../../components/ws-label-preview.component';
 import { WsSupportChatAdminComponent } from '../../components/ws-support-chat-admin.component';
 import { buildWsLabelPages } from '../../ws-label-layout';
+import { buildDeliveryNoteHtml } from '../../ws-delivery-note';
 import type { WsLabelAlignH, WsLabelAlignV, WsLabelOrientation } from '../../ws-label-settings';
 import { labelPageDimensions } from '../../ws-label-settings';
 
@@ -395,6 +396,35 @@ export class WsAdminComponent {
       return;
     }
     this.session.openPrint(orderId);
+  }
+
+  printDeliveryNote(orderId: string): void {
+    const order = this.session.orderById(orderId);
+    if (!order) {
+      return;
+    }
+    this.openDeliveryNotes([order]);
+  }
+
+  printAllDeliveryNotes(): void {
+    const orders = this.filteredOrders();
+    if (!orders.length) {
+      this.session.showToast('Keine Bestellungen für Lieferscheine.');
+      return;
+    }
+    this.openDeliveryNotes(orders);
+  }
+
+  private openDeliveryNotes(orders: WsOrder[]): void {
+    const html = buildDeliveryNoteHtml(orders);
+    const win = window.open('', '_blank');
+    if (!win) {
+      this.session.showToast('Bitte Pop-ups für diese Seite erlauben.');
+      return;
+    }
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
   }
 
   async processNewOrders(): Promise<void> {
