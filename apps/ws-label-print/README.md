@@ -15,15 +15,28 @@ npm install
 npm start
 ```
 
-## Als .exe bauen
+## Als .exe bauen (portable, kein Installer)
 
 ```bash
 cd apps/ws-label-print
 npm install
-npm run build:win
+npm run dist
 ```
 
-Die fertige Datei liegt unter `apps/ws-label-print/dist/WS-Etikettendruck-1.0.0.exe`.
+Die fertige Datei liegt unter `apps/ws-label-print/dist/ws-etikettendruck.exe`.
+Diese Datei auf den Server nach `/opt/downloads/ws-etikettendruck.exe` legen — dann
+funktioniert der Download-Button in der Verwaltung (Drucker) direkt.
+
+Alternativ baut die GitHub-Action „Build print app (Windows)“ die EXE automatisch
+und stellt sie als Artefakt bereit.
+
+## Eigenständiger Druck ohne offene Webseite (Cloud)
+
+1. App starten → Tray-Icon → **Cloud-Einstellungen…**
+2. **Server-URL** und **Zugangscode** aus der Verwaltung (Drucker) eintragen
+3. „Automatischen Druck aktivieren“, Modus wählen (Intervall **oder** feste Uhrzeiten)
+4. Speichern — die App holt neue Bestellungen/Lagerwarnungen selbst und druckt,
+   auch wenn keine Webseite geöffnet ist.
 
 ## Verbindung Website ↔ App
 

@@ -1,0 +1,34 @@
+name: Build print app (Windows)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    paths:
+      - 'apps/ws-label-print/**'
+      - '.github/workflows/build-print-app.yml'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        working-directory: apps/ws-label-print
+        run: npm install
+
+      - name: Build portable EXE
+        working-directory: apps/ws-label-print
+        run: npm run dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ws-etikettendruck
+          path: apps/ws-label-print/dist/ws-etikettendruck.exe
+          if-no-files-found: error
