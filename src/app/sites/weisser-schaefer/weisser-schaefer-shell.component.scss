@@ -525,8 +525,8 @@
 
 .ws__footer {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.85rem 1.2rem;
   max-width: var(--ws-max);
   margin: 1rem auto 0;
 }
@@ -556,6 +556,12 @@
 
 .ws__footer-link:hover {
   text-decoration: underline;
+}
+
+.ws__footer-text {
+  color: var(--ws-muted);
+  font-size: 0.83rem;
+  line-height: 1.45;
 }
 
 .ws__footer-button {
