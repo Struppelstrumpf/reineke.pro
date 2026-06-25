@@ -1,11 +1,11 @@
 /**
- * Reineke Fuchs — portfolio preview links (single deployment).
+ * Reineke GbR — portfolio preview links (single deployment).
  * Paths are relative to site origin (e.g. https://example.com/pizzeria-demo).
  */
 export type PreviewSiteId = 'pizzeria' | 'weisser-schaefer';
 
 export const PREVIEW_STUDIO = {
-  name: 'Reineke Fuchs',
+  name: 'Reineke GbR',
   role: 'Webdesign-Studio · Individuelle Websites',
   email: 'info@reineke.pro',
   phone: '015561 048098',

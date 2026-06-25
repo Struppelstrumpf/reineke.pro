@@ -21,7 +21,7 @@ import { WelcomeOverlayComponent } from './core/welcome-overlay/welcome-overlay.
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  readonly title = 'Reineke Fuchs — Portfolio';
+  readonly title = 'Reineke GbR — Portfolio';
   readonly booking = inject(BookingModalService);
   // Initialisiert das gespeicherte Farblayout beim App-Start.
   readonly demoTheme = inject(DemoThemeService);
