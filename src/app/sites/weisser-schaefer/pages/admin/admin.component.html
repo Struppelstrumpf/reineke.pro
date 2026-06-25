@@ -701,6 +701,63 @@
         </div>
       </section>
 
+      <section class="admin__printer-cloud ws-card">
+        <h2>Automatischer Druck ohne geöffnete Webseite</h2>
+        <p>
+          Mit der Etiketten-App (ab v1.5) druckt dieser Standort neue Bestellungen und
+          Lagerwarnungen automatisch — auch wenn keine Webseite geöffnet ist. Tragen Sie dafür
+          einmalig diese Daten in der App ein.
+        </p>
+        <div class="admin__cloud-grid">
+          <div class="ws-field">
+            <label for="ws-cloud-server">Server-URL</label>
+            <div class="admin__copy-line">
+              <input id="ws-cloud-server" type="text" readonly [value]="serverOrigin" />
+              <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="copyToClipboard(serverOrigin)">
+                Kopieren
+              </button>
+            </div>
+          </div>
+          <div class="ws-field">
+            <label for="ws-cloud-token">Zugangscode</label>
+            <div class="admin__copy-line">
+              <input
+                id="ws-cloud-token"
+                type="text"
+                readonly
+                [value]="agentToken() || 'Noch kein Code erzeugt'"
+              />
+              <button
+                type="button"
+                class="ws-btn ws-btn--ghost ws-btn--sm"
+                [disabled]="!agentToken()"
+                (click)="copyToClipboard(agentToken())"
+              >
+                Kopieren
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="admin__printer-actions">
+          <button type="button" class="ws-btn" (click)="generateAgentToken()">
+            {{ agentToken() ? 'Neuen Zugangscode erzeugen' : 'Zugangscode erzeugen' }}
+          </button>
+          @if (agentToken()) {
+            <button type="button" class="ws-btn ws-btn--ghost" (click)="clearAgentToken()">Code entfernen</button>
+          }
+        </div>
+        <ol class="admin__printer-steps">
+          <li>Etiketten-App installieren/öffnen (Download oben)</li>
+          <li>In der App: Tray-Icon (unten rechts) → <strong>„Cloud-Einstellungen…“</strong></li>
+          <li>Server-URL und Zugangscode eintragen, <strong>„Automatischen Druck aktivieren“</strong></li>
+          <li>Druckzeitpunkt wählen: regelmäßig (alle X Minuten) <strong>oder</strong> feste Uhrzeiten</li>
+          <li>Speichern — Drucke laufen nun ohne offene Webseite.</li>
+        </ol>
+        <p class="admin__printer-hint">
+          Ohne gültigen Zugangscode kann sich keine fremde App verbinden. Neuen Code erzeugen sperrt alte Geräte aus.
+        </p>
+      </section>
+
       <div class="admin__label-settings">
         <h2>Etiketten-Layout</h2>
         <p class="admin__label-settings-intro">

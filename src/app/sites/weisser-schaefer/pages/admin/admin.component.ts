@@ -107,6 +107,8 @@ export class WsAdminComponent {
   readonly userDialogRequiredPhrase = signal('BESTAETIGEN');
   readonly selectedPrinter = signal('');
   readonly appDownloadUrlDraft = signal(WS_PRINT_APP_DOWNLOAD_URL);
+  readonly agentToken = signal('');
+  readonly serverOrigin = typeof window !== 'undefined' ? window.location.origin : '';
 
   readonly staffEmail = signal('');
   readonly staffName = signal('');
@@ -292,6 +294,7 @@ export class WsAdminComponent {
     }
     this.auth.reloadUsersFromStorage();
     this.appDownloadUrlDraft.set(this.routingSettings().appDownloadUrl ?? WS_PRINT_APP_DOWNLOAD_URL);
+    this.agentToken.set(this.loadAgentToken());
     this.applyFocusTab(this.route.snapshot.queryParamMap.get('tab'));
     this.route.queryParamMap
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -881,6 +884,68 @@ export class WsAdminComponent {
   saveDownloadUrl(): void {
     this.print.setDownloadUrl(this.appDownloadUrlDraft());
     this.session.showToast('Download-Link gespeichert');
+  }
+
+  private loadAgentToken(): string {
+    if (typeof localStorage === 'undefined') {
+      return '';
+    }
+    try {
+      const raw = localStorage.getItem('ws-agent-token');
+      if (!raw) {
+        return '';
+      }
+      const parsed = JSON.parse(raw);
+      return typeof parsed === 'string' ? parsed : '';
+    } catch {
+      return '';
+    }
+  }
+
+  generateAgentToken(): void {
+    const token = this.randomToken();
+    this.agentToken.set(token);
+    try {
+      localStorage.setItem('ws-agent-token', JSON.stringify(token));
+    } catch {
+      /* ignore */
+    }
+    this.session.showToast('Zugangscode erzeugt');
+  }
+
+  clearAgentToken(): void {
+    this.agentToken.set('');
+    try {
+      localStorage.setItem('ws-agent-token', JSON.stringify(''));
+    } catch {
+      /* ignore */
+    }
+    this.session.showToast('Zugangscode entfernt');
+  }
+
+  copyToClipboard(value: string): void {
+    if (!value || typeof navigator === 'undefined' || !navigator.clipboard) {
+      return;
+    }
+    void navigator.clipboard.writeText(value).then(
+      () => this.session.showToast('Kopiert'),
+      () => undefined,
+    );
+  }
+
+  private randomToken(): string {
+    const bytes = new Uint8Array(18);
+    const cryptoObj = typeof window !== 'undefined' ? window.crypto : undefined;
+    if (cryptoObj?.getRandomValues) {
+      cryptoObj.getRandomValues(bytes);
+    } else {
+      for (let i = 0; i < bytes.length; i += 1) {
+        bytes[i] = Math.floor(Math.random() * 256);
+      }
+    }
+    return Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
   }
 
   setLabelWidth(value: string): void {

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cloud-Einstellungen</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #11150f;
+      color: #edf4e8;
+      padding: 20px;
+    }
+    h1 { font-size: 1.2rem; margin: 0 0 4px; }
+    p.lead { margin: 0 0 18px; color: #9aa491; font-size: 0.85rem; line-height: 1.5; }
+    label { display: block; margin: 0 0 4px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #9aa491; font-weight: 700; }
+    .field { margin-bottom: 14px; }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: 9px;
+      border: 1px solid #2c3526;
+      background: #1a2016;
+      color: #edf4e8;
+      font: inherit;
+    }
+    .row { display: flex; gap: 12px; }
+    .row > .field { flex: 1; }
+    .check { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 0.9rem; color: #d7e0cf; }
+    .check input { width: 18px; height: 18px; }
+    fieldset { border: 1px solid #2c3526; border-radius: 12px; padding: 12px 14px; margin: 0 0 16px; }
+    legend { padding: 0 6px; font-size: 0.74rem; color: #c8d96a; }
+    button {
+      font: inherit; font-weight: 700; cursor: pointer;
+      border-radius: 999px; padding: 10px 18px; border: 1px solid transparent;
+    }
+    .btn-primary { background: linear-gradient(135deg, #dce88a, #a8b84a); color: #1a1c18; }
+    .btn-ghost { background: transparent; border-color: #3a4530; color: #d7e0cf; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+    .status { margin-top: 16px; font-size: 0.82rem; padding: 10px 12px; border-radius: 10px; background: #1a2016; border: 1px solid #2c3526; }
+    .status b { color: #c8d96a; }
+    .ok { color: #8fd17a; }
+    .err { color: #e3a07f; }
+    .hint { font-size: 0.72rem; color: #7e886f; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Cloud-Einstellungen</h1>
+  <p class="lead">
+    Verbinden Sie diese App mit Ihrem Server. Dann werden neue Bestellungen und
+    Lagerwarnungen automatisch gedruckt — auch ohne geöffnete Webseite.
+  </p>
+
+  <div class="field">
+    <label for="serverUrl">Server-URL</label>
+    <input id="serverUrl" type="text" placeholder="https://www.reineke.pro" />
+    <p class="hint">Genau die Adresse, die in der Verwaltung unter Drucker angezeigt wird.</p>
+  </div>
+
+  <div class="field">
+    <label for="token">Zugangscode</label>
+    <input id="token" type="text" placeholder="Code aus der Verwaltung einfügen" />
+  </div>
+
+  <label class="check">
+    <input id="enabled" type="checkbox" />
+    Automatischen Druck aktivieren
+  </label>
+
+  <fieldset>
+    <legend>Wann drucken?</legend>
+    <label class="check">
+      <input type="radio" name="mode" id="mode-interval" value="interval" />
+      Regelmäßig prüfen
+    </label>
+    <div class="field" style="margin-left: 26px;">
+      <label for="intervalMinutes">Alle … Minuten</label>
+      <input id="intervalMinutes" type="number" min="1" step="1" value="2" style="width: 120px;" />
+    </div>
+    <label class="check">
+      <input type="radio" name="mode" id="mode-times" value="times" />
+      Zu festen Uhrzeiten
+    </label>
+    <div class="field" style="margin-left: 26px;">
+      <label for="orderTimes">Uhrzeiten (Komma-getrennt, z. B. 08:00, 12:00, 16:00)</label>
+      <input id="orderTimes" type="text" placeholder="08:00, 12:00, 16:00" />
+    </div>
+  </fieldset>
+
+  <label class="check">
+    <input id="printOrders" type="checkbox" checked />
+    Bestellungen automatisch drucken
+  </label>
+  <label class="check">
+    <input id="printStockAlerts" type="checkbox" checked />
+    Lagerwarnungen automatisch drucken
+  </label>
+
+  <div class="actions">
+    <button class="btn-primary" id="save">Speichern</button>
+    <button class="btn-ghost" id="poll">Jetzt prüfen</button>
+  </div>
+
+  <div class="status" id="status">Lade Einstellungen…</div>
+
+  <script>
+    const API = 'http://127.0.0.1:19284';
+    const $ = (id) => document.getElementById(id);
+
+    async function load() {
+      try {
+        const res = await fetch(API + '/cloud-config');
+        const data = await res.json();
+        const c = data.config || {};
+        $('serverUrl').value = c.serverUrl || '';
+        $('token').value = c.token || '';
+        $('enabled').checked = !!c.enabled;
+        $('intervalMinutes').value = c.intervalMinutes || 2;
+        $('orderTimes').value = (c.orderTimes || []).join(', ');
+        $('printOrders').checked = c.printOrders !== false;
+        $('printStockAlerts').checked = c.printStockAlerts !== false;
+        $('mode-' + (c.mode === 'times' ? 'times' : 'interval')).checked = true;
+        renderStatus(data.status);
+      } catch (e) {
+        $('status').innerHTML = '<span class="err">App nicht erreichbar. Läuft WS Etikettendruck?</span>';
+      }
+    }
+
+    function renderStatus(s) {
+      if (!s) { $('status').textContent = 'Bereit.'; return; }
+      let html = '';
+      if (s.lastCloudError) {
+        html = '<span class="err">Letzter Fehler: ' + s.lastCloudError + '</span>';
+      } else if (s.lastCloudOkAt) {
+        html = '<span class="ok">Zuletzt erfolgreich: ' + new Date(s.lastCloudOkAt).toLocaleString('de-DE') + '</span>';
+      } else {
+        html = 'Noch keine Cloud-Abfrage.';
+      }
+      $('status').innerHTML = html;
+    }
+
+    function readForm() {
+      const mode = $('mode-times').checked ? 'times' : 'interval';
+      return {
+        serverUrl: $('serverUrl').value,
+        token: $('token').value,
+        enabled: $('enabled').checked,
+        mode,
+        intervalMinutes: Number($('intervalMinutes').value) || 2,
+        orderTimes: $('orderTimes').value,
+        printOrders: $('printOrders').checked,
+        printStockAlerts: $('printStockAlerts').checked,
+      };
+    }
+
+    $('save').addEventListener('click', async () => {
+      $('status').textContent = 'Speichere…';
+      try {
+        const res = await fetch(API + '/cloud-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(readForm()),
+        });
+        const data = await res.json();
+        const c = data.config || {};
+        $('orderTimes').value = (c.orderTimes || []).join(', ');
+        $('status').innerHTML = '<span class="ok">Gespeichert.</span>';
+      } catch (e) {
+        $('status').innerHTML = '<span class="err">Speichern fehlgeschlagen.</span>';
+      }
+    });
+
+    $('poll').addEventListener('click', async () => {
+      $('status').textContent = 'Prüfe…';
+      try {
+        await fetch(API + '/cloud-poll', { method: 'POST' });
+        setTimeout(load, 1500);
+      } catch (e) {
+        $('status').innerHTML = '<span class="err">Prüfung fehlgeschlagen.</span>';
+      }
+    });
+
+    load();
+  </script>
+</body>
+</html>

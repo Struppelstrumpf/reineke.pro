@@ -7,6 +7,8 @@ COPY server.js ./
 
 ENV PORT=19290
 ENV WS_DATA_FILE=/data/ws-store.json
+# Zeitzone für korrekte Lagerwarn-Uhrzeiten (anpassbar)
+ENV TZ=Europe/Berlin
 
 # Persistenter Speicher für die JSON-Datenbank
 VOLUME ["/data"]

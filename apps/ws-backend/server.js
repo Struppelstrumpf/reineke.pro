@@ -71,8 +71,8 @@ function sendJson(res, status, body) {
   res.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, PUT, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, x-ws-token',
     'Cache-Control': 'no-store',
   });
   res.end(data);
@@ -107,6 +107,178 @@ function allValues() {
   return values;
 }
 
+/** Liest einen gespeicherten Wert als geparstes JSON (oder null). */
+function readDoc(key) {
+  const entry = store[key];
+  if (!entry || typeof entry.value !== 'string') {
+    return null;
+  }
+  try {
+    return JSON.parse(entry.value);
+  } catch {
+    return null;
+  }
+}
+
+function writeDoc(key, obj) {
+  store[key] = { value: JSON.stringify(obj), updatedAt: nowIso() };
+  return persistStore();
+}
+
+function agentToken() {
+  const raw = readDoc('ws-agent-token');
+  return typeof raw === 'string' ? raw.trim() : '';
+}
+
+function requestToken(req, url) {
+  const header = req.headers['x-ws-token'];
+  if (typeof header === 'string' && header.trim()) {
+    return header.trim();
+  }
+  return (url.searchParams.get('token') || '').trim();
+}
+
+// --- Lagerwarn-Logik (gespiegelt aus der Web-App) ----------------------------
+
+function normalizeAlertTime(value) {
+  const match = /^(\d{1,2}):(\d{2})$/.exec(String(value).trim());
+  if (!match) return null;
+  const h = Number(match[1]);
+  const m = Number(match[2]);
+  if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+function normalizeAlertTimes(values) {
+  const set = new Set();
+  for (const v of values || []) {
+    const n = normalizeAlertTime(v);
+    if (n) set.add(n);
+  }
+  return [...set].sort();
+}
+
+function alertSlotKey(date, time) {
+  const y = date.getFullYear();
+  const mo = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${mo}-${d}:${time}`;
+}
+
+function slotDateTime(date, time) {
+  const [h, m] = time.split(':').map(Number);
+  const slot = new Date(date);
+  slot.setHours(h, m, 0, 0);
+  return slot;
+}
+
+function dueUnprintedSlots(alertTimes, printedSlots, now) {
+  const normalized = normalizeAlertTimes(alertTimes);
+  if (!normalized.length) return [];
+  const printed = new Set(printedSlots || []);
+  const due = [];
+  for (const time of normalized) {
+    if (now.getTime() < slotDateTime(now, time).getTime()) continue;
+    if (!printed.has(alertSlotKey(now, time))) due.push(time);
+  }
+  return due;
+}
+
+function buildStockAlert(now) {
+  const inventory = readDoc('ws-demo-inventory');
+  if (!inventory || !inventory.settings || !inventory.settings.alertsEnabled) {
+    return null;
+  }
+  const stock = inventory.stock || {};
+  const catalog = readDoc('ws-demo-catalog');
+  const products = (catalog && Array.isArray(catalog.products)) ? catalog.products : [];
+  const byId = new Map(products.map((p) => [p.id, p]));
+
+  const items = [];
+  for (const productId of Object.keys(stock)) {
+    const entry = stock[productId] || {};
+    const quantity = Number(entry.quantity) || 0;
+    const threshold = Number(entry.alertThreshold) || 0;
+    if (quantity > threshold) continue;
+    const product = byId.get(productId);
+    if (!product || product.active === false) continue;
+    items.push({
+      productId,
+      productName: product.name || productId,
+      spec: product.spec || '',
+      unit: product.unit || '',
+      quantity,
+      threshold,
+    });
+  }
+  if (!items.length) return null;
+
+  const due = dueUnprintedSlots(
+    inventory.settings.alertTimes,
+    inventory.settings.printedAlertSlots,
+    now,
+  );
+  if (!due.length) return null;
+
+  return { items, slots: due.map((time) => alertSlotKey(now, time)) };
+}
+
+function orderPrintPayloads() {
+  const orders = readDoc('ws-demo-orders');
+  if (!Array.isArray(orders)) return [];
+  return orders
+    .filter((o) => o && o.status === 'neu' && !o.printedAt)
+    .map((o) => ({
+      orderId: o.id,
+      jobId: `cloud-${o.id}`,
+      customer: o.customer,
+      customerAddress: o.customerAddress,
+      customerPhone: o.customerPhone,
+      createdAt: o.createdAt,
+      lines: o.lines || [],
+      note: o.note,
+    }));
+}
+
+function markOrdersPrinted(orderIds) {
+  const ids = new Set(orderIds || []);
+  if (!ids.size) return;
+  const orders = readDoc('ws-demo-orders');
+  if (!Array.isArray(orders)) return;
+  const stamp = nowIso();
+  let changed = false;
+  const next = orders.map((o) => {
+    if (!o || !ids.has(o.id) || o.printedAt) return o;
+    changed = true;
+    return {
+      ...o,
+      status: o.status === 'neu' ? 'in Bearbeitung' : o.status,
+      printedAt: stamp,
+      printState: 'printed',
+      printingSince: undefined,
+      printDispatchedAt: undefined,
+    };
+  });
+  if (changed) writeDoc('ws-demo-orders', next);
+}
+
+function markStockSlotsPrinted(slots) {
+  if (!slots || !slots.length) return;
+  const inventory = readDoc('ws-demo-inventory');
+  if (!inventory || !inventory.settings) return;
+  const printed = new Set(inventory.settings.printedAlertSlots || []);
+  for (const s of slots) printed.add(s);
+  const next = {
+    ...inventory,
+    settings: {
+      ...inventory.settings,
+      printedAlertSlots: [...printed],
+      lastCombinedAlertAt: nowIso(),
+    },
+  };
+  writeDoc('ws-demo-inventory', next);
+}
+
 const server = http.createServer(async (req, res) => {
   const method = req.method || 'GET';
   let pathname = '/';
@@ -119,8 +291,8 @@ const server = http.createServer(async (req, res) => {
   if (method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Methods': 'GET, PUT, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, x-ws-token',
     });
     res.end();
     return;
@@ -133,6 +305,52 @@ const server = http.createServer(async (req, res) => {
 
   if (method === 'GET' && pathname === '/api/state') {
     sendJson(res, 200, { values: allValues(), updatedAt: nowIso() });
+    return;
+  }
+
+  // --- Agent-Schnittstelle (Etikettendruck-App, token-geschützt) -------------
+  if (pathname === '/api/agent/poll' || pathname === '/api/agent/printed') {
+    const url = new URL(req.url, 'http://localhost');
+    const configured = agentToken();
+    if (!configured) {
+      sendJson(res, 503, {
+        ok: false,
+        error: 'Kein Zugangscode konfiguriert. Bitte in der Verwaltung unter Drucker einen Code erzeugen.',
+      });
+      return;
+    }
+    if (requestToken(req, url) !== configured) {
+      sendJson(res, 401, { ok: false, error: 'Zugangscode ungültig.' });
+      return;
+    }
+
+    if (method === 'GET' && pathname === '/api/agent/poll') {
+      const now = new Date();
+      sendJson(res, 200, {
+        ok: true,
+        serverTime: now.toISOString(),
+        orders: orderPrintPayloads(),
+        stockAlert: buildStockAlert(now),
+        labelSettings: readDoc('ws-label-print-settings'),
+      });
+      return;
+    }
+
+    if (method === 'POST' && pathname === '/api/agent/printed') {
+      try {
+        const raw = await readBody(req);
+        const body = raw ? JSON.parse(raw) : {};
+        markOrdersPrinted(Array.isArray(body.orderIds) ? body.orderIds : []);
+        markStockSlotsPrinted(Array.isArray(body.stockSlots) ? body.stockSlots : []);
+        await persistStore();
+        sendJson(res, 200, { ok: true });
+      } catch (err) {
+        sendJson(res, 400, { ok: false, error: 'Ungültiger Request: ' + err.message });
+      }
+      return;
+    }
+
+    sendJson(res, 405, { ok: false, error: 'Methode nicht erlaubt' });
     return;
   }
 

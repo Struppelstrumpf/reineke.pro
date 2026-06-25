@@ -1,3 +1,21 @@
+.admin__cloud-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.admin__copy-line {
+  display: flex;
+  gap: 0.4rem;
+  align-items: stretch;
+}
+
+.admin__copy-line input {
+  flex: 1;
+  min-width: 0;
+}
+
 .admin__order-stats {
   display: grid;
   grid-template-columns: repeat(2, minmax(4.8rem, auto));

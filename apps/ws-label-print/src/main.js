@@ -25,7 +25,7 @@ const {
 
 const PORT = 19284;
 const PROTOCOL = 'wslabel';
-const VERSION = '1.4.5';
+const VERSION = '1.5.0';
 const DEMO_URL_HINT = 'reineke.pro/demo/weisser-schaefer';
 const ALLOW_DOTNET_FALLBACK = process.env.WS_ALLOW_DOTNET_FALLBACK === '1';
 
@@ -639,6 +639,257 @@ async function printLabel(payload) {
   }
 }
 
+// --- Cloud-Anbindung: eigenständiger Druck ohne offene Webseite --------------
+
+const DEFAULT_CLOUD_CONFIG = {
+  serverUrl: '',
+  token: '',
+  enabled: false,
+  mode: 'interval', // 'interval' | 'times'
+  intervalMinutes: 2,
+  orderTimes: [],
+  printOrders: true,
+  printStockAlerts: true,
+};
+
+let cloudConfig = { ...DEFAULT_CLOUD_CONFIG };
+let cloudWindow = null;
+let cloudPolling = false;
+let lastCloudPollAt = 0;
+let lastCloudError = null;
+let lastCloudOkAt = null;
+const cloudDoneSlots = new Set();
+
+function cloudConfigPath() {
+  return path.join(app.getPath('userData'), 'cloud.json');
+}
+
+function normalizeTimeList(values) {
+  const set = new Set();
+  for (const v of Array.isArray(values) ? values : String(values || '').split(',')) {
+    const match = /^(\d{1,2}):(\d{2})$/.exec(String(v).trim());
+    if (!match) continue;
+    const h = Number(match[1]);
+    const m = Number(match[2]);
+    if (h < 0 || h > 23 || m < 0 || m > 59) continue;
+    set.add(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+  }
+  return [...set].sort();
+}
+
+function loadCloudConfig() {
+  try {
+    const raw = fs.readFileSync(cloudConfigPath(), 'utf8');
+    cloudConfig = { ...DEFAULT_CLOUD_CONFIG, ...JSON.parse(raw) };
+  } catch {
+    cloudConfig = { ...DEFAULT_CLOUD_CONFIG };
+  }
+}
+
+function saveCloudConfig(next) {
+  const merged = { ...DEFAULT_CLOUD_CONFIG, ...cloudConfig, ...next };
+  merged.serverUrl = String(merged.serverUrl || '').trim().replace(/\/+$/, '');
+  merged.token = String(merged.token || '').trim();
+  merged.enabled = merged.enabled === true;
+  merged.mode = merged.mode === 'times' ? 'times' : 'interval';
+  merged.intervalMinutes = Math.max(1, Math.round(Number(merged.intervalMinutes) || 2));
+  merged.orderTimes = normalizeTimeList(merged.orderTimes);
+  merged.printOrders = merged.printOrders !== false;
+  merged.printStockAlerts = merged.printStockAlerts !== false;
+  cloudConfig = merged;
+  try {
+    fs.writeFileSync(cloudConfigPath(), JSON.stringify(cloudConfig, null, 2), 'utf8');
+  } catch {
+    /* ignore */
+  }
+}
+
+function cloudRequest(method, fullUrl, token, bodyObj) {
+  return new Promise((resolve, reject) => {
+    let u;
+    try {
+      u = new URL(fullUrl);
+    } catch (err) {
+      reject(err);
+      return;
+    }
+    const lib = u.protocol === 'https:' ? require('https') : require('http');
+    const payload = bodyObj ? Buffer.from(JSON.stringify(bodyObj)) : null;
+    const opts = {
+      method,
+      hostname: u.hostname,
+      port: u.port || (u.protocol === 'https:' ? 443 : 80),
+      path: u.pathname + u.search,
+      headers: { Accept: 'application/json' },
+    };
+    if (token) {
+      opts.headers['x-ws-token'] = token;
+    }
+    if (payload) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.headers['Content-Length'] = payload.length;
+    }
+    const reqc = lib.request(opts, (resp) => {
+      let data = '';
+      resp.on('data', (c) => (data += c));
+      resp.on('end', () => {
+        let json = null;
+        try {
+          json = data ? JSON.parse(data) : {};
+        } catch {
+          json = null;
+        }
+        resolve({ status: resp.statusCode, json });
+      });
+    });
+    reqc.on('error', reject);
+    reqc.setTimeout(15000, () => reqc.destroy(new Error('timeout')));
+    if (payload) {
+      reqc.write(payload);
+    }
+    reqc.end();
+  });
+}
+
+async function pollCloud() {
+  if (cloudPolling) {
+    return;
+  }
+  if (!cloudConfig.enabled || !cloudConfig.serverUrl || !cloudConfig.token) {
+    return;
+  }
+  cloudPolling = true;
+  lastCloudPollAt = Date.now();
+  try {
+    const { status, json } = await cloudRequest(
+      'GET',
+      `${cloudConfig.serverUrl}/api/agent/poll`,
+      cloudConfig.token,
+      null,
+    );
+    if (status !== 200 || !json || !json.ok) {
+      lastCloudError = (json && json.error) || `HTTP ${status}`;
+      updateTray();
+      return;
+    }
+    lastCloudError = null;
+    lastCloudOkAt = new Date().toISOString();
+
+    if (json.labelSettings) {
+      try {
+        saveLabelSettings(json.labelSettings);
+      } catch {
+        /* ignore */
+      }
+    }
+
+    const printedOrderIds = [];
+    if (cloudConfig.printOrders && Array.isArray(json.orders)) {
+      for (const payload of json.orders) {
+        if (!payload || !payload.orderId) {
+          continue;
+        }
+        const dup = findDuplicatePrint(payload.orderId, payload.jobId, false);
+        if (dup) {
+          printedOrderIds.push(payload.orderId);
+          continue;
+        }
+        reservePrint(payload.orderId, payload.jobId);
+        isPrinting = true;
+        try {
+          await runExclusive(() => printLabel(payload));
+          lastPrintError = null;
+          lastPrintOk = new Date().toISOString();
+          printedOrderIds.push(payload.orderId);
+        } catch (err) {
+          if (!isUncertainPrintError(err)) {
+            unreservePrint(payload.orderId, payload.jobId);
+          }
+          lastPrintError = err.message || 'Cloud-Druck fehlgeschlagen';
+        } finally {
+          isPrinting = false;
+        }
+      }
+    }
+
+    const printedSlots = [];
+    if (
+      cloudConfig.printStockAlerts &&
+      json.stockAlert &&
+      Array.isArray(json.stockAlert.items) &&
+      json.stockAlert.items.length
+    ) {
+      isPrinting = true;
+      try {
+        await runExclusive(() => printStockAlert(json.stockAlert));
+        lastPrintError = null;
+        lastPrintOk = new Date().toISOString();
+        printedSlots.push(...(json.stockAlert.slots || []));
+      } catch (err) {
+        lastPrintError = err.message || 'Lagerwarn-Druck fehlgeschlagen';
+      } finally {
+        isPrinting = false;
+      }
+    }
+
+    if (printedOrderIds.length || printedSlots.length) {
+      try {
+        await cloudRequest('POST', `${cloudConfig.serverUrl}/api/agent/printed`, cloudConfig.token, {
+          orderIds: printedOrderIds,
+          stockSlots: printedSlots,
+        });
+      } catch {
+        /* Ack fehlgeschlagen — Dedup verhindert beim nächsten Poll Doppeldruck. */
+      }
+    }
+    updateTray();
+  } catch (err) {
+    lastCloudError = err.message || 'Cloud nicht erreichbar';
+    updateTray();
+  } finally {
+    cloudPolling = false;
+  }
+}
+
+function cloudTick() {
+  if (!cloudConfig.enabled || !cloudConfig.serverUrl || !cloudConfig.token) {
+    return;
+  }
+  if (cloudConfig.mode === 'interval') {
+    if (Date.now() - lastCloudPollAt >= cloudConfig.intervalMinutes * 60000) {
+      void pollCloud();
+    }
+    return;
+  }
+  const now = new Date();
+  const hhmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  if (cloudConfig.orderTimes.includes(hhmm)) {
+    const slot = `${now.toDateString()}:${hhmm}`;
+    if (!cloudDoneSlots.has(slot)) {
+      cloudDoneSlots.add(slot);
+      void pollCloud();
+    }
+  }
+}
+
+function createCloudWindow() {
+  if (cloudWindow && !cloudWindow.isDestroyed()) {
+    cloudWindow.focus();
+    return;
+  }
+  cloudWindow = new BrowserWindow({
+    width: 560,
+    height: 720,
+    title: 'WS Etikettendruck — Cloud-Einstellungen',
+    autoHideMenuBar: true,
+    webPreferences: { contextIsolation: true, nodeIntegration: false },
+  });
+  cloudWindow.loadFile(resolveAsset('src', 'cloud-settings.html'));
+  cloudWindow.on('closed', () => {
+    cloudWindow = null;
+  });
+}
+
 function startServer() {
   const server = http.createServer(async (req, res) => {
     cors(res);
@@ -832,6 +1083,38 @@ function startServer() {
         return;
       }
 
+      if (req.method === 'GET' && url.pathname === '/cloud-config') {
+        sendJson(res, 200, {
+          ok: true,
+          config: cloudConfig,
+          status: {
+            lastCloudOkAt,
+            lastCloudError,
+            lastCloudPollAt: lastCloudPollAt || null,
+            polling: cloudPolling,
+          },
+        });
+        return;
+      }
+
+      if (req.method === 'POST' && url.pathname === '/cloud-config') {
+        const body = await readBody(req);
+        saveCloudConfig(body || {});
+        lastCloudPollAt = 0;
+        cloudDoneSlots.clear();
+        sendJson(res, 200, { ok: true, config: cloudConfig });
+        if (cloudConfig.enabled) {
+          void pollCloud();
+        }
+        return;
+      }
+
+      if (req.method === 'POST' && url.pathname === '/cloud-poll') {
+        void pollCloud();
+        sendJson(res, 200, { ok: true });
+        return;
+      }
+
       sendJson(res, 404, { ok: false, error: 'not found' });
     } catch (err) {
       sendJson(res, 500, { ok: false, error: err.message || 'error' });
@@ -853,8 +1136,11 @@ function updateTray() {
     : lastPrintOk
       ? '\nLetzter Druck: OK'
       : '';
+  const cloud = cloudConfig.enabled
+    ? `\nCloud: aktiv (${cloudConfig.mode === 'times' ? 'Uhrzeiten' : `alle ${cloudConfig.intervalMinutes} min`})${lastCloudError ? ' · Fehler: ' + lastCloudError : lastCloudOkAt ? ' · OK' : ''}`
+    : '\nCloud: aus';
   tray.setToolTip(
-    `WS Etikettendruck v${VERSION}\nPort ${PORT}\nDrucker: ${selectedPrinter || 'automatisch'}\nWeb: ${connected ? 'verbunden' : 'warte'}${status}`,
+    `WS Etikettendruck v${VERSION}\nPort ${PORT}\nDrucker: ${selectedPrinter || 'automatisch'}\nWeb: ${connected ? 'verbunden' : 'warte'}${cloud}${status}`,
   );
 }
 
@@ -882,6 +1168,15 @@ function createTray() {
             updateTray();
           });
       },
+    },
+    { type: 'separator' },
+    {
+      label: 'Cloud-Einstellungen…',
+      click: () => createCloudWindow(),
+    },
+    {
+      label: 'Jetzt auf neue Bestellungen prüfen',
+      click: () => void pollCloud(),
     },
     { type: 'separator' },
     {
@@ -921,11 +1216,15 @@ if (!gotLock) {
     loadPrinter();
     loadLabelSettings();
     loadRecentPrints();
+    loadCloudConfig();
     await preloadPrintWindow();
     await refreshPrinters(true);
     startServer();
     createTray();
     setInterval(updateTray, 5000);
+    setInterval(cloudTick, 20000);
+    // Kurz nach Start einmal prüfen, falls Cloud-Druck aktiv ist.
+    setTimeout(() => void pollCloud(), 8000);
   });
 
   app.on('window-all-closed', (e) => e.preventDefault());

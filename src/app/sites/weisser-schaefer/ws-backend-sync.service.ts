@@ -38,6 +38,7 @@ const SYNC_KEYS: readonly string[] = [
   'ws-label-print-settings',
   'ws-demo-print-routing-v1',
   'ws-auto-print-enabled',
+  'ws-agent-token',
 ];
 
 const SYNC_KEY_SET = new Set(SYNC_KEYS);
