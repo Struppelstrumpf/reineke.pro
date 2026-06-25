@@ -278,13 +278,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 1.15rem;
-  height: 1.15rem;
-  padding: 0 0.28rem;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  padding: 0 0.3rem;
   border-radius: 999px;
-  background: currentColor;
-  color: var(--ws-bg);
-  font-size: 0.72rem;
+  background: var(--pill-accent, var(--ws-accent));
+  color: #11150f;
+  font-size: 0.74rem;
   font-weight: 800;
 }
 
@@ -294,19 +294,22 @@
 }
 
 .ws__live-pill--orders {
-  color: color-mix(in srgb, var(--ws-accent) 86%, white 14%);
+  --pill-accent: color-mix(in srgb, var(--ws-accent) 86%, white 14%);
+  color: var(--pill-accent);
   border-color: color-mix(in srgb, var(--ws-accent) 52%, var(--ws-border-strong));
 }
 
 .ws__live-pill--chat {
-  color: #8fc8e8;
+  --pill-accent: #8fc8e8;
+  color: var(--pill-accent);
   border-color: rgba(120, 170, 212, 0.5);
   background:
     linear-gradient(135deg, rgba(120, 170, 212, 0.18), color-mix(in srgb, var(--ws-surface) 88%, transparent));
 }
 
 .ws__live-pill--stock {
-  color: #e8a88a;
+  --pill-accent: #e8a88a;
+  color: var(--pill-accent);
   border-color: rgba(212, 120, 90, 0.5);
   background:
     linear-gradient(135deg, rgba(212, 120, 90, 0.18), color-mix(in srgb, var(--ws-surface) 88%, transparent));

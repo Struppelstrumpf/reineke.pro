@@ -144,7 +144,11 @@ export class WeisserSchaeferShellComponent {
   }
 
   readonly newOrdersLiveCount = computed(() =>
-    this.auth.isStaff() ? this.session.activeOrders().filter((order) => order.status === 'neu').length : 0,
+    this.auth.isStaff()
+      ? this.session
+          .activeOrders()
+          .filter((order) => order.status === 'neu' || order.status === 'in Bearbeitung').length
+      : 0,
   );
   readonly newChatLiveCount = computed(() => (this.auth.isStaff() ? this.chat.waitingForStaffCount() : 0));
   readonly lowStockLiveCount = computed(() => (this.auth.isStaff() ? this.inventory.lowStockRows().length : 0));
