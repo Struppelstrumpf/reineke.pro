@@ -78,6 +78,15 @@
     );
 }
 
+.ws-field select {
+  color-scheme: dark;
+}
+
+.ws-field select option {
+  background: #111915;
+  color: #edf4e8;
+}
+
 .ws-form__error {
   margin: 0;
   font-size: 0.82rem;

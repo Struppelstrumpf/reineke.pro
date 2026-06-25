@@ -10,7 +10,7 @@ export const WS_PRINT_API = 'http://127.0.0.1:19284';
 export const WS_PRINT_PROTOCOL = 'wslabel';
 export const WS_PRINT_MIN_STOCK_VERSION = '1.2.0';
 export const WS_PRINT_CONTACT_HEADER_VERSION = '1.4.5';
-export const WS_PRINT_APP_DOWNLOAD_URL = 'https://github.com/struppelstrumpf/reineke.pro/releases';
+export const WS_PRINT_APP_DOWNLOAD_URL = 'https://www.reineke.pro/downloads/ws-etikettendruck.zip';
 const WS_PRINT_ROUTING_KEY = 'ws-demo-print-routing-v1';
 
 export type WsAgentPrintRecord = { orderId?: string | null; jobId?: string | null; at: string };

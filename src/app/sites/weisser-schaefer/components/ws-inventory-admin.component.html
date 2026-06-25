@@ -110,35 +110,38 @@
                       </button>
                     </div>
                     <div class="inventory-admin__adjust-editor">
-                      <div class="inventory-admin__adjust-mode" role="group" aria-label="Bestandsmodus">
+                      <div class="inventory-admin__stepper" role="group" aria-label="Menge wählen">
                         <button
                           type="button"
-                          class="ws-btn ws-btn--ghost ws-btn--sm inventory-admin__mode-btn"
-                          [class.is-active]="modeFor(row.productId) === 'add'"
-                          (click)="setMode(row.productId, 'add')"
+                          class="ws-btn ws-btn--ghost ws-btn--sm inventory-admin__step-btn"
+                          (click)="stepAmount(row.productId, -1)"
+                          aria-label="Menge verringern"
+                        >
+                          −
+                        </button>
+                        <input
+                          class="inventory-admin__adjust-input"
+                          type="number"
+                          min="0"
+                          step="1"
+                          placeholder="Menge"
+                          [value]="amountFor(row.productId)"
+                          (input)="setAmount(row.productId, $any($event.target).value)"
+                        />
+                        <button
+                          type="button"
+                          class="ws-btn ws-btn--ghost ws-btn--sm inventory-admin__step-btn"
+                          (click)="stepAmount(row.productId, 1)"
+                          aria-label="Menge erhöhen"
                         >
                           +
                         </button>
-                        <button
-                          type="button"
-                          class="ws-btn ws-btn--ghost ws-btn--sm inventory-admin__mode-btn"
-                          [class.is-active]="modeFor(row.productId) === 'remove'"
-                          (click)="setMode(row.productId, 'remove')"
-                        >
-                          -
-                        </button>
                       </div>
-                      <input
-                        class="inventory-admin__adjust-input"
-                        type="number"
-                        min="0"
-                        step="1"
-                        placeholder="Menge"
-                        [value]="amountFor(row.productId)"
-                        (input)="setAmount(row.productId, $any($event.target).value)"
-                      />
-                      <button type="button" class="ws-btn ws-btn--sm inventory-admin__apply-btn" (click)="requestStockChange(row.productId, row.productName)">
-                        Menge ändern
+                      <button type="button" class="ws-btn ws-btn--sm inventory-admin__apply-btn" (click)="requestStockChange(row.productId, row.productName, 'add')">
+                        Hinzufügen
+                      </button>
+                      <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="requestStockChange(row.productId, row.productName, 'remove')">
+                        Entfernen
                       </button>
                       <button
                         type="button"

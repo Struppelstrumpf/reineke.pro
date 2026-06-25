@@ -329,13 +329,14 @@
   transform: translateY(0);
 }
 
-.inventory-admin__adjust-mode {
+.inventory-admin__stepper {
   display: inline-flex;
-  gap: 0.25rem;
+  align-items: center;
+  gap: 0.2rem;
 }
 
 .inventory-admin__cell-btn,
-.inventory-admin__adjust-mode .ws-btn,
+.inventory-admin__stepper .ws-btn,
 .inventory-admin__adjust-close,
 .inventory-admin__apply-btn {
   min-height: 2rem;
@@ -344,20 +345,16 @@
   box-shadow: none;
 }
 
-.inventory-admin__mode-btn {
-  min-width: 1.9rem;
+.inventory-admin__step-btn {
+  min-width: 2rem;
   padding-inline: 0;
-  opacity: 0.5;
-}
-
-.inventory-admin__adjust-mode .ws-btn.is-active {
-  border-color: color-mix(in srgb, var(--ws-accent) 66%, var(--ws-border-strong));
-  color: color-mix(in srgb, var(--ws-accent) 80%, white 20%);
-  opacity: 1;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .inventory-admin__adjust-input {
   width: 4.7rem;
+  text-align: center;
 }
 
 .inventory-admin__apply-btn {

@@ -858,7 +858,17 @@ export class WsAdminComponent {
   }
 
   addAlertTime(): void {
-    this.inventory.setAlertTimes([...this.alertTimes(), '08:00']);
+    const existing = new Set(this.alertTimes());
+    let free = '08:00';
+    for (let offset = 0; offset < 24; offset += 1) {
+      const hour = (8 + offset) % 24;
+      const candidate = `${String(hour).padStart(2, '0')}:00`;
+      if (!existing.has(candidate)) {
+        free = candidate;
+        break;
+      }
+    }
+    this.inventory.setAlertTimes([...this.alertTimes(), free]);
   }
 
   removeAlertTime(index: number): void {

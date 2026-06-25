@@ -30,7 +30,6 @@ export class WsInventoryAdminComponent {
   private readonly session = inject(WeisserSchaeferSessionService);
 
   readonly addAmounts = signal<Record<string, string>>({});
-  readonly adjustModes = signal<Record<string, StockAdjustMode>>({});
   readonly thresholdDrafts = signal<Record<string, string>>({});
   readonly showCombinedPreview = signal(false);
   readonly editingProductId = signal<string | null>(null);
@@ -52,12 +51,11 @@ export class WsInventoryAdminComponent {
     this.addAmounts.update((map) => ({ ...map, [productId]: value }));
   }
 
-  modeFor(productId: string): StockAdjustMode {
-    return this.adjustModes()[productId] ?? 'add';
-  }
-
-  setMode(productId: string, mode: StockAdjustMode): void {
-    this.adjustModes.update((map) => ({ ...map, [productId]: mode }));
+  stepAmount(productId: string, delta: number): void {
+    const current = Number((this.amountFor(productId) || '0').replace(',', '.'));
+    const base = Number.isFinite(current) ? current : 0;
+    const next = Math.max(0, Math.round((base + delta) * 1000) / 1000);
+    this.setAmount(productId, String(next));
   }
 
   thresholdFor(productId: string, current: number): string {
@@ -80,7 +78,7 @@ export class WsInventoryAdminComponent {
     this.editingProductId.set(null);
   }
 
-  requestStockChange(productId: string, productName: string): void {
+  requestStockChange(productId: string, productName: string, mode: StockAdjustMode): void {
     const amount = Number(this.amountFor(productId).replace(',', '.'));
     if (!Number.isFinite(amount) || amount <= 0) {
       this.session.showToast('Bitte eine positive Menge eingeben.');
@@ -89,7 +87,7 @@ export class WsInventoryAdminComponent {
     this.pendingStockChange.set({
       productId,
       productName,
-      mode: this.modeFor(productId),
+      mode,
       amount,
     });
   }
