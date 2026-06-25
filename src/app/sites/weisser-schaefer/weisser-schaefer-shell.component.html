@@ -60,7 +60,7 @@
             <button
               type="button"
               class="ws__live-pill ws__live-pill--orders is-pulse"
-              (click)="openAdminTab('orders')"
+              (click)="dismissOrdersAlert()"
               [attr.aria-label]="newOrdersLiveCount() + ' neue Bestellungen'"
               title="Neue Bestellungen anzeigen"
             >
@@ -77,7 +77,7 @@
             <button
               type="button"
               class="ws__live-pill ws__live-pill--chat"
-              (click)="openAdminTab('chat')"
+              (click)="dismissChatAlert()"
               [attr.aria-label]="newChatLiveCount() + ' neue Chats'"
               title="Chat öffnen"
             >
@@ -94,7 +94,7 @@
             <button
               type="button"
               class="ws__live-pill ws__live-pill--stock"
-              (click)="openAdminTab('inventory')"
+              (click)="dismissStockAlert()"
               [attr.aria-label]="lowStockLiveCount() + ' Produkte unter Schwelle'"
               title="Lager anzeigen"
             >

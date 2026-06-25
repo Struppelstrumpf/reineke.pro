@@ -143,15 +143,56 @@ export class WeisserSchaeferShellComponent {
     });
   }
 
-  readonly newOrdersLiveCount = computed(() =>
-    this.auth.isStaff()
-      ? this.session
-          .activeOrders()
-          .filter((order) => order.status === 'neu' || order.status === 'in Bearbeitung').length
-      : 0,
+  // Quittierte ("gesehene") Benachrichtigungen — geräte­lokal, nicht synchronisiert.
+  private readonly ackOrderIds = signal<string[]>(this.loadAck('ws-live-ack-orders'));
+  private readonly ackChatSigs = signal<string[]>(this.loadAck('ws-live-ack-chat'));
+  private readonly ackStockIds = signal<string[]>(this.loadAck('ws-live-ack-stock'));
+
+  private readonly activeOrderIds = computed(() =>
+    this.session
+      .activeOrders()
+      .filter((order) => order.status === 'neu' || order.status === 'in Bearbeitung')
+      .map((order) => order.id),
   );
-  readonly newChatLiveCount = computed(() => (this.auth.isStaff() ? this.chat.waitingForStaffCount() : 0));
-  readonly lowStockLiveCount = computed(() => (this.auth.isStaff() ? this.inventory.lowStockRows().length : 0));
+
+  private readonly waitingChatSigs = computed(() =>
+    this.chat
+      .openConversations()
+      .filter((conversation) => this.chat.isWaitingForStaff(conversation))
+      .map((conversation) => {
+        const last = conversation.messages[conversation.messages.length - 1];
+        return `${conversation.id}:${last?.id ?? ''}`;
+      }),
+  );
+
+  private readonly lowStockIds = computed(() =>
+    this.inventory.lowStockRows().map((row) => row.productId),
+  );
+
+  readonly newOrdersLiveCount = computed(() => {
+    if (!this.auth.isStaff()) {
+      return 0;
+    }
+    const ack = new Set(this.ackOrderIds());
+    return this.activeOrderIds().filter((id) => !ack.has(id)).length;
+  });
+
+  readonly newChatLiveCount = computed(() => {
+    if (!this.auth.isStaff()) {
+      return 0;
+    }
+    const ack = new Set(this.ackChatSigs());
+    return this.waitingChatSigs().filter((sig) => !ack.has(sig)).length;
+  });
+
+  readonly lowStockLiveCount = computed(() => {
+    if (!this.auth.isStaff()) {
+      return 0;
+    }
+    const ack = new Set(this.ackStockIds());
+    return this.lowStockIds().filter((id) => !ack.has(id)).length;
+  });
+
   readonly hasLiveNotifications = computed(
     () =>
       this.newOrdersLiveCount() > 0 || this.newChatLiveCount() > 0 || this.lowStockLiveCount() > 0,
@@ -164,6 +205,48 @@ export class WeisserSchaeferShellComponent {
     void this.router.navigate(['/demo/weisser-schaefer/verwaltung'], {
       queryParams: { tab },
     });
+  }
+
+  dismissOrdersAlert(): void {
+    this.ackOrderIds.set([...this.activeOrderIds()]);
+    this.saveAck('ws-live-ack-orders', this.ackOrderIds());
+    this.openAdminTab('orders');
+  }
+
+  dismissChatAlert(): void {
+    this.ackChatSigs.set([...this.waitingChatSigs()]);
+    this.saveAck('ws-live-ack-chat', this.ackChatSigs());
+    this.openAdminTab('chat');
+  }
+
+  dismissStockAlert(): void {
+    this.ackStockIds.set([...this.lowStockIds()]);
+    this.saveAck('ws-live-ack-stock', this.ackStockIds());
+    this.openAdminTab('inventory');
+  }
+
+  private loadAck(key: string): string[] {
+    if (typeof localStorage === 'undefined') {
+      return [];
+    }
+    try {
+      const raw = localStorage.getItem(key);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.map((value) => String(value)) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private saveAck(key: string, values: string[]): void {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+    try {
+      localStorage.setItem(key, JSON.stringify(values));
+    } catch {
+      /* ignore */
+    }
   }
 
   readonly printPreviewPages = computed(() => {
