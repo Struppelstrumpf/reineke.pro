@@ -63,7 +63,7 @@
 
           <div class="pv-booking__field">
             <label for="pv-booking-package">Paket</label>
-            <select id="pv-booking-package" formControlName="package">
+            <select id="pv-booking-package" class="pv-booking__select" formControlName="package">
               @for (pkg of packages; track pkg.id) {
                 <option [value]="pkg.id">
                   {{ pkg.name }} — {{ pkg.priceOnce }}@if (pkg.priceMonthly) { + {{ pkg.priceMonthly }}}

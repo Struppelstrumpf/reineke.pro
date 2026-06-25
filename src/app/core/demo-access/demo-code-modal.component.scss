@@ -80,14 +80,39 @@
 .pv-demo-code__select {
   width: 100%;
   box-sizing: border-box;
-  padding: 0.62rem 0.75rem;
+  padding: 0.62rem 2.35rem 0.62rem 0.75rem;
   margin-bottom: 0.5rem;
   border-radius: 10px;
   border: 1px solid rgba(140, 164, 5, 0.28);
-  background: rgba(0, 0, 0, 0.35);
   color: #f4f4f0;
   font: inherit;
   font-size: 0.9rem;
+  appearance: none;
+  -webkit-appearance: none;
+  color-scheme: dark;
+  cursor: pointer;
+  background:
+    linear-gradient(145deg, rgba(22, 26, 18, 0.92), rgba(14, 16, 12, 0.96)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23a3c729' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: 0 0, calc(100% - 0.72rem) 50%;
+  background-size: auto, 0.9rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.pv-demo-code__select:hover {
+  border-color: rgba(163, 199, 41, 0.38);
+}
+
+.pv-demo-code__select option {
+  background: #141712;
+  color: #f4f4f0;
+}
+
+.pv-demo-code__select option:checked {
+  background: linear-gradient(145deg, #2a3218, #1a2010);
+  color: #d8e8a8;
 }
 
 .pv-demo-code__select:focus {
