@@ -57,23 +57,54 @@
       @if (auth.isStaff() && hasLiveNotifications()) {
         <div class="ws__live-alerts" aria-live="polite" aria-label="Live-Benachrichtigungen">
           @if (newOrdersLiveCount() > 0) {
-            <button type="button" class="ws__live-pill ws__live-pill--orders" (click)="openAdminTab('orders')">
-              {{ newOrdersLiveCount() }} neue Bestellung(en)
+            <button
+              type="button"
+              class="ws__live-pill ws__live-pill--orders is-pulse"
+              (click)="openAdminTab('orders')"
+              [attr.aria-label]="newOrdersLiveCount() + ' neue Bestellungen'"
+              title="Neue Bestellungen anzeigen"
+            >
+              <span class="ws__live-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="15" height="15">
+                  <path fill="currentColor" d="M7 4h10l1.2 2.4 2.8.6v2h-1.3l-1 9.2A2 2 0 0 1 16.7 20H7.3a2 2 0 0 1-2-1.8l-1-9.2H3v-2l2.8-.6L7 4Zm1.2 2-.6 1.2h8.8L15.8 6H8.2ZM6.7 9l.9 8.4h8.8l.9-8.4H6.7Z"/>
+                </svg>
+              </span>
+              <span class="ws__live-count">{{ newOrdersLiveCount() }}</span>
+              <span class="ws__live-label">{{ newOrdersLiveCount() === 1 ? 'neue Bestellung' : 'neue Bestellungen' }}</span>
             </button>
           }
           @if (newChatLiveCount() > 0) {
-            <button type="button" class="ws__live-pill ws__live-pill--chat" (click)="openAdminTab('chat')">
-              {{ newChatLiveCount() }} neuer Chat
+            <button
+              type="button"
+              class="ws__live-pill ws__live-pill--chat"
+              (click)="openAdminTab('chat')"
+              [attr.aria-label]="newChatLiveCount() + ' neue Chats'"
+              title="Chat öffnen"
+            >
+              <span class="ws__live-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="15" height="15">
+                  <path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm3 5v2h10V9H7Zm0 4v2h7v-2H7Z"/>
+                </svg>
+              </span>
+              <span class="ws__live-count">{{ newChatLiveCount() }}</span>
+              <span class="ws__live-label">{{ newChatLiveCount() === 1 ? 'neuer Chat' : 'neue Chats' }}</span>
             </button>
           }
           @if (lowStockLiveCount() > 0) {
             <button
               type="button"
               class="ws__live-pill ws__live-pill--stock"
-              style="border-color: rgba(212, 120, 90, 0.45); color: #e8a88a; background: rgba(212, 120, 90, 0.16);"
               (click)="openAdminTab('inventory')"
+              [attr.aria-label]="lowStockLiveCount() + ' Produkte unter Schwelle'"
+              title="Lager anzeigen"
             >
-              {{ lowStockLiveCount() }} unter Schwelle
+              <span class="ws__live-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="15" height="15">
+                  <path fill="currentColor" d="M12 2 1 21h22L12 2Zm0 4.5L19.5 19h-15L12 6.5ZM11 10v4h2v-4h-2Zm0 6v2h2v-2h-2Z"/>
+                </svg>
+              </span>
+              <span class="ws__live-count">{{ lowStockLiveCount() }}</span>
+              <span class="ws__live-label">unter Schwelle</span>
             </button>
           }
         </div>
