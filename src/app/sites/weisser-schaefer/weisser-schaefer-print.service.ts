@@ -442,11 +442,22 @@ export class WeisserSchaeferPrintService {
         mainPrinter: parsed.mainPrinter?.trim() || undefined,
         orderPrinter: parsed.orderPrinter?.trim() || undefined,
         stockAlertPrinter: parsed.stockAlertPrinter?.trim() || undefined,
-        appDownloadUrl: parsed.appDownloadUrl?.trim() || WS_PRINT_APP_DOWNLOAD_URL,
+        appDownloadUrl: this.healDownloadUrl(parsed.appDownloadUrl?.trim()),
       };
     } catch {
       return fallback;
     }
+  }
+
+  /** Veraltete Download-Links (altes .zip / privates GitHub) auf aktuellen Stand heben. */
+  private healDownloadUrl(stored: string | undefined): string {
+    if (!stored) {
+      return WS_PRINT_APP_DOWNLOAD_URL;
+    }
+    const isStale =
+      stored.endsWith('ws-etikettendruck.zip') ||
+      stored.includes('github.com/struppelstrumpf/reineke.pro/releases');
+    return isStale ? WS_PRINT_APP_DOWNLOAD_URL : stored;
   }
 
   private persistRoutingSettings(settings: WsPrintRoutingSettings): void {
