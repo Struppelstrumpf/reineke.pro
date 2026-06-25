@@ -1,0 +1,32 @@
+<svg width="640" height="760" viewBox="0 0 640 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="72" y1="36" x2="566" y2="726" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff9f0"/>
+      <stop offset="1" stop-color="#f5ead5"/>
+    </linearGradient>
+    <linearGradient id="seal" x1="392" y1="88" x2="560" y2="286" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f07a2e"/>
+      <stop offset="1" stop-color="#a9471a"/>
+    </linearGradient>
+    <radialGradient id="fiber" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(320 424) rotate(90) scale(232 188)">
+      <stop stop-color="#fff8ee"/>
+      <stop offset="1" stop-color="#ece0cd"/>
+    </radialGradient>
+  </defs>
+  <rect x="74" y="30" width="492" height="700" rx="28" fill="url(#bg)" stroke="#e6d8be" stroke-width="8"/>
+  <rect x="84" y="40" width="472" height="680" rx="22" stroke="#fff9ef" stroke-opacity=".8" stroke-width="2"/>
+  <rect x="386" y="88" width="172" height="204" rx="16" fill="url(#seal)"/>
+  <circle cx="472" cy="178" r="70" fill="#fff" fill-opacity=".93"/>
+  <path d="M440 178c0-18 15-33 33-33s33 15 33 33-15 33-33 33-33-15-33-33Zm11 0c0 12 10 22 22 22s22-10 22-22-10-22-22-22-22 10-22 22Z" fill="#2f1f11"/>
+  <rect x="118" y="144" width="232" height="56" rx="12" fill="#fff4e4"/>
+  <text x="138" y="179" fill="#855832" font-family="DM Sans, Arial, sans-serif" font-size="24" font-weight="700">LAMMDARM</text>
+  <rect x="110" y="222" width="420" height="362" rx="20" fill="url(#fiber)"/>
+  <path d="M130 260c18 15 42 15 62 4 23-11 47-11 68 1 23 13 49 13 72 1 23-12 47-12 70 1 22 11 46 12 65-2" stroke="#dcccb3" stroke-width="6" stroke-linecap="round"/>
+  <path d="M126 318c17 14 41 15 61 5 23-12 48-11 70 2 21 13 46 13 69 2 24-12 48-12 72 0 22 11 47 11 66-2" stroke="#d6c6ad" stroke-width="6" stroke-linecap="round"/>
+  <path d="M128 378c17 14 42 14 62 4 23-11 48-11 69 2 22 13 47 13 70 1 24-11 48-12 71 1 23 12 48 12 68-2" stroke="#dfd1ba" stroke-width="6" stroke-linecap="round"/>
+  <path d="M127 438c17 13 42 13 61 3 24-12 49-12 70 1s46 14 69 2c24-12 48-12 72 1 22 11 46 11 65-2" stroke="#d6c9b4" stroke-width="6" stroke-linecap="round"/>
+  <path d="M130 496c16 13 40 13 60 3 24-12 49-12 70 2 21 13 46 13 69 1 24-11 48-11 72 1 23 12 47 12 66-2" stroke="#d1c2a8" stroke-width="6" stroke-linecap="round"/>
+  <rect x="180" y="610" width="278" height="68" rx="12" fill="#fffbf4" stroke="#dfd1bb" stroke-width="2"/>
+  <text x="204" y="639" fill="#5a3a20" font-family="DM Sans, Arial, sans-serif" font-size="18" font-weight="700">Feindärme Auswahl</text>
+  <text x="204" y="662" fill="#795a3d" font-family="DM Sans, Arial, sans-serif" font-size="16">91m Beutel</text>
+</svg>

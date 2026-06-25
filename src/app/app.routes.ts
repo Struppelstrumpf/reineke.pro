@@ -1,103 +1,224 @@
 import { Routes } from '@angular/router';
 
+
+
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'sportflow' },
+
+  { path: '', pathMatch: 'full', redirectTo: 'pizzeria-demo' },
+
   {
-    path: 'sportflow',
-    loadComponent: () =>
-      import('./sites/sportflow/sportflow-shell.component').then((m) => m.SportflowShellComponent),
-    children: [
-      {
-        path: '',
-        loadComponent: () =>
-          import('./sites/sportflow/pages/home/home.component').then((m) => m.HomeComponent),
-      },
-      {
-        path: 'contact',
-        loadComponent: () =>
-          import('./sites/sportflow/pages/contact/contact.component').then((m) => m.ContactComponent),
-      },
-      {
-        path: 'imprint',
-        loadComponent: () =>
-          import('./sites/sportflow/pages/imprint/imprint.component').then((m) => m.ImprintComponent),
-      },
-    ],
-  },
-  {
-    path: 'cardealer',
-    loadComponent: () =>
-      import('./sites/cardealer/cardealer-shell.component').then((m) => m.CardealerShellComponent),
-    children: [
-      {
-        path: '',
-        loadComponent: () =>
-          import('./sites/cardealer/pages/home/home.component').then((m) => m.HomeComponent),
-      },
-      {
-        path: 'contact',
-        loadComponent: () =>
-          import('./sites/cardealer/pages/contact/contact.component').then((m) => m.ContactComponent),
-      },
-      {
-        path: 'imprint',
-        loadComponent: () =>
-          import('./sites/cardealer/pages/imprint/imprint.component').then((m) => m.ImprintComponent),
-      },
-    ],
-  },
-  {
-    path: 'restaurant',
-    loadComponent: () =>
-      import('./sites/restaurant/restaurant-shell.component').then((m) => m.RestaurantShellComponent),
-    children: [
-      {
-        path: '',
-        loadComponent: () =>
-          import('./sites/restaurant/pages/home/home.component').then((m) => m.HomeComponent),
-      },
-      {
-        path: 'contact',
-        loadComponent: () =>
-          import('./sites/restaurant/pages/contact/contact.component').then((m) => m.ContactComponent),
-      },
-      {
-        path: 'imprint',
-        loadComponent: () =>
-          import('./sites/restaurant/pages/imprint/imprint.component').then((m) => m.ImprintComponent),
-      },
-    ],
-  },
-  {
-    path: 'sportlerklause',
-    loadComponent: () =>
-      import('./sites/sportlerklause/sportlerklause-shell.component').then(
-        (m) => m.SportlerklauseShellComponent,
-      ),
-    children: [
-      {
-        path: '',
-        loadComponent: () =>
-          import('./sites/sportlerklause/pages/home/home.component').then((m) => m.HomeComponent),
-      },
-      {
-        path: 'contact',
-        loadComponent: () =>
-          import('./sites/sportlerklause/pages/contact/contact.component').then((m) => m.ContactComponent),
-      },
-      {
-        path: 'imprint',
-        loadComponent: () =>
-          import('./sites/sportlerklause/pages/imprint/imprint.component').then((m) => m.ImprintComponent),
-      },
-    ],
-  },
-  {
+
     path: 'pizzeria-demo',
+
     loadComponent: () =>
+
       import('./core/pizzeria-demo-embed/pizzeria-demo-embed.component').then(
+
         (m) => m.PizzeriaDemoEmbedComponent,
+
       ),
+
   },
-  { path: '**', redirectTo: 'sportflow' },
+
+  {
+
+    path: 'demo/weisser-schaefer',
+
+    loadComponent: () =>
+
+      import('./sites/weisser-schaefer/weisser-schaefer-shell.component').then(
+
+        (m) => m.WeisserSchaeferShellComponent,
+
+      ),
+
+    children: [
+
+      {
+
+        path: '',
+
+        loadComponent: () =>
+
+          import('./sites/weisser-schaefer/pages/shop/shop.component').then(
+
+            (m) => m.WsShopComponent,
+
+          ),
+
+      },
+
+      {
+
+        path: 'start',
+
+        loadComponent: () =>
+
+          import('./sites/weisser-schaefer/pages/landing/landing.component').then(
+
+            (m) => m.WsLandingComponent,
+
+          ),
+
+      },
+
+      {
+
+        path: 'anmelden',
+
+        loadComponent: () =>
+
+          import('./sites/weisser-schaefer/pages/login/login.component').then(
+
+            (m) => m.WsLoginComponent,
+
+          ),
+
+      },
+
+      {
+
+        path: 'registrieren',
+
+        loadComponent: () =>
+
+          import('./sites/weisser-schaefer/pages/register/register.component').then(
+
+            (m) => m.WsRegisterComponent,
+
+          ),
+
+      },
+
+      {
+
+        path: 'passwort-vergessen',
+
+        loadComponent: () =>
+
+          import('./sites/weisser-schaefer/pages/forgot-password/forgot-password.component').then(
+
+            (m) => m.WsForgotPasswordComponent,
+
+          ),
+
+      },
+
+      {
+
+        path: 'passwort-reset',
+
+        loadComponent: () =>
+
+          import('./sites/weisser-schaefer/pages/reset-password/reset-password.component').then(
+
+            (m) => m.WsResetPasswordComponent,
+
+          ),
+
+      },
+
+      {
+
+        path: 'konto-aktivieren',
+
+        loadComponent: () =>
+
+          import('./sites/weisser-schaefer/pages/activate-account/activate-account.component').then(
+
+            (m) => m.WsActivateAccountComponent,
+
+          ),
+
+      },
+
+      {
+
+        path: 'konto',
+
+        loadComponent: () =>
+
+          import('./sites/weisser-schaefer/pages/account/account.component').then(
+
+            (m) => m.WsAccountComponent,
+
+          ),
+
+      },
+
+      {
+
+        path: 'shop',
+
+        loadComponent: () =>
+
+          import('./sites/weisser-schaefer/pages/shop/shop.component').then(
+
+            (m) => m.WsShopComponent,
+
+          ),
+
+      },
+
+      {
+
+        path: 'verwaltung',
+
+        loadComponent: () =>
+
+          import('./sites/weisser-schaefer/pages/admin/admin.component').then(
+
+            (m) => m.WsAdminComponent,
+
+          ),
+
+      },
+
+      {
+
+        path: 'impressum',
+
+        loadComponent: () =>
+
+          import('./sites/weisser-schaefer/pages/impressum/impressum.component').then(
+
+            (m) => m.WsImpressumComponent,
+
+          ),
+
+      },
+
+      {
+
+        path: 'datenschutz',
+
+        loadComponent: () =>
+
+          import('./sites/weisser-schaefer/pages/datenschutz/datenschutz.component').then(
+
+            (m) => m.WsDatenschutzComponent,
+
+          ),
+
+      },
+
+      { path: 'inhaber', redirectTo: 'verwaltung', pathMatch: 'full' },
+
+    ],
+
+  },
+
+  // Deactivated portfolio demos — sources remain under src/app/sites/
+
+  { path: 'sportflow', redirectTo: 'pizzeria-demo', pathMatch: 'prefix' },
+
+  { path: 'cardealer', redirectTo: 'pizzeria-demo', pathMatch: 'prefix' },
+
+  { path: 'restaurant', redirectTo: 'pizzeria-demo', pathMatch: 'prefix' },
+
+  { path: 'sportlerklause', redirectTo: 'pizzeria-demo', pathMatch: 'prefix' },
+
+  { path: '**', redirectTo: 'pizzeria-demo' },
+
 ];
+

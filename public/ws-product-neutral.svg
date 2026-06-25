@@ -1,0 +1,32 @@
+<svg width="640" height="760" viewBox="0 0 640 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="76" y1="34" x2="564" y2="726" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f8f9fb"/>
+      <stop offset="1" stop-color="#e9edf2"/>
+    </linearGradient>
+    <linearGradient id="seal" x1="396" y1="88" x2="562" y2="286" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8c96a8"/>
+      <stop offset="1" stop-color="#545c6b"/>
+    </linearGradient>
+    <radialGradient id="fiber" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(320 424) rotate(90) scale(232 188)">
+      <stop stop-color="#f6f7f9"/>
+      <stop offset="1" stop-color="#dce1e8"/>
+    </radialGradient>
+  </defs>
+  <rect x="74" y="30" width="492" height="700" rx="28" fill="url(#bg)" stroke="#d1d7e0" stroke-width="8"/>
+  <rect x="84" y="40" width="472" height="680" rx="22" stroke="#f9fbff" stroke-opacity=".8" stroke-width="2"/>
+  <rect x="386" y="88" width="172" height="204" rx="16" fill="url(#seal)"/>
+  <circle cx="472" cy="178" r="70" fill="#fff" fill-opacity=".93"/>
+  <path d="M440 178c0-18 15-33 33-33s33 15 33 33-15 33-33 33-33-15-33-33Zm11 0c0 12 10 22 22 22s22-10 22-22-10-22-22-22-22 10-22 22Z" fill="#272e37"/>
+  <rect x="112" y="144" width="246" height="56" rx="12" fill="#eef1f6"/>
+  <text x="130" y="179" fill="#4e5b70" font-family="DM Sans, Arial, sans-serif" font-size="24" font-weight="700">NATURDARM</text>
+  <rect x="110" y="222" width="420" height="362" rx="20" fill="url(#fiber)"/>
+  <path d="M127 260c17 14 41 14 61 4 24-12 49-12 70 1s46 14 69 2c24-12 48-13 72 0 22 11 47 11 66-2" stroke="#c8cfd9" stroke-width="6" stroke-linecap="round"/>
+  <path d="M126 320c16 13 40 13 60 3 24-12 49-12 70 2 21 13 46 13 69 1 24-11 48-11 72 1 23 12 48 12 68-2" stroke="#c2c9d3" stroke-width="6" stroke-linecap="round"/>
+  <path d="M128 378c17 13 41 13 61 3 24-12 49-12 70 2 21 13 46 13 69 1 24-11 48-11 72 1 23 12 48 12 68-2" stroke="#ccd3dc" stroke-width="6" stroke-linecap="round"/>
+  <path d="M127 438c16 12 40 12 60 2 24-12 49-12 70 2 21 13 46 13 69 1 24-11 48-11 72 1 23 12 47 12 66-2" stroke="#bdc4cd" stroke-width="6" stroke-linecap="round"/>
+  <path d="M128 496c16 12 40 12 60 2 24-12 49-12 70 2 21 13 46 13 69 1 24-11 48-11 72 1 23 12 48 12 67-2" stroke="#b4bcc6" stroke-width="6" stroke-linecap="round"/>
+  <rect x="180" y="610" width="278" height="68" rx="12" fill="#f9fbff" stroke="#cdd3de" stroke-width="2"/>
+  <text x="204" y="639" fill="#3e4a5f" font-family="DM Sans, Arial, sans-serif" font-size="18" font-weight="700">Sortimentsartikel</text>
+  <text x="204" y="662" fill="#5b6678" font-family="DM Sans, Arial, sans-serif" font-size="16">91m Beutel</text>
+</svg>

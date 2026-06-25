@@ -1,0 +1,41 @@
+@if (modal.visible()) {
+  <div class="pv-demo-code" role="dialog" aria-modal="true" aria-labelledby="pv-demo-code-title" (click)="close()">
+    <div class="pv-demo-code__panel" (click)="$event.stopPropagation()">
+      <button type="button" class="pv-demo-code__close" (click)="close()" aria-label="Schließen">×</button>
+      <h2 id="pv-demo-code-title" class="pv-demo-code__title">Persönliche Demo</h2>
+      <p class="pv-demo-code__lead">
+        Gib deinen Demo-Code ein, um deine individuelle Vorlage anzusehen.
+      </p>
+      <label class="pv-demo-code__label" for="pv-demo-code-input">Demo-Code</label>
+      <input
+        id="pv-demo-code-input"
+        class="pv-demo-code__input"
+        type="text"
+        [value]="code()"
+        (input)="code.set($any($event.target).value); error.set('')"
+        placeholder="z. B. WEISSER2024"
+        autocomplete="off"
+        spellcheck="false"
+        (keydown.enter)="submit()"
+      />
+      <label class="pv-demo-code__label" for="pv-demo-theme-select">Farblayout</label>
+      <select
+        id="pv-demo-theme-select"
+        class="pv-demo-code__select"
+        [value]="selectedTheme()"
+        (change)="selectedTheme.set($any($event.target).value)"
+      >
+        @for (theme of themeOptions; track theme.id) {
+          <option [value]="theme.id">{{ theme.label }}</option>
+        }
+      </select>
+      <p class="pv-demo-code__hint">
+        Das ausgewählte Farblayout wird lokal gespeichert und auf allen Seiten der Demo angewendet.
+      </p>
+      @if (error()) {
+        <p class="pv-demo-code__error" role="alert">{{ error() }}</p>
+      }
+      <button type="button" class="pv-demo-code__submit" (click)="submit()">Demo öffnen</button>
+    </div>
+  </div>
+}

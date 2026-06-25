@@ -1,0 +1,87 @@
+<div class="ws-label-preview">
+  @if (showMeta()) {
+    <p class="ws-label-preview__meta">{{ pageMeta() }}</p>
+  }
+  <div class="ws-label-preview__stack">
+    @for (page of pages(); track $index) {
+      @let sections = splitLabelSections(page);
+      @let headerCols = splitLabelHeader(sections.header);
+      <div class="ws-label-preview__sheet" [ngStyle]="sheetStyle()">
+        <div class="ws-label-preview__inner" [ngStyle]="innerStyle()">
+          <div class="ws-label-preview__top">
+            <div class="ws-label-preview__order">
+              @for (line of headerCols.order; track line.text) {
+                @switch (line.style) {
+                  @case ('subtitle') {
+                    <span class="ws-label-preview__sub">{{ line.text }}</span>
+                  }
+                  @case ('body') {
+                    <span class="ws-label-preview__body">{{ line.text }}</span>
+                  }
+                  @case ('spacer') {
+                    <span class="ws-label-preview__spacer" aria-hidden="true"></span>
+                  }
+                  @default {
+                    <span class="ws-label-preview__meta-line">{{ line.text }}</span>
+                  }
+                }
+              }
+            </div>
+            <div class="ws-label-preview__brand">
+              @for (line of headerCols.brand; track $index + '-' + line.style) {
+                @switch (line.style) {
+                  @case ('logo') {
+                    <img
+                      class="ws-label-preview__logo"
+                      src="/ws-label-logo.png"
+                      width="140"
+                      height="40"
+                      alt="Weißer Schäfer"
+                    />
+                  }
+                  @default {
+                    <span class="ws-label-preview__meta-line ws-label-preview__meta-line--center">{{ line.text }}</span>
+                  }
+                }
+              }
+            </div>
+          </div>
+          <div class="ws-label-preview__items">
+            @for (line of sections.items; track line.text) {
+              @if (line.style === 'itemHeading') {
+                <span class="ws-label-preview__items-title">{{ line.text }}</span>
+              } @else if (line.text.startsWith('Hinweis:')) {
+                <span class="ws-label-preview__note">{{ line.text }}</span>
+              } @else if (line.style === 'meta') {
+                <span class="ws-label-preview__meta-line">{{ line.text }}</span>
+              } @else {
+                <span class="ws-label-preview__item">{{ line.text }}</span>
+              }
+            }
+          </div>
+          <div class="ws-label-preview__footer">
+            @for (line of sections.footer; track $index + '-' + line.style) {
+              @switch (line.style) {
+                @case ('divider') {
+                  <hr class="ws-label-preview__divider" />
+                }
+                @case ('contact') {
+                  <span class="ws-label-preview__contact">{{ line.text }}</span>
+                }
+                @case ('page') {
+                  <span class="ws-label-preview__page">{{ line.text }}</span>
+                }
+                @case ('barcode') {
+                  <span class="ws-label-preview__barcode" aria-hidden="true">{{ line.text }}</span>
+                }
+                @default {
+                  <span class="ws-label-preview__meta-line">{{ line.text }}</span>
+                }
+              }
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

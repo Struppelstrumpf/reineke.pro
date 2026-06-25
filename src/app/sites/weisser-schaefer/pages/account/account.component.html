@@ -1,0 +1,125 @@
+@if (auth.currentUser(); as user) {
+  <section class="account">
+    <header class="account__head">
+      <h1>Mein Konto</h1>
+      <p>{{ user.companyName }}@if (user.role !== 'customer') { · {{ roleLabel(user.role) }} }</p>
+    </header>
+
+    <div class="account__profile-grid">
+      <div class="ws-card">
+        <h2>Profil</h2>
+        <form class="ws-form" (submit)="$event.preventDefault(); saveProfile()">
+          <div class="ws-field">
+            <label for="ws-acc-profile-name">Ansprechpartner</label>
+            <input
+              id="ws-acc-profile-name"
+              type="text"
+              [value]="profileContactName()"
+              (input)="profileContactName.set($any($event.target).value)"
+            />
+          </div>
+          <pv-ws-address-autocomplete
+            inputId="ws-acc-profile-address"
+            label="Anschrift"
+            placeholder="Straße Hausnummer, Stadt"
+            [value]="profileAddress()"
+            [assumeSelected]="profileAddressSelected()"
+            (valueChange)="profileAddress.set($event)"
+            (validSelectionChange)="profileAddressSelected.set($event)"
+          />
+          <div class="ws-field">
+            <label for="ws-acc-profile-phone">Telefon</label>
+            <input
+              id="ws-acc-profile-phone"
+              type="tel"
+              [value]="profilePhone()"
+              (input)="profilePhone.set($any($event.target).value)"
+            />
+          </div>
+          <p class="account__profile-email">Anmelde-E-Mail: {{ user.email }}</p>
+          @if (profileErr()) { <p class="ws-form__error">{{ profileErr() }}</p> }
+          @if (profileMsg()) { <p class="ws-form__success">{{ profileMsg() }}</p> }
+          <button type="submit" class="ws-btn ws-btn--ghost">Profil speichern</button>
+        </form>
+      </div>
+
+      <div class="ws-card">
+        <h2>E-Mail ändern</h2>
+        <form class="ws-form" (submit)="$event.preventDefault(); changeEmail()">
+          <div class="ws-field">
+            <label for="ws-acc-email">Neue E-Mail</label>
+            <input id="ws-acc-email" type="email" [value]="newEmail()" (input)="newEmail.set($any($event.target).value)" />
+          </div>
+          <div class="ws-field">
+            <label for="ws-acc-email-pw">Passwort zur Bestätigung</label>
+            <input id="ws-acc-email-pw" type="password" [value]="emailPassword()" (input)="emailPassword.set($any($event.target).value)" />
+          </div>
+          @if (emailErr()) { <p class="ws-form__error">{{ emailErr() }}</p> }
+          @if (emailMsg()) { <p class="ws-form__success">{{ emailMsg() }}</p> }
+          <button type="submit" class="ws-btn ws-btn--ghost">E-Mail speichern</button>
+        </form>
+      </div>
+
+      <div class="ws-card">
+        <h2>Passwort ändern</h2>
+        <form class="ws-form" (submit)="$event.preventDefault(); changePassword()">
+          <div class="ws-field">
+            <label for="ws-acc-cur">Aktuelles Passwort</label>
+            <input id="ws-acc-cur" type="password" [value]="currentPassword()" (input)="currentPassword.set($any($event.target).value)" />
+          </div>
+          <div class="ws-field">
+            <label for="ws-acc-new">Neues Passwort</label>
+            <input id="ws-acc-new" type="password" [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" />
+          </div>
+          @if (passwordErr()) { <p class="ws-form__error">{{ passwordErr() }}</p> }
+          @if (passwordMsg()) { <p class="ws-form__success">{{ passwordMsg() }}</p> }
+          <button type="submit" class="ws-btn ws-btn--ghost">Passwort speichern</button>
+        </form>
+        @if (user.role !== 'customer') {
+          <p class="account__hint">Passwort vergessen? Bitte wenden Sie sich an einen Administrator.</p>
+        }
+      </div>
+    </div>
+
+    @if (user.role === 'customer') {
+      <section class="account__orders ws-card" aria-label="Meine Bestellungen">
+        <div class="account__orders-head">
+          <h2>Meine Bestellungen</h2>
+          @if (auth.canOrder()) {
+            <a class="ws-btn ws-btn--sm" routerLink="/demo/weisser-schaefer/shop">Neue Bestellung</a>
+          }
+        </div>
+
+        @if (myOrders().length === 0) {
+          <p class="account__empty">Noch keine Bestellungen vorhanden.</p>
+        } @else {
+          <ul class="account__order-list">
+            @for (order of myOrders(); track order.id) {
+              <li class="account__order">
+                <div class="account__order-top">
+                  <div>
+                    <strong>{{ order.id }}</strong>
+                    <time class="account__order-date">{{ order.createdAt | date: 'dd.MM.yyyy · HH:mm' }}</time>
+                  </div>
+                  <span class="account__order-status" [attr.data-status]="order.status">
+                    {{ orderStatusLabel(order) }}
+                  </span>
+                </div>
+                <ul class="account__lines">
+                  @for (line of order.lines; track line.productId) {
+                    <li>{{ line.qty }}× {{ line.name }}@if (line.unit) { ({{ line.unit }}) }</li>
+                  }
+                </ul>
+                @if (order.note) {
+                  <p class="account__note">Hinweis: {{ order.note }}</p>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
+
+    <button type="button" class="account__logout" (click)="logout()">Abmelden</button>
+  </section>
+}

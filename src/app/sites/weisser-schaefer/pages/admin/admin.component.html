@@ -1,0 +1,841 @@
+<section class="admin">
+  <nav class="admin__tabs" aria-label="Bereiche">
+    <button
+      type="button"
+      [class.is-active]="tab() === 'orders' && ordersView() === 'active'"
+      (click)="setOrdersView('active')"
+    >
+      Bestellungen
+      @if (newCount() > 0) {
+        <span class="admin__pill">{{ newCount() }}</span>
+      }
+    </button>
+    @if (auth.isStaff()) {
+      <button type="button" [class.is-active]="tab() === 'inventory'" (click)="setTab('inventory')">Lager</button>
+      <button type="button" [class.is-active]="tab() === 'catalog'" (click)="setTab('catalog')">Sortiment</button>
+    }
+    <button
+      type="button"
+      [class.is-active]="tab() === 'orders' && ordersView() === 'archive'"
+      (click)="setOrdersView('archive')"
+    >
+      Archiv
+      @if (archiveCount() > 0) {
+        <span class="admin__pill admin__pill--muted">{{ archiveCount() }}</span>
+      }
+    </button>
+    @if (auth.isAdmin()) {
+      <button type="button" [class.is-active]="tab() === 'users'" (click)="setTab('users')">Benutzer</button>
+    }
+    @if (auth.isStaff()) {
+      <button type="button" [class.is-active]="tab() === 'approvals'" (click)="setTab('approvals')">
+        Freigaben
+        @if (auth.pendingCustomers().length > 0) {
+          <span class="admin__pill">{{ auth.pendingCustomers().length }}</span>
+        }
+      </button>
+      <button type="button" [class.is-active]="tab() === 'chat'" (click)="setTab('chat')">
+        Chat
+        @if (openChatCount() > 0) {
+          <span class="admin__pill">{{ openChatCount() }}</span>
+        }
+      </button>
+    }
+    <button type="button" [class.is-active]="tab() === 'printer'" (click)="setTab('printer')">
+      Drucker
+      <span class="admin__pill" [class.is-online]="print.connected()">{{ print.connected() ? '●' : '○' }}</span>
+    </button>
+    <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm admin__refresh" (click)="auth.reloadUsersFromStorage()">
+      Aktualisieren
+    </button>
+  </nav>
+
+  @if (auth.isStaff() && auth.pendingCustomers().length > 0 && tab() !== 'approvals') {
+    <div class="admin__pending-banner ws-card">
+      <div>
+        <strong>{{ auth.pendingCustomers().length }} Fleischerei-Registrierung(en) warten auf Freigabe</strong>
+        <p>Neue Konten erscheinen unter Freigaben — und in Benutzer mit Status „Wartet auf Freigabe“.</p>
+      </div>
+      <button type="button" class="ws-btn ws-btn--sm" (click)="setTab('approvals')">Zu Freigaben</button>
+    </div>
+  }
+
+  @if (tab() === 'orders') {
+    <div class="ws-toolbar">
+      <div class="ws-toolbar__search">
+        <input
+          type="search"
+          [placeholder]="ordersView() === 'archive' ? 'Archiv durchsuchen…' : 'Suche: Bestell-Nr., Kunde, Produkt…'"
+          [value]="search()"
+          (input)="search.set($any($event.target).value)"
+        />
+      </div>
+      @if (ordersView() === 'active') {
+        <div class="admin__order-stats" aria-label="Statusübersicht">
+          <div class="ws-stat admin__stat-inline">
+            <strong>{{ activeCount() }}</strong>
+            <span>Aktiv</span>
+          </div>
+          <div class="ws-stat admin__stat-inline" [class.admin__stat-new]="newCount() > 0">
+            <strong>{{ newCount() }}</strong>
+            <span>Neu</span>
+          </div>
+        </div>
+        <div class="ws-toolbar__group" role="group" aria-label="Status filtern">
+          <button
+            type="button"
+            class="ws-btn ws-btn--sm"
+            [disabled]="processingOrders() || newCount() === 0 || !print.connected()"
+            (click)="processNewOrders()"
+          >
+            {{ processingOrders() ? 'Bearbeite…' : 'Bestellungen bearbeiten' }}
+          </button>
+          <button type="button" class="ws-chip" [class.is-active]="statusFilter() === 'alle'" (click)="setStatusFilter('alle')">Alle</button>
+          <button type="button" class="ws-chip" [class.is-active]="statusFilter() === 'neu'" (click)="setStatusFilter('neu')">Neu</button>
+          <button type="button" class="ws-chip" [class.is-active]="statusFilter() === 'in Bearbeitung'" (click)="setStatusFilter('in Bearbeitung')">In Arbeit</button>
+        </div>
+      }
+    </div>
+
+    @if (filteredOrders().length === 0) {
+      <p class="ws-empty">
+        {{ ordersView() === 'archive' ? 'Keine archivierten Bestellungen.' : 'Keine aktiven Bestellungen für diesen Filter.' }}
+      </p>
+    } @else {
+      <div class="admin__cards" aria-label="Bestellungen">
+        @for (order of filteredOrders(); track order.id) {
+          <article class="admin__order-card ws-card" [class.is-archived]="ordersView() === 'archive'">
+            <div class="admin__order-top">
+              <div>
+                <strong>{{ order.id }}</strong>
+                <span class="admin__date">{{ order.createdAt | date: 'dd.MM.yyyy · HH:mm' }}</span>
+                @if (order.archivedAt) {
+                  <span class="admin__archive-date">Archiviert {{ order.archivedAt | date: 'dd.MM.yyyy · HH:mm' }}</span>
+                }
+              </div>
+              @if (ordersView() === 'active') {
+                <div class="admin__status-cell">
+                  <span class="admin__status-current">{{ orderStatusOptionLabel(order, order.status) }}</span>
+                  <select [value]="order.status" (change)="setOrderStatus(order.id, $any($event.target).value)">
+                    @for (status of orderStaffStatusOptions(order.status); track status) {
+                      <option [value]="status">{{ orderStatusOptionLabel(order, status) }}</option>
+                    }
+                  </select>
+                </div>
+              } @else {
+                <span class="admin__status-done">Versendet</span>
+              }
+            </div>
+            <p class="admin__customer">{{ order.customer }}</p>
+            <ul class="admin__lines-list">
+              @for (line of order.lines; track line.productId) {
+                <li>{{ line.qty }}× {{ line.name }}</li>
+              }
+            </ul>
+            @if (order.note) {
+              <p class="admin__note">„{{ order.note }}“</p>
+            }
+            <div class="admin__order-actions">
+              <button type="button" class="ws-btn ws-btn--sm admin__print-btn" (click)="printOrder(order.id)">
+                Etikett
+              </button>
+              @if (ordersView() === 'archive') {
+                <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="restoreOrder(order.id)">
+                  Wiederherstellen
+                </button>
+              }
+            </div>
+          </article>
+        }
+      </div>
+
+      <div class="admin__table-wrap admin__table-wrap--desktop">
+        <table class="admin__table">
+          <thead>
+            <tr>
+              <th>Bestellung</th>
+              <th>Kunde</th>
+              <th>Positionen</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of filteredOrders(); track order.id) {
+              <tr [class.is-archived]="ordersView() === 'archive'">
+                <td>
+                  <strong>{{ order.id }}</strong>
+                  <span class="admin__date">{{ order.createdAt | date: 'dd.MM.yyyy · HH:mm' }}</span>
+                  @if (order.archivedAt) {
+                    <span class="admin__archive-date">Archiv {{ order.archivedAt | date: 'dd.MM.yyyy · HH:mm' }}</span>
+                  }
+                </td>
+                <td>{{ order.customer }}</td>
+                <td>
+                  @for (line of order.lines; track line.productId) {
+                    <span class="admin__line">{{ line.qty }}× {{ line.name }}</span>
+                  }
+                  @if (order.note) {
+                    <span class="admin__note">„{{ order.note }}“</span>
+                  }
+                </td>
+                <td>
+                  @if (ordersView() === 'active') {
+                    <div class="admin__status-cell">
+                      <span class="admin__status-current">{{ orderStatusOptionLabel(order, order.status) }}</span>
+                      <select [value]="order.status" (change)="setOrderStatus(order.id, $any($event.target).value)">
+                        @for (status of orderStaffStatusOptions(order.status); track status) {
+                          <option [value]="status">{{ orderStatusOptionLabel(order, status) }}</option>
+                        }
+                      </select>
+                    </div>
+                  } @else {
+                    <span class="admin__status-done">Versendet</span>
+                  }
+                </td>
+                <td>
+                  <button type="button" class="ws-btn ws-btn--sm" (click)="printOrder(order.id)">Etikett</button>
+                  @if (ordersView() === 'archive') {
+                    <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="restoreOrder(order.id)">
+                      ↩
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+  @if (tab() === 'approvals' && auth.isStaff()) {
+    <div class="admin__approvals-grid">
+      <div class="admin__panel ws-card">
+        <h2>Kunden einladen</h2>
+        <p class="admin__invite-lead">
+          Legen Sie ein Konto per E-Mail an. Der Kunde erhält eine Einladung, vervollständigt seine Daten
+          und kann danach sofort bestellen — ohne weitere Freigabe.
+        </p>
+        <form class="ws-form" (submit)="$event.preventDefault(); inviteCustomer()">
+          <div class="ws-field">
+            <label for="ws-invite-email">E-Mail des Kunden</label>
+            <input
+              id="ws-invite-email"
+              type="email"
+              [value]="inviteEmail()"
+              (input)="inviteEmail.set($any($event.target).value); inviteError.set(''); inviteSuccess.set(false)"
+            />
+          </div>
+          @if (inviteError()) {
+            <p class="ws-form__error">{{ inviteError() }}</p>
+          }
+          @if (inviteSuccess()) {
+            <p class="ws-form__success">
+              Einladung wurde versendet. Der Kunde erhält eine E-Mail mit Aktivierungslink.
+            </p>
+            @if (inviteToken()) {
+              <p class="ws-form__success ws-form__demo-hint">
+                Demo: Aktivierungscode <strong>{{ inviteToken() }}</strong>
+              </p>
+              <a
+                class="ws-btn ws-btn--sm"
+                [href]="inviteActivationUrl()"
+              >
+                Aktivierungsseite öffnen
+              </a>
+            }
+          } @else {
+            <button type="submit" class="ws-btn">Einladung senden</button>
+          }
+        </form>
+
+        @if (inviteSuccess() && inviteEmailHtml()) {
+          <div class="admin__invite-preview">
+            <h3>E-Mail-Vorschau</h3>
+            <iframe
+              class="admin__invite-preview-frame"
+              [attr.srcdoc]="inviteEmailHtml()"
+              title="Einladungs-E-Mail Vorschau"
+            ></iframe>
+            <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="resetInviteForm()">
+              Weitere Einladung
+            </button>
+          </div>
+        }
+
+        @if (auth.invitedCustomers().length > 0) {
+          <h3 class="admin__invite-pending-title">Ausstehende Einladungen</h3>
+          <ul class="admin__user-list">
+            @for (user of auth.invitedCustomers(); track user.id) {
+              <li>
+                <div>
+                  <strong>{{ user.email }}</strong>
+                  <span>Einladung ausstehend · noch nicht aktiviert</span>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <div class="admin__panel ws-card">
+        <h2>Neue Fleischerei-Registrierungen</h2>
+        <p class="admin__invite-lead">
+          Selbst registrierte Konten müssen weiterhin manuell freigeschaltet werden.
+        </p>
+        @if (auth.pendingCustomers().length === 0) {
+          <p class="ws-empty">Keine offenen Freigaben.</p>
+        } @else {
+          <ul class="admin__user-list">
+            @for (user of auth.pendingCustomers(); track user.id) {
+              <li>
+                <div>
+                  <strong>{{ user.companyName }}</strong>
+                  <span>{{ user.contactName }} · {{ user.email }}</span>
+                  @if (user.phone) { <span>{{ user.phone }}</span> }
+                </div>
+                <button type="button" class="ws-btn ws-btn--sm" (click)="approve(user.id)">Freischalten</button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  }
+
+  @if (tab() === 'users' && auth.isAdmin()) {
+    <div class="ws-toolbar admin__users-toolbar">
+      <div class="ws-toolbar__search">
+        <input
+          type="search"
+          placeholder="Benutzer suchen…"
+          [value]="userSearch()"
+          (input)="userSearch.set($any($event.target).value)"
+        />
+      </div>
+      <select [value]="userRoleFilter()" (change)="userRoleFilter.set($any($event.target).value)">
+        <option value="alle">Alle Rollen</option>
+        <option value="customer">Fleischerei</option>
+        <option value="employee">Mitarbeiter</option>
+        <option value="admin">Administrator</option>
+      </select>
+      <select [value]="userLockFilter()" (change)="userLockFilter.set($any($event.target).value)">
+        <option value="alle">Alle Zustände</option>
+        <option value="aktiv">Aktiv</option>
+        <option value="gesperrt">Gesperrt</option>
+      </select>
+      <label class="admin__select-all">
+        <input
+          type="checkbox"
+          [checked]="allVisibleSelected()"
+          (change)="toggleSelectAllVisible($any($event.target).checked)"
+        />
+        Sichtbare wählen
+      </label>
+      <button type="button" class="ws-btn ws-btn--sm" (click)="toggleCreateUserForm()">
+        {{ createUserFormOpen() ? 'Benutzer anlegen schließen' : 'Benutzer anlegen' }}
+      </button>
+    </div>
+    @if (createUserFormOpen()) {
+      <section class="ws-card admin__create-user">
+        <h2>Mitarbeiter / Admin anlegen</h2>
+        <form class="ws-form" (submit)="$event.preventDefault(); addStaff()">
+          <div class="admin__create-user-grid">
+            <div class="ws-field">
+              <label for="ws-staff-name">Name</label>
+              <input id="ws-staff-name" type="text" [value]="staffName()" (input)="staffName.set($any($event.target).value)" />
+            </div>
+            <div class="ws-field">
+              <label for="ws-staff-email">E-Mail</label>
+              <input id="ws-staff-email" type="email" [value]="staffEmail()" (input)="staffEmail.set($any($event.target).value)" />
+            </div>
+            <div class="ws-field">
+              <label for="ws-staff-role">Rolle</label>
+              <select id="ws-staff-role" [value]="staffRole()" (change)="staffRole.set($any($event.target).value)">
+                <option value="employee">Mitarbeiter</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+            <div class="ws-field">
+              <label for="ws-staff-pw">Passwort</label>
+              <input id="ws-staff-pw" type="password" [value]="staffPassword()" (input)="staffPassword.set($any($event.target).value)" />
+            </div>
+          </div>
+          @if (staffError()) { <p class="ws-form__error">{{ staffError() }}</p> }
+          @if (staffMsg()) { <p class="ws-form__success">{{ staffMsg() }}</p> }
+          <div class="admin__create-user-actions">
+            <button type="button" class="ws-btn ws-btn--ghost" (click)="toggleCreateUserForm()">Abbrechen</button>
+            <button type="submit" class="ws-btn">Benutzer anlegen</button>
+          </div>
+        </form>
+      </section>
+    }
+    @if (selectionCount() > 0) {
+      <div class="admin__bulk-actions ws-card">
+        <p>{{ selectionCount() }} ausgewählt</p>
+        <div class="admin__bulk-actions-controls">
+          <select [value]="bulkRoleTarget()" (change)="bulkRoleTarget.set($any($event.target).value)">
+            <option value="customer">Rolle: Fleischerei</option>
+            <option value="employee">Rolle: Mitarbeiter</option>
+            <option value="admin">Rolle: Administrator</option>
+          </select>
+          <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="applyBulkRoleChange()">Rolle setzen</button>
+          <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="applyBulkLock(true)">Sperren</button>
+          <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="applyBulkLock(false)">Freigeben</button>
+          <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="applyBulkDelete()">Löschen</button>
+          <button type="button" class="ws-btn ws-btn--sm ws-btn--ghost" (click)="clearUserSelection()">Auswahl löschen</button>
+        </div>
+      </div>
+    }
+    <div class="ws-card admin__user-table-wrap">
+      <h2>Alle Benutzer ({{ filteredUsers().length }})</h2>
+      <div class="admin__table-wrap admin__table-wrap--users">
+        <table class="admin__table">
+          <thead>
+            <tr>
+              <th>
+                <input
+                  type="checkbox"
+                  [checked]="allVisibleSelected()"
+                  (change)="toggleSelectAllVisible($any($event.target).checked)"
+                  aria-label="Alle sichtbaren Benutzer auswählen"
+                />
+              </th>
+              <th>Name</th>
+              <th>E-Mail</th>
+              <th>Rolle</th>
+              <th>Status</th>
+              <th>Aktive Bestellungen</th>
+              <th>Aktion</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of filteredUsers(); track user.id) {
+              <tr
+                [class.is-pending]="user.role === 'customer' && user.status === 'pending'"
+                [class.is-invited]="user.role === 'customer' && user.status === 'invited'"
+                [class.is-locked]="user.locked"
+                [class.is-active-order]="userActiveOrderCount(user) > 0"
+              >
+                <td>
+                  <input
+                    type="checkbox"
+                    [checked]="isUserSelected(user.id)"
+                    [disabled]="user.id === auth.currentUser()?.id"
+                    (change)="toggleUserSelection(user.id, $any($event.target).checked)"
+                    aria-label="Benutzer auswählen"
+                  />
+                </td>
+                <td>{{ user.contactName }}<br /><small>{{ user.companyName }}</small></td>
+                <td>{{ user.email }}</td>
+                <td>
+                  @if (auth.isAdmin() && user.id !== auth.currentUser()?.id) {
+                    <select [value]="user.role" (change)="changeRole(user.id, $any($event.target).value)">
+                      <option value="customer">Fleischerei</option>
+                      <option value="employee">Mitarbeiter</option>
+                      <option value="admin">Administrator</option>
+                    </select>
+                  } @else {
+                    {{ roleLabel(user.role) }}
+                  }
+                </td>
+                <td>{{ userStatusLabel(user) }}</td>
+                <td>
+                  @if (user.role === 'customer') {
+                    <span class="admin__order-badge" [class.has-orders]="userActiveOrderCount(user) > 0">
+                      {{ userActiveOrderCount(user) }} aktiv
+                    </span>
+                  } @else {
+                    —
+                  }
+                </td>
+                <td>
+                  @if (user.id !== auth.currentUser()?.id) {
+                    <div class="admin__user-actions">
+                      <button
+                        type="button"
+                        class="ws-btn ws-btn--sm ws-btn--ghost"
+                        (click)="requestToggleUserLock(user)"
+                      >
+                        {{ user.locked ? 'Freigeben' : 'Sperren' }}
+                      </button>
+                      <button
+                        type="button"
+                        class="ws-btn ws-btn--sm ws-btn--ghost"
+                        (click)="requestDeleteUser(user)"
+                      >
+                        Löschen
+                      </button>
+                    </div>
+                  } @else {
+                    <span class="admin__self-hint">Eigener Account</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  @if (userDialogOpen()) {
+    <div class="admin__confirm-backdrop" (click)="closeUserDialog()">
+      <section class="admin__confirm ws-card" (click)="$event.stopPropagation()" aria-label="Bestätigung">
+        <h3>{{ userDialogTitle() }}</h3>
+        <p>{{ userDialogMessage() }}</p>
+        <label class="ws-field">
+          <span>Zur Bestätigung bitte <strong>{{ userDialogRequiredPhrase() }}</strong> eingeben:</span>
+          <input
+            type="text"
+            [value]="userDialogInput()"
+            (input)="userDialogInput.set($any($event.target).value)"
+            autocomplete="off"
+          />
+        </label>
+        <div class="admin__confirm-actions">
+          <button type="button" class="ws-btn ws-btn--ghost" (click)="closeUserDialog()">Abbrechen</button>
+          <button
+            type="button"
+            class="ws-btn"
+            [disabled]="!canConfirmUserDialog()"
+            (click)="confirmUserDialog()"
+          >
+            {{ userDialogConfirmLabel() }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+
+  @if (tab() === 'inventory' && auth.isStaff()) {
+    <pv-ws-inventory-admin />
+  }
+
+  @if (tab() === 'chat' && auth.isStaff()) {
+    <pv-ws-support-chat-admin />
+  }
+
+  @if (tab() === 'catalog' && auth.isStaff()) {
+    <pv-ws-catalog-admin />
+  }
+
+  @if (tab() === 'printer') {
+    <div class="admin__printer ws-card">
+      <div class="admin__printer-status" [class.is-online]="print.connected()">
+        <span class="admin__printer-dot" aria-hidden="true"></span>
+        <div>
+          <strong>{{ print.connected() ? 'Etiketten-App verbunden' : 'Etiketten-App nicht gefunden' }}</strong>
+          <p>
+            @if (print.connected()) {
+              Drucker: {{ print.agent()?.printer || 'automatisch' }} · Port 19284
+            } @else {
+              Starten Sie <code>WS-Etikettendruck.exe</code> auf diesem Windows-PC.
+            }
+          </p>
+        </div>
+      </div>
+
+      @if (!print.connected()) {
+        <div class="admin__printer-actions">
+          <button type="button" class="ws-btn" (click)="wakeApp()">App verbinden / starten</button>
+          <a class="ws-btn ws-btn--ghost" [href]="routingSettings().appDownloadUrl" target="_blank" rel="noreferrer">
+            Drucker-App herunterladen
+          </a>
+        </div>
+      } @else {
+        <div class="admin__printer-actions">
+          <button type="button" class="ws-btn ws-btn--ghost" (click)="testPrint()">Testdruck</button>
+          <a class="ws-btn ws-btn--ghost" [href]="routingSettings().appDownloadUrl" target="_blank" rel="noreferrer">
+            App-Download
+          </a>
+        </div>
+      }
+
+      @if (print.agent()?.printers?.length) {
+        <div class="ws-field admin__printer-select">
+          <label for="ws-printer-select">Labeldrucker wählen</label>
+          <select
+            id="ws-printer-select"
+            class="admin__pretty-select"
+            (change)="selectedPrinter.set($any($event.target).value)"
+          >
+            <option value="" disabled [selected]="!activeMainPrinter()">Drucker wählen…</option>
+            @if (mainPrinterMissing()) {
+              <option [value]="activeMainPrinter()" [selected]="true">{{ activeMainPrinter() }} (nicht verfügbar)</option>
+            }
+            @for (p of print.agent()?.printers ?? []; track p) {
+              <option [value]="p" [selected]="p === activeMainPrinter()">{{ p }}</option>
+            }
+          </select>
+          <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="savePrinter()">Speichern</button>
+        </div>
+      }
+
+      <section class="admin__printer-routing">
+        <h2>Druckaufgaben zuweisen</h2>
+        <p>
+          Bestimmen Sie je Aufgabe den Ziel-Drucker. Mehrere Aufgaben dürfen denselben Drucker nutzen.
+        </p>
+        <div class="admin__printer-routing-grid">
+          <div class="ws-field">
+            <label for="ws-printer-route-orders">Bestellungen</label>
+            <select
+              id="ws-printer-route-orders"
+              class="admin__pretty-select"
+              [disabled]="!printerOptions().length"
+              (change)="setOrderTaskPrinter($any($event.target).value)"
+            >
+              <option value="" [selected]="!orderRoutePrinterValue()">{{ defaultTaskPrinterLabel() }}</option>
+              @if (orderRoutePrinterMissing()) {
+                <option [value]="orderRoutePrinterRaw()" [selected]="true">{{ orderRoutePrinterRaw() }} (nicht verfügbar)</option>
+              }
+              @for (p of printerOptions(); track p) {
+                <option [value]="p" [selected]="p === orderRoutePrinterValue()">{{ p }}</option>
+              }
+            </select>
+          </div>
+          <div class="ws-field">
+            <label for="ws-printer-route-stock">Lagerwarnungen</label>
+            <select
+              id="ws-printer-route-stock"
+              class="admin__pretty-select"
+              [disabled]="!printerOptions().length"
+              (change)="setStockAlertTaskPrinter($any($event.target).value)"
+            >
+              <option value="" [selected]="!stockRoutePrinterValue()">{{ defaultTaskPrinterLabel() }}</option>
+              @if (stockRoutePrinterMissing()) {
+                <option [value]="stockRoutePrinterRaw()" [selected]="true">{{ stockRoutePrinterRaw() }} (nicht verfügbar)</option>
+              }
+              @for (p of printerOptions(); track p) {
+                <option [value]="p" [selected]="p === stockRoutePrinterValue()">{{ p }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin__printer-automation">
+        <h2>Automatisierung</h2>
+        <label class="admin__printer-toggle">
+          <input type="checkbox" [checked]="autoPrint.enabled()" (change)="setAutoPrintEnabled($event)" />
+          <span>Automatischer Etikettendruck bei neuen Bestellungen (nur solange Webseite geöffnet ist)</span>
+        </label>
+        <p class="admin__printer-hint">
+          Offene neue Bestellungen: {{ autoPrint.pendingCount() }} ·
+          @if (autoPrint.flushing()) {
+            Druckt gerade…
+          } @else {
+            Wartet auf neue Aufträge
+          }
+        </p>
+
+        <label class="admin__printer-toggle">
+          <input
+            type="checkbox"
+            [checked]="inventory.inventorySettings().alertsEnabled"
+            (change)="toggleStockAlerts($event)"
+          />
+          <span>Automatische Lagerwarn-Etiketten aktivieren</span>
+        </label>
+
+        <div class="admin__printer-times">
+          <span class="admin__printer-times-label">Druck-Uhrzeiten Lagerwarnung</span>
+          <ul class="admin__printer-times-list">
+            @for (time of alertTimes(); track $index; let i = $index) {
+              <li class="admin__printer-times-item">
+                <input
+                  type="time"
+                  [value]="time"
+                  [disabled]="!inventory.inventorySettings().alertsEnabled"
+                  (change)="updateAlertTime(i, $any($event.target).value)"
+                />
+                @if (alertTimes().length > 1) {
+                  <button
+                    type="button"
+                    class="ws-btn ws-btn--ghost ws-btn--sm"
+                    [disabled]="!inventory.inventorySettings().alertsEnabled"
+                    (click)="removeAlertTime(i)"
+                  >
+                    Entfernen
+                  </button>
+                }
+              </li>
+            }
+          </ul>
+          <button
+            type="button"
+            class="ws-btn ws-btn--ghost ws-btn--sm"
+            [disabled]="!inventory.inventorySettings().alertsEnabled"
+            (click)="addAlertTime()"
+          >
+            + Uhrzeit
+          </button>
+          <p class="admin__printer-hint">
+            Wartende Lagerwarnungen: {{ stockAlerts.pendingCount() }} ·
+            @if (stockAlerts.isFlushing()) {
+              Druckt gerade…
+            } @else {
+              Nächster Druck zur nächsten fälligen Uhrzeit
+            }
+          </p>
+        </div>
+      </section>
+
+      <section class="admin__printer-download ws-card">
+        <h2>Drucker-App Download</h2>
+        <p>Falls auf einem Rechner noch keine Drucker-App installiert ist, kann sie direkt hier geladen werden.</p>
+        <div class="admin__printer-download-row">
+          <div class="ws-field">
+            <label for="ws-printer-download-url">Download-Link</label>
+            <input
+              id="ws-printer-download-url"
+              type="url"
+              [value]="appDownloadUrlDraft()"
+              (input)="appDownloadUrlDraft.set($any($event.target).value)"
+            />
+          </div>
+          <button type="button" class="ws-btn ws-btn--ghost" (click)="saveDownloadUrl()">Speichern</button>
+          <a class="ws-btn" [href]="routingSettings().appDownloadUrl" target="_blank" rel="noreferrer">Jetzt öffnen</a>
+        </div>
+      </section>
+
+      <div class="admin__label-settings">
+        <h2>Etiketten-Layout</h2>
+        <p class="admin__label-settings-intro">
+          Vorschau und Druck nutzen dieselben Einstellungen. Standard: <strong>100 × 150 mm Hochformat</strong>.
+          Aktuell: {{ labelDimsLabel() }}
+        </p>
+
+        <div class="admin__label-settings-grid">
+          <div class="admin__label-form">
+            <div class="admin__label-row admin__label-row--2">
+              <div class="ws-field">
+                <label for="ws-label-width">Breite (mm)</label>
+                <input
+                  id="ws-label-width"
+                  type="number"
+                  min="40"
+                  max="220"
+                  step="1"
+                  [value]="labelSettings.settings().widthMm"
+                  (input)="setLabelWidth($any($event.target).value)"
+                />
+              </div>
+              <div class="ws-field">
+                <label for="ws-label-height">Höhe (mm)</label>
+                <input
+                  id="ws-label-height"
+                  type="number"
+                  min="30"
+                  max="300"
+                  step="1"
+                  [value]="labelSettings.settings().heightMm"
+                  (input)="setLabelHeight($any($event.target).value)"
+                />
+              </div>
+            </div>
+
+            <div class="ws-field">
+              <label for="ws-label-orient">Ausrichtung Papier</label>
+              <select
+                id="ws-label-orient"
+                [value]="labelSettings.settings().orientation"
+                (change)="setLabelOrientation($any($event.target).value)"
+              >
+                <option value="portrait">Hochformat</option>
+                <option value="landscape">Querformat</option>
+              </select>
+            </div>
+
+            <div class="ws-field">
+              <label for="ws-label-scale">
+                Inhalt-Größe: {{ labelSettings.settings().scalePercent }} %
+              </label>
+              <input
+                id="ws-label-scale"
+                type="range"
+                min="40"
+                max="100"
+                step="1"
+                [value]="labelSettings.settings().scalePercent"
+                (input)="setLabelScale($any($event.target).value)"
+              />
+            </div>
+
+            <div class="ws-field">
+              <label for="ws-label-padding">
+                Rand innen: {{ labelSettings.settings().paddingMm }} mm
+              </label>
+              <input
+                id="ws-label-padding"
+                type="range"
+                min="0"
+                max="15"
+                step="0.5"
+                [value]="labelSettings.settings().paddingMm"
+                (input)="setLabelPadding($any($event.target).value)"
+              />
+            </div>
+
+            <div class="admin__label-row admin__label-row--2">
+              <div class="ws-field">
+                <label for="ws-label-align-h">Horizontal</label>
+                <select
+                  id="ws-label-align-h"
+                  [value]="labelSettings.settings().alignH"
+                  (change)="setLabelAlignH($any($event.target).value)"
+                >
+                  <option value="left">Links</option>
+                  <option value="center">Mitte</option>
+                  <option value="right">Rechts</option>
+                </select>
+              </div>
+              <div class="ws-field">
+                <label for="ws-label-align-v">Vertikal</label>
+                <select
+                  id="ws-label-align-v"
+                  [value]="labelSettings.settings().alignV"
+                  (change)="setLabelAlignV($any($event.target).value)"
+                >
+                  <option value="top">Oben</option>
+                  <option value="center">Mitte</option>
+                  <option value="bottom">Unten</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="admin__label-presets">
+              <span>Schnellauswahl:</span>
+              <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="applyLabelPreset('center', 'center')">Mitte</button>
+              <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="applyLabelPreset('left', 'top')">Oben links</button>
+              <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="applyLabelPreset('right', 'top')">Oben rechts</button>
+              <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="applyLabelPreset('left', 'bottom')">Unten links</button>
+              <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="applyLabelPreset('right', 'bottom')">Unten rechts</button>
+            </div>
+
+            <div class="admin__label-actions">
+              <button type="button" class="ws-btn" [disabled]="labelSettings.syncing()" (click)="saveLabelSettings()">
+                {{ labelSettings.syncing() ? 'Speichert…' : 'Speichern & übernehmen' }}
+              </button>
+              <button type="button" class="ws-btn ws-btn--ghost" (click)="resetLabelSettings()">Zurücksetzen</button>
+            </div>
+          </div>
+
+          <div class="admin__label-preview-wrap">
+            <h3>Live-Vorschau</h3>
+            <pv-ws-label-preview [pages]="labelPreviewPages()" [showMeta]="false" />
+          </div>
+        </div>
+      </div>
+
+      <ol class="admin__printer-steps">
+        <li>App starten (Tray-Icon)</li>
+        <li>Hier „verbunden“ abwarten</li>
+        <li>Bestellungen wahlweise automatisch oder über <strong>Bestellungen bearbeiten</strong> drucken</li>
+        <li>Manuell: Bestellung → <strong>Etikett</strong> (Vorschau) → <strong>An Labeldrucker senden</strong></li>
+      </ol>
+    </div>
+  }
+</section>

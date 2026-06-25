@@ -14,6 +14,10 @@ import {
   PREVIEW_STUDIO,
   type PreviewSiteId,
 } from '../preview.config';
+import { STUDIO_PACKAGES, type StudioPackageId } from '../studio-packages.config';
+import { StudioPromoService } from '../studio-promo.service';
+import { BookingModalService } from '../booking-modal/booking-modal.service';
+import { DemoCodeModalService } from '../demo-access/demo-code-modal.service';
 
 @Component({
   selector: 'pv-fiverr-sidebar',
@@ -24,8 +28,12 @@ import {
 })
 export class FiverrSidebarComponent {
   private readonly router = inject(Router);
+  private readonly promo = inject(StudioPromoService);
+  private readonly booking = inject(BookingModalService);
+  private readonly demoCode = inject(DemoCodeModalService);
 
-  readonly open = signal(true);
+  readonly open = signal(false);
+  readonly spotlight = this.promo.spotlight;
 
   private readonly siteId = toSignal(
     this.router.events.pipe(
@@ -37,26 +45,51 @@ export class FiverrSidebarComponent {
   );
 
   readonly studio = PREVIEW_STUDIO;
-  readonly currentSite = computed(
-    () => PREVIEW_SITES.find((s) => s.id === this.siteId()) ?? PREVIEW_SITES[0],
-  );
+  readonly packages = STUDIO_PACKAGES;
+  readonly expandedPackage = signal<StudioPackageId | null>(null);
+  readonly currentSite = computed(() => {
+    const id = this.siteId();
+    if (id === 'weisser-schaefer') {
+      return {
+        id: 'weisser-schaefer' as const,
+        label: 'Weißer Schäfer (Demo)',
+        hint: 'B2B · Bestellportal · Naturdärme',
+        href: '/demo/weisser-schaefer',
+      };
+    }
+    return PREVIEW_SITES.find((s) => s.id === id) ?? PREVIEW_SITES[0];
+  });
   readonly otherSites = computed(() =>
     PREVIEW_SITES.filter((s) => s.id !== this.siteId()),
   );
 
   toggle(): void {
+    if (this.spotlight()) {
+      this.promo.dismiss();
+    }
     this.open.update((v) => !v);
   }
 
+  togglePackage(id: StudioPackageId): void {
+    this.expandedPackage.update((current) => (current === id ? null : id));
+  }
+
+  isPackageOpen(id: StudioPackageId): boolean {
+    return this.expandedPackage() === id;
+  }
+
+  openBooking(packageId?: StudioPackageId): void {
+    this.booking.open(packageId);
+  }
+
+  openDemoCode(): void {
+    this.demoCode.open();
+  }
+
   private urlToId(url: string): PreviewSiteId {
-    const path = url.split('?')[0].split('#')[0];
-    const seg = path.split('/').filter(Boolean)[0];
-    if (seg === 'pizzeria-demo') {
-      return 'pizzeria';
+    if (url.includes('weisser-schaefer')) {
+      return 'weisser-schaefer';
     }
-    if (seg === 'cardealer' || seg === 'restaurant' || seg === 'sportlerklause') {
-      return seg;
-    }
-    return 'sportflow';
+    return 'pizzeria';
   }
 }

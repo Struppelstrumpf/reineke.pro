@@ -1,11 +1,35 @@
 .app-root {
   min-height: 100dvh;
   background-color: var(--pv-shelf-bg);
-  /* Main content starts right of the fixed dock when open */
-  padding-left: calc(var(--pv-fiverr-panel-w) + var(--pv-fiverr-handle-w));
-  transition: padding-left 0.28s ease;
 }
 
-.app-root:has(.fiverr.fiverr--collapsed) {
+.app-stage {
+  min-height: 100dvh;
   padding-left: var(--pv-fiverr-handle-w);
+  transition: padding-left 0.28s ease;
+  opacity: 1;
+  transition:
+    opacity 1.5s ease,
+    padding-left 0.28s ease;
+}
+
+.app-stage:has(.fiverr:not(.fiverr--collapsed)) {
+  padding-left: calc(var(--pv-fiverr-panel-w) + var(--pv-fiverr-handle-w));
+}
+
+.app-stage--dimmed {
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-stage {
+    transition:
+      opacity 0.01ms,
+      padding-left 0.28s ease;
+  }
+
+  .app-stage--dimmed {
+    opacity: 0.1;
+  }
 }

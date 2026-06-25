@@ -1,0 +1,122 @@
+<div
+  #chatWidgetRoot
+  class="ws-chat-widget"
+  [class.is-open]="open()"
+  [class.is-dragging]="isDragging()"
+  [style.--ws-chat-offset-x.px]="widgetOffset().x"
+  [style.--ws-chat-offset-y.px]="widgetOffset().y"
+>
+  @if (open()) {
+    <section
+      #chatPanel
+      class="ws-chat-widget__panel"
+      [attr.data-placement]="panelPlacement()"
+      [style.left.px]="panelStyle().left"
+      [style.top.px]="panelStyle().top"
+      [style.max-height.px]="panelStyle().maxHeight"
+      aria-label="Support Chat"
+    >
+      <header class="ws-chat-widget__head" (pointerdown)="startPanelDrag($event)">
+        <div>
+          <p class="ws-chat-widget__kicker">Live Support</p>
+          <h2>Chat mit Weißer Schäfer</h2>
+        </div>
+        <button
+          type="button"
+          class="ws-chat-widget__close"
+          (pointerdown)="$event.stopPropagation()"
+          (click)="toggleOpen()"
+          aria-label="Chat schließen"
+        >
+          ×
+        </button>
+      </header>
+
+      @if (customerProfile(); as customer) {
+        <div class="ws-chat-widget__profile">
+          <strong>{{ customer.companyName }}</strong>
+          <span>{{ customer.contactName }} · {{ customer.phone || 'Telefon nicht hinterlegt' }}</span>
+          <span>{{ customer.address || 'Adresse nicht hinterlegt' }}</span>
+        </div>
+      } @else if (!conversation()) {
+        <div class="ws-chat-widget__intro">
+          <p>Schreiben Sie uns direkt - unser Team antwortet in der Regel in wenigen Minuten.</p>
+          <div class="ws-field">
+            <label for="ws-chat-guest-name">Ihr Name</label>
+            <input
+              id="ws-chat-guest-name"
+              type="text"
+              [value]="guestName()"
+              (input)="syncGuestName($any($event.target).value)"
+            />
+          </div>
+          <div class="ws-field">
+            <label for="ws-chat-first">Nachricht</label>
+            <textarea
+              id="ws-chat-first"
+              rows="3"
+              [value]="firstMessage()"
+              (input)="firstMessage.set($any($event.target).value)"
+              placeholder="Was können wir für Sie tun?"
+            ></textarea>
+          </div>
+          <button type="button" class="ws-btn" (click)="startGuestChat()">Chat starten</button>
+        </div>
+      }
+
+      @if (conversation(); as conv) {
+        <div class="ws-chat-widget__messages" aria-label="Chatverlauf">
+          @for (msg of conv.messages; track msg.id) {
+            <article
+              class="ws-chat-widget__message"
+              [class.is-self]="msg.authorRole !== 'staff'"
+              [class.is-staff]="msg.authorRole === 'staff'"
+            >
+              <strong>{{ msg.authorName }}</strong>
+              <p>{{ msg.text }}</p>
+              <time>{{ msg.createdAt | date: 'HH:mm' }}</time>
+            </article>
+          }
+        </div>
+      }
+
+      @if (conversation() || customerProfile()) {
+        <div class="ws-chat-widget__composer">
+          <div class="ws-field">
+            <label for="ws-chat-message">Nachricht</label>
+            <textarea
+              id="ws-chat-message"
+              rows="2"
+              [value]="messageDraft()"
+              (input)="messageDraft.set($any($event.target).value)"
+              placeholder="Nachricht schreiben..."
+            ></textarea>
+          </div>
+          <button type="button" class="ws-btn" (click)="sendMessage()">Senden</button>
+        </div>
+      }
+
+      @if (error()) {
+        <p class="ws-form__error ws-chat-widget__error">{{ error() }}</p>
+      }
+    </section>
+  }
+
+  <button
+    #chatBubble
+    type="button"
+    class="ws-chat-widget__toggle"
+    [class.has-unread]="hasUnreadReply() && !open()"
+    (pointerdown)="startBubbleDrag($event)"
+    (click)="toggleOpen()"
+    aria-label="Support Chat öffnen"
+  >
+    <span class="ws-chat-widget__mascot" aria-hidden="true">
+      <img src="/ws-sheep-mascot.svg" alt="" />
+    </span>
+    <span class="ws-chat-widget__label">{{ open() ? 'Schließen' : 'Chat' }}</span>
+  </button>
+  @if (hasUnreadReply() && !open()) {
+    <p class="ws-chat-widget__incoming-hint">Neue Nachricht</p>
+  }
+</div>

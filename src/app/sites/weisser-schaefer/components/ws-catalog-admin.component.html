@@ -1,0 +1,277 @@
+<div class="catalog-admin">
+  <header class="catalog-admin__head">
+    <div>
+      <h2>Sortiment verwalten</h2>
+      <p>Produkte anlegen, sortieren und Kategorien ordnen — der Shop zeigt immer vier Produkte nebeneinander.</p>
+    </div>
+    <button type="button" class="ws-btn ws-btn--sm" (click)="startNewProduct()">+ Neues Produkt</button>
+  </header>
+
+  <section class="catalog-admin__categories ws-card">
+    <h3>Kategorien</h3>
+    <ul class="catalog-admin__category-list">
+      @for (category of catalog.sortedCategories(); track category.id; let i = $index; let last = $last) {
+        <li>
+          <div class="catalog-admin__category-order">
+            <button
+              type="button"
+              class="catalog-admin__move"
+              [disabled]="i === 0"
+              (click)="catalog.moveCategory(category.id, 'up')"
+              aria-label="Nach oben"
+            >
+              ▲
+            </button>
+            <button
+              type="button"
+              class="catalog-admin__move"
+              [disabled]="last"
+              (click)="catalog.moveCategory(category.id, 'down')"
+              aria-label="Nach unten"
+            >
+              ▼
+            </button>
+          </div>
+          <input
+            type="text"
+            class="catalog-admin__category-name"
+            [value]="category.name"
+            (change)="renameCategory(category.id, $event)"
+          />
+          <button
+            type="button"
+            class="ws-btn ws-btn--ghost ws-btn--sm"
+            (click)="removeCategory(category.id)"
+            title="Nur leere Kategorien"
+          >
+            Löschen
+          </button>
+        </li>
+      }
+    </ul>
+    <form class="catalog-admin__category-add" (submit)="$event.preventDefault(); addCategory()">
+      <input
+        type="text"
+        placeholder="Neue Kategorie…"
+        [value]="newCategoryName()"
+        (input)="newCategoryName.set($any($event.target).value)"
+      />
+      <button type="submit" class="ws-btn ws-btn--sm">Anlegen</button>
+    </form>
+    @if (categoryError()) {
+      <p class="ws-form__error">{{ categoryError() }}</p>
+    }
+    @if (categoryMsg()) {
+      <p class="ws-form__success">{{ categoryMsg() }}</p>
+    }
+  </section>
+
+  @if (showForm()) {
+    <section class="catalog-admin__form ws-card">
+      <h3>{{ editingId() === 'new' ? 'Neues Produkt' : 'Produkt bearbeiten' }}</h3>
+      <form class="ws-form catalog-admin__product-form" (submit)="$event.preventDefault(); saveProduct()">
+        <div class="ws-field">
+          <label for="ws-prod-cat">Kategorie</label>
+          <select
+            id="ws-prod-cat"
+            [value]="formCategoryId()"
+            (change)="formCategoryId.set($any($event.target).value)"
+          >
+            @for (category of catalog.sortedCategories(); track category.id) {
+              <option [value]="category.id" [selected]="category.id === formCategoryId()">
+                {{ category.name }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="ws-field">
+          <label for="ws-prod-name">Name</label>
+          <input
+            id="ws-prod-name"
+            type="text"
+            [value]="formName()"
+            (input)="formName.set($any($event.target).value)"
+          />
+        </div>
+        <div class="ws-field">
+          <label for="ws-prod-spec">Spezifikation</label>
+          <input
+            id="ws-prod-spec"
+            type="text"
+            [value]="formSpec()"
+            (input)="formSpec.set($any($event.target).value)"
+          />
+        </div>
+        <div class="catalog-admin__form-row">
+          <div class="ws-field">
+            <label for="ws-prod-unit">Einheit</label>
+            <input
+              id="ws-prod-unit"
+              type="text"
+              [value]="formUnit()"
+              (input)="formUnit.set($any($event.target).value)"
+            />
+          </div>
+          <div class="ws-field">
+            <label for="ws-prod-price">Preis (EUR)</label>
+            <input
+              id="ws-prod-price"
+              type="text"
+              inputmode="decimal"
+              [value]="formPrice()"
+              (input)="formPrice.set($any($event.target).value)"
+            />
+          </div>
+          <div class="ws-field">
+            <label for="ws-prod-stock">Bestand</label>
+            <select
+              id="ws-prod-stock"
+              [value]="formStock()"
+              (change)="formStock.set(normalizeProductStock($any($event.target).value))"
+            >
+              @for (stock of stockOptions; track stock) {
+                <option [value]="stock" [selected]="stock === formStock()">{{ stock }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        @if (formError()) {
+          <p class="ws-form__error">{{ formError() }}</p>
+        }
+        <div class="catalog-admin__form-actions">
+          <button type="submit" class="ws-btn">Speichern</button>
+          <button type="button" class="ws-btn ws-btn--ghost" (click)="cancelForm()">Abbrechen</button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <div class="catalog-admin__columns">
+    <section class="catalog-admin__active ws-card" aria-label="Aktive Produkte">
+      <h3>Aktiv</h3>
+      @for (category of catalog.sortedCategories(); track category.id) {
+        @let products = catalog.productsForCategory(category.id, true);
+        <div class="catalog-admin__group">
+          <div class="catalog-admin__group-head">
+            <h4>{{ category.name }}</h4>
+            <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="startNewProduct(category.id)">
+              + Produkt
+            </button>
+          </div>
+          @if (products.length === 0) {
+            <p class="catalog-admin__empty">Keine aktiven Produkte.</p>
+          } @else {
+            <ul class="catalog-admin__products">
+              @for (product of products; track product.id; let i = $index; let last = $last) {
+                <li>
+                  <div class="catalog-admin__product-order">
+                    <button
+                      type="button"
+                      class="catalog-admin__move"
+                      [disabled]="i === 0"
+                      (click)="catalog.moveProduct(product.id, 'up')"
+                      aria-label="Nach oben"
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      class="catalog-admin__move"
+                      [disabled]="last"
+                      (click)="catalog.moveProduct(product.id, 'down')"
+                      aria-label="Nach unten"
+                    >
+                      ▼
+                    </button>
+                  </div>
+                  <div class="catalog-admin__product-info">
+                    <strong>{{ product.name }}</strong>
+                    <span>{{ product.spec }}</span>
+                    <span class="catalog-admin__price">{{ product.price | currency: 'EUR' }} / {{ product.unit }}</span>
+                    <span class="catalog-admin__stock">{{ stockLabel(product, inventory.quantity(product.id)) }}</span>
+                  </div>
+                  <div class="catalog-admin__product-actions">
+                    <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="startEdit(product.id)">
+                      Bearbeiten
+                    </button>
+                    <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="deactivate(product.id)">
+                      Deaktivieren
+                    </button>
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="catalog-admin__inactive ws-card" aria-label="Inaktive Produkte">
+      <h3>Inaktiv</h3>
+      @if (catalog.inactiveProducts().length === 0) {
+        <p class="catalog-admin__empty">Keine inaktiven Produkte.</p>
+      } @else {
+        <ul class="catalog-admin__products catalog-admin__products--inactive">
+          @for (product of catalog.inactiveProducts(); track product.id) {
+            <li>
+              <div class="catalog-admin__product-info">
+                <strong>{{ product.name }}</strong>
+                <span>{{ catalog.categoryName(product.categoryId) }}</span>
+                <span class="catalog-admin__price">{{ product.price | currency: 'EUR' }} / {{ product.unit }}</span>
+              </div>
+              <div class="catalog-admin__product-actions">
+                <button type="button" class="ws-btn ws-btn--sm" (click)="activate(product.id)">Aktivieren</button>
+                <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="startEdit(product.id)">
+                  Bearbeiten
+                </button>
+                <button
+                  type="button"
+                  class="ws-btn ws-btn--ghost ws-btn--sm"
+                  (click)="requestRemoveProduct(product.id)"
+                >
+                  Löschen
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+
+  @if (productDeleteDialogOpen()) {
+    <div class="catalog-admin__confirm-backdrop" (click)="closeProductDeleteDialog()">
+      <section class="catalog-admin__confirm ws-card" (click)="$event.stopPropagation()" aria-label="Produkt löschen bestätigen">
+        <h3>Produkt löschen</h3>
+        <p>
+          Produkt <strong>{{ productDeleteDialogName() }}</strong> wirklich dauerhaft löschen?
+          Diese Aktion kann nicht rückgängig gemacht werden.
+        </p>
+        <label class="ws-field">
+          <span>
+            Zur Bestätigung bitte <strong>{{ productDeleteDialogRequiredPhrase() }}</strong> eingeben:
+          </span>
+          <input
+            type="text"
+            [value]="productDeleteDialogInput()"
+            (input)="productDeleteDialogInput.set($any($event.target).value)"
+            autocomplete="off"
+          />
+        </label>
+        <div class="catalog-admin__confirm-actions">
+          <button type="button" class="ws-btn ws-btn--ghost" (click)="closeProductDeleteDialog()">
+            Abbrechen
+          </button>
+          <button
+            type="button"
+            class="ws-btn"
+            [disabled]="!canConfirmProductDelete()"
+            (click)="confirmRemoveProduct()"
+          >
+            Dauerhaft löschen
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+</div>

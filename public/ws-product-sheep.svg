@@ -1,0 +1,32 @@
+<svg width="640" height="760" viewBox="0 0 640 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="75" y1="34" x2="575" y2="726" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f8faf5"/>
+      <stop offset="1" stop-color="#eef3e3"/>
+    </linearGradient>
+    <linearGradient id="seal" x1="405" y1="98" x2="575" y2="285" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ef3d3d"/>
+      <stop offset="1" stop-color="#b71818"/>
+    </linearGradient>
+    <radialGradient id="fiber" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(326 433) rotate(88) scale(228 188)">
+      <stop stop-color="#f7f6f1"/>
+      <stop offset="1" stop-color="#ddd9cd"/>
+    </radialGradient>
+  </defs>
+  <rect x="74" y="30" width="492" height="700" rx="28" fill="url(#bg)" stroke="#d9dfcd" stroke-width="8"/>
+  <rect x="84" y="40" width="472" height="680" rx="22" stroke="#f9fcf5" stroke-opacity=".75" stroke-width="2"/>
+  <rect x="386" y="88" width="172" height="204" rx="16" fill="url(#seal)"/>
+  <circle cx="472" cy="180" r="70" fill="#fff" fill-opacity=".93"/>
+  <path d="M438 180c0-19 15-34 34-34s34 15 34 34-15 34-34 34-34-15-34-34Zm11 0c0 13 10 23 23 23s23-10 23-23-10-23-23-23-23 10-23 23Z" fill="#191919"/>
+  <rect x="126" y="142" width="214" height="56" rx="12" fill="#f5f8eb"/>
+  <text x="144" y="178" fill="#576338" font-family="DM Sans, Arial, sans-serif" font-size="24" font-weight="700">NATURDARM</text>
+  <rect x="110" y="222" width="420" height="362" rx="20" fill="url(#fiber)"/>
+  <path d="M128 260c18 16 44 16 64 4 22-12 48-12 69 1s47 14 70 2c24-13 48-13 73 1 23 12 49 12 68-3" stroke="#d4cfbf" stroke-width="6" stroke-linecap="round"/>
+  <path d="M127 320c16 14 43 16 63 5 21-11 47-11 69 2 22 13 46 14 69 2 24-12 48-12 72 1 22 11 47 12 67-3" stroke="#cdc8b9" stroke-width="6" stroke-linecap="round"/>
+  <path d="M127 380c18 15 43 15 63 4 22-12 46-12 68 1s48 14 71 2c24-13 47-13 70 0 24 13 49 13 70-2" stroke="#d0ccbe" stroke-width="6" stroke-linecap="round"/>
+  <path d="M129 438c17 14 41 14 61 3 23-12 49-12 70 1s47 14 69 3c24-12 48-13 73 0 23 12 49 12 70-2" stroke="#d6d2c5" stroke-width="6" stroke-linecap="round"/>
+  <path d="M131 496c15 13 40 14 60 4 24-12 49-12 71 1 21 13 46 13 68 2 24-12 48-12 73 0 24 12 48 11 67-2" stroke="#ccc8ba" stroke-width="6" stroke-linecap="round"/>
+  <rect x="188" y="610" width="264" height="68" rx="12" fill="#f8f8f6" stroke="#d4d3ce" stroke-width="2"/>
+  <text x="212" y="639" fill="#232323" font-family="DM Sans, Arial, sans-serif" font-size="18" font-weight="700">Gelhard Saltings</text>
+  <text x="212" y="662" fill="#4d4d4d" font-family="DM Sans, Arial, sans-serif" font-size="16">91m Beutel</text>
+</svg>

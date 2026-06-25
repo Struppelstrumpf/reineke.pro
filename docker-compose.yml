@@ -6,6 +6,7 @@ services:
   web:
     build: .
     image: ghcr.io/struppelstrumpf/reineke.pro:latest
+    pull_policy: always
     ports:
       - "8080:80"
     restart: unless-stopped

@@ -1,0 +1,42 @@
+{
+  "name": "ws-label-print",
+  "version": "1.4.5",
+  "description": "Weißer Schäfer — Etikettendruck für Windows",
+  "main": "src/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win portable",
+    "build": "electron-builder --win portable"
+  },
+  "build": {
+    "appId": "pro.reineke.ws-label-print",
+    "productName": "WS Etikettendruck",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "WS-Etikettendruck-${version}.exe",
+      "signAndEditExecutable": false
+    },
+    "portable": {
+      "artifactName": "WS-Etikettendruck-${version}.exe"
+    }
+  },
+  "devDependencies": {
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8"
+  }
+}

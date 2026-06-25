@@ -1,0 +1,32 @@
+<svg width="640" height="760" viewBox="0 0 640 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="76" y1="34" x2="562" y2="726" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f3fcfa"/>
+      <stop offset="1" stop-color="#deeeea"/>
+    </linearGradient>
+    <linearGradient id="seal" x1="394" y1="88" x2="562" y2="286" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2ab7a0"/>
+      <stop offset="1" stop-color="#1b7364"/>
+    </linearGradient>
+    <radialGradient id="fiber" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(320 422) rotate(90) scale(232 188)">
+      <stop stop-color="#eef8f6"/>
+      <stop offset="1" stop-color="#d5e5e1"/>
+    </radialGradient>
+  </defs>
+  <rect x="74" y="30" width="492" height="700" rx="28" fill="url(#bg)" stroke="#bfd9d2" stroke-width="8"/>
+  <rect x="84" y="40" width="472" height="680" rx="22" stroke="#f0fcf8" stroke-opacity=".82" stroke-width="2"/>
+  <rect x="386" y="88" width="172" height="204" rx="16" fill="url(#seal)"/>
+  <circle cx="472" cy="178" r="70" fill="#fff" fill-opacity=".93"/>
+  <path d="M440 178c0-18 15-33 33-33s33 15 33 33-15 33-33 33-33-15-33-33Zm11 0c0 12 10 22 22 22s22-10 22-22-10-22-22-22-22 10-22 22Z" fill="#0f3230"/>
+  <rect x="112" y="144" width="246" height="56" rx="12" fill="#e7f6f2"/>
+  <text x="132" y="179" fill="#2a6d65" font-family="DM Sans, Arial, sans-serif" font-size="24" font-weight="700">ZIEGENDARM</text>
+  <rect x="110" y="222" width="420" height="362" rx="20" fill="url(#fiber)"/>
+  <path d="M128 260c17 14 42 15 62 4 23-11 47-11 68 2 23 13 48 13 71 1 23-12 47-12 70 1 22 11 46 11 65-2" stroke="#bfd6d2" stroke-width="6" stroke-linecap="round"/>
+  <path d="M126 320c17 13 42 14 62 4 23-11 47-11 69 2 22 13 47 13 70 1 24-12 48-12 71 0 22 11 46 11 65-2" stroke="#bad1cd" stroke-width="6" stroke-linecap="round"/>
+  <path d="M129 378c16 13 41 13 61 3 24-12 49-12 70 2 21 13 46 13 69 1 24-11 48-11 72 1 23 12 47 12 66-2" stroke="#c4ddda" stroke-width="6" stroke-linecap="round"/>
+  <path d="M128 438c16 12 40 12 60 2 24-12 49-12 70 2 21 13 46 13 69 1 24-11 48-11 72 1 23 12 47 12 67-2" stroke="#b8ceca" stroke-width="6" stroke-linecap="round"/>
+  <path d="M130 496c15 12 39 12 59 3 24-12 49-12 70 1 22 13 47 13 70 1 23-11 47-11 70 1 24 12 49 12 69-2" stroke="#afc7c2" stroke-width="6" stroke-linecap="round"/>
+  <rect x="178" y="610" width="282" height="68" rx="12" fill="#f2fbf9" stroke="#c8ddd8" stroke-width="2"/>
+  <text x="202" y="639" fill="#245e58" font-family="DM Sans, Arial, sans-serif" font-size="18" font-weight="700">Premium Naturdarm</text>
+  <text x="202" y="662" fill="#3c7770" font-family="DM Sans, Arial, sans-serif" font-size="16">91m Beutel</text>
+</svg>

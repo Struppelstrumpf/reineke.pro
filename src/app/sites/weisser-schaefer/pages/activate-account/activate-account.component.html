@@ -1,0 +1,152 @@
+<div class="ws-card ws-form-wrap">
+  @if (success()) {
+    <div class="ws-form">
+      <h1 class="ws-form__title">Konto aktiviert</h1>
+      <p class="ws-form__lead">
+        Ihr Fleischerei-Konto ist freigeschaltet. Sie können sich jetzt anmelden und sofort bestellen.
+      </p>
+      <p class="ws-form__success">Willkommen bei Weißer Schäfer!</p>
+      <button type="button" class="ws-btn" (click)="goLogin()">Zur Anmeldung</button>
+    </div>
+  } @else {
+    <form class="ws-form" (submit)="$event.preventDefault(); submit()">
+      <h1 class="ws-form__title">Kundenkonto aktivieren</h1>
+      <p class="ws-form__lead">
+        Vervollständigen Sie Ihre Angaben, um Ihr von Weißer Schäfer eingerichtetes Konto zu eröffnen.
+      </p>
+
+      <div class="ws-field">
+        <label for="ws-act-email">E-Mail</label>
+        <input
+          id="ws-act-email"
+          type="email"
+          autocomplete="username"
+          [value]="email()"
+          (input)="email.set($any($event.target).value)"
+        />
+      </div>
+      <div class="ws-field">
+        <label for="ws-act-token">Code aus Einladungs-E-Mail</label>
+        <input
+          id="ws-act-token"
+          type="text"
+          [value]="token()"
+          (input)="token.set($any($event.target).value)"
+        />
+      </div>
+      <div class="ws-field">
+        <label for="ws-act-company">Fleischerei / Firma</label>
+        <input
+          id="ws-act-company"
+          type="text"
+          [value]="companyName()"
+          (input)="companyName.set($any($event.target).value)"
+        />
+      </div>
+      <div class="ws-field">
+        <label for="ws-act-name">Ansprechpartner</label>
+        <input
+          id="ws-act-name"
+          type="text"
+          [value]="contactName()"
+          (input)="contactName.set($any($event.target).value)"
+        />
+      </div>
+      <pv-ws-address-autocomplete
+        inputId="ws-act-address"
+        label="Anschrift"
+        placeholder="Straße Hausnummer, Stadt"
+        [value]="address()"
+        [assumeSelected]="addressSelected()"
+        (valueChange)="address.set($event)"
+        (validSelectionChange)="addressSelected.set($event)"
+      />
+      <div class="ws-field">
+        <label for="ws-act-phone">Telefon</label>
+        <input
+          id="ws-act-phone"
+          type="tel"
+          autocomplete="tel"
+          [value]="phone()"
+          (input)="phone.set($any($event.target).value)"
+        />
+      </div>
+      <div class="ws-field">
+        <label for="ws-act-password">Passwort</label>
+        <div class="reg__pw">
+          <input
+            id="ws-act-password"
+            [type]="showPassword() ? 'text' : 'password'"
+            autocomplete="new-password"
+            [value]="password()"
+            (input)="password.set($any($event.target).value)"
+          />
+          <button
+            type="button"
+            class="reg__pw-toggle"
+            (click)="togglePassword()"
+            [attr.aria-label]="showPassword() ? 'Passwort verbergen' : 'Passwort anzeigen'"
+            [attr.aria-pressed]="showPassword()"
+          >
+            @if (showPassword()) {
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M12 6.5c3.79 0 7.17 2.13 9.24 5.5-1.02 1.56-2.45 2.86-4.14 3.73L15.5 13a3.5 3.5 0 0 0-4.92-4.92L9.27 6.76A9.7 9.7 0 0 1 12 6.5Zm0 11c-3.79 0-7.17-2.13-9.24-5.5.78-1.2 1.8-2.23 2.98-3.01l1.78 1.78A3.5 3.5 0 0 0 12 17.5c.87 0 1.67-.32 2.29-.85l1.52 1.52c-.95.38-1.99.58-3.06.58Zm-7.35-2.35 1.41 1.41L18.36 5.22l-1.41-1.41L4.65 15.15Z"
+                />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M12 6.5C7 6.5 2.73 9.61 1 14c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 9.61 17 6.5 12 6.5Zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5Zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
+                />
+              </svg>
+            }
+          </button>
+        </div>
+      </div>
+      <div class="ws-field">
+        <label for="ws-act-password-confirm">Passwort wiederholen</label>
+        <div class="reg__pw">
+          <input
+            id="ws-act-password-confirm"
+            [type]="showPasswordConfirm() ? 'text' : 'password'"
+            autocomplete="new-password"
+            [value]="passwordConfirm()"
+            (input)="passwordConfirm.set($any($event.target).value)"
+          />
+          <button
+            type="button"
+            class="reg__pw-toggle"
+            (click)="togglePasswordConfirm()"
+            [attr.aria-label]="showPasswordConfirm() ? 'Passwort verbergen' : 'Passwort anzeigen'"
+            [attr.aria-pressed]="showPasswordConfirm()"
+          >
+            @if (showPasswordConfirm()) {
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M12 6.5c3.79 0 7.17 2.13 9.24 5.5-1.02 1.56-2.45 2.86-4.14 3.73L15.5 13a3.5 3.5 0 0 0-4.92-4.92L9.27 6.76A9.7 9.7 0 0 1 12 6.5Zm0 11c-3.79 0-7.17-2.13-9.24-5.5.78-1.2 1.8-2.23 2.98-3.01l1.78 1.78A3.5 3.5 0 0 0 12 17.5c.87 0 1.67-.32 2.29-.85l1.52 1.52c-.95.38-1.99.58-3.06.58Zm-7.35-2.35 1.41 1.41L18.36 5.22l-1.41-1.41L4.65 15.15Z"
+                />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M12 6.5C7 6.5 2.73 9.61 1 14c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 9.61 17 6.5 12 6.5Zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5Zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"
+                />
+              </svg>
+            }
+          </button>
+        </div>
+      </div>
+
+      @if (error()) {
+        <p class="ws-form__error" role="alert">{{ error() }}</p>
+      }
+
+      <button type="submit" class="ws-btn">Konto eröffnen</button>
+    </form>
+  }
+</div>

@@ -1,0 +1,202 @@
+<div class="shop">
+  @if (!isGuest() && !auth.canOrder()) {
+    <div class="shop__pending ws-card">
+      <h2>Konto wartet auf Freigabe</h2>
+      <p>Ihre Registrierung wird geprüft. Nach Freischaltung können Sie sofort bestellen.</p>
+    </div>
+  }
+
+  <section class="shop__filters" aria-label="Produktsuche und Filter">
+    <div class="shop__search-wrap">
+      <input
+        id="ws-shop-search"
+        type="search"
+        placeholder="Produkt suchen…"
+        [value]="search()"
+        (input)="search.set($any($event.target).value)"
+      />
+    </div>
+    <div class="shop__head-actions">
+      <button
+        type="button"
+        class="shop__cart-pill shop__cart-pill--desktop"
+        (click)="cartOpen.set(true)"
+        aria-label="Warenkorb öffnen"
+      >
+        <span>Warenkorb</span>
+        @if (session.cartTotal() > 0) {
+          <span class="shop__cart-sum">{{ cartSubtotal() | currency: 'EUR' }}</span>
+        }
+        <span class="shop__cart-badge">{{ session.cartTotal() }}</span>
+      </button>
+    </div>
+    <div class="shop__chips">
+      <button
+        type="button"
+        class="ws-chip"
+        [class.is-active]="categoryFilter() === 'alle'"
+        (click)="setCategory('alle')"
+      >
+        Alle
+      </button>
+      @for (category of catalog.sortedCategories(); track category.id) {
+        <button
+          type="button"
+          class="ws-chip"
+          [class.is-active]="categoryFilter() === category.id"
+          (click)="setCategory(category.id)"
+        >
+          {{ category.name }}
+        </button>
+      }
+      <button
+        type="button"
+        class="ws-chip"
+        [class.is-active]="orderableOnly()"
+        (click)="orderableOnly.set(!orderableOnly())"
+      >
+        Nur bestellbar
+      </button>
+      @if (hasActiveFilters()) {
+        <button
+          type="button"
+          class="ws-chip shop__chip-reset"
+          (click)="resetFilters()"
+        >
+          Zurücksetzen
+        </button>
+      }
+    </div>
+  </section>
+
+  <div class="shop__catalog" aria-label="Sortiment">
+    @if (!hasProducts()) {
+      <p class="ws-empty">Keine Produkte für diesen Filter.</p>
+    }
+    @for (group of shopView(); track group.category.id) {
+      <section class="shop__category-block">
+        <header class="shop__category-head">
+          <h2 class="shop__category-title">{{ group.category.name }}</h2>
+        </header>
+        <div class="shop__catalog-grid">
+          @for (product of group.products; track product.id) {
+            <article
+              class="shop__product"
+              [class.is-disabled]="!canOrderProduct(product)"
+            >
+              <div class="shop__media" [class]="productMediaClass(group.category.name)">
+                @if (productImage(product); as imageUrl) {
+                  <img
+                    class="shop__media-img"
+                    [src]="imageUrl"
+                    [alt]="'Produktbild ' + product.name"
+                    loading="lazy"
+                  />
+                } @else {
+                  <div class="shop__media-fallback" aria-label="Standardbild">
+                      <img class="shop__media-mascot" src="/ws-sheep-mascot.svg" alt="" />
+                    <p class="shop__media-missing">Noch kein Bild</p>
+                  </div>
+                }
+                <span>{{ productInitials(product.name) }}</span>
+              </div>
+              <div class="shop__product-top">
+                <span class="shop__category">{{ group.category.name }}</span>
+                <span
+                  class="shop__stock"
+                  [class]="'shop__stock ' + stockBadgeClass(product.stock)"
+                >
+                  {{ stockLabel(product, warehouseQty(product.id)) }}
+                </span>
+              </div>
+              <h3>{{ product.name }}</h3>
+              <p class="shop__spec">{{ product.spec }}</p>
+              <p class="shop__hint">{{ stockHint(product) }}</p>
+              <div class="shop__product-meta">
+                <span class="shop__unit">{{ product.unit }}</span>
+                @if (cartQty(product.id) > 0) {
+                  <span class="shop__in-cart">{{ cartQty(product.id) }} im Warenkorb</span>
+                }
+              </div>
+              <div class="shop__product-foot">
+                <span class="shop__price">{{ product.price | currency: 'EUR' }}</span>
+                <button
+                  type="button"
+                  [disabled]="!canOrderProduct(product) || maxAddQty(product) < 1"
+                  (click)="add(product)"
+                >
+                  @if (product.stock === 'Ausverkauft') {
+                    Ausverkauft
+                  } @else if (product.stock === 'Bestand' && warehouseQty(product.id) < 1) {
+                    Nicht verfügbar
+                  } @else {
+                    In den Warenkorb
+                  }
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    }
+  </div>
+
+  @if (cartOpen()) {
+    <button
+      type="button"
+      class="shop__cart-backdrop"
+      (click)="cartOpen.set(false)"
+      aria-label="Warenkorb schließen"
+    ></button>
+    <aside class="shop__cart shop__cart--modal is-open" aria-label="Warenkorb" role="dialog" aria-modal="true">
+      <div class="shop__cart-head">
+        <div>
+          <h2>Warenkorb</h2>
+          <p class="shop__cart-meta">{{ session.cartTotal() }} Artikel</p>
+        </div>
+        <button type="button" class="shop__cart-close" (click)="cartOpen.set(false)" aria-label="Schließen">
+          ×
+        </button>
+      </div>
+      @if (session.cart().length === 0) {
+        <p class="shop__empty">Noch keine Positionen.</p>
+      } @else {
+        <ul class="shop__lines">
+          @for (line of session.cart(); track line.productId) {
+            <li>
+              <div class="shop__line-main">
+                <strong>{{ line.name }}</strong>
+                <small>{{ line.qty }} × {{ line.unit }}</small>
+              </div>
+              <button
+                type="button"
+                class="shop__remove"
+                (click)="session.removeFromCart(line.productId)"
+                aria-label="Entfernen"
+              >
+                ×
+              </button>
+            </li>
+          }
+        </ul>
+        <p class="shop__subtotal">Zwischensumme <strong>{{ cartSubtotal() | currency: 'EUR' }}</strong></p>
+        @if (auth.canOrder()) {
+          <label class="shop__label" for="ws-note">Lieferhinweis</label>
+          <textarea
+            id="ws-note"
+            rows="2"
+            [value]="note()"
+            (input)="note.set($any($event.target).value)"
+            placeholder="z. B. Abholung Donnerstag vormittags"
+          ></textarea>
+          <button type="button" class="ws-btn shop__submit" (click)="checkout()">Bestellung absenden</button>
+        } @else {
+          <p class="shop__empty">Zum Bestellen bitte anmelden. Warenkorb bleibt erhalten.</p>
+          <button type="button" class="ws-btn shop__submit" routerLink="/demo/weisser-schaefer/anmelden">
+            Zum Login
+          </button>
+        }
+      }
+    </aside>
+  }
+</div>

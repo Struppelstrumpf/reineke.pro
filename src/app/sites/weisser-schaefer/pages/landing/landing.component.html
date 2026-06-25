@@ -1,0 +1,85 @@
+<section class="landing">
+  @if (showPublicIntro()) {
+    <section id="landing-hero" class="landing__hero ws-card">
+      <p class="landing__eyebrow">Naturdärme · B2B seit 2024</p>
+      <h1>Ihr Partner für Schafs- und Lammdärme — bestellt in Minuten, nicht am Telefon.</h1>
+      <p class="landing__lead">
+        Feste Kaliber, gleichbleibende Qualität, klare Preise. Für Metzgereien und Fleischereien,
+        die Wert auf Zuverlässigkeit legen.
+      </p>
+      <div class="landing__cta">
+        <a class="ws-btn" routerLink="/demo/weisser-schaefer/registrieren">Als Fleischerei registrieren</a>
+        <a class="ws-btn ws-btn--ghost" routerLink="/demo/weisser-schaefer/anmelden">Anmelden</a>
+      </div>
+      <ul class="landing__quick" aria-label="Vorteile auf einen Blick">
+        <li>✓ B2B-Konto mit Freigabe</li>
+        <li>✓ Etikettendruck in der Werkstatt</li>
+        <li>✓ Mobil & Desktop</li>
+      </ul>
+      <nav class="landing__jump-nav" aria-label="Direkt zu Abschnitten">
+        <button type="button" (click)="scrollToSection('landing-about')">Über uns</button>
+        <button type="button" (click)="scrollToSection('landing-benefits')">Vorteile</button>
+        <button type="button" (click)="scrollToSection('landing-steps')">Ablauf</button>
+      </nav>
+    </section>
+  }
+
+  <section class="landing__story" aria-label="Verbundene Abschnitte">
+    <section id="landing-about" class="landing__about ws-card landing__story-section" aria-label="Über uns">
+      <div class="landing__about-copy">
+        <p class="landing__eyebrow">Über uns</p>
+        <h2>Familienbetrieb mit Herz, Verlässlichkeit und modernem Anspruch.</h2>
+        <p>
+          Weißer Schäfer ist ein Familienbetrieb: Wir arbeiten mit Herzblut, kurzen Wegen
+          und persönlicher Verantwortung. Was wir versprechen, liefern wir auch - sauber,
+          pünktlich und in gleichbleibender Qualität.
+        </p>
+        <p>
+          Uns macht die Verbindung aus Tradition und Zukunft aus: ehrliches Handwerk auf der
+          einen Seite, ein professioneller digitaler Auftritt auf der anderen. So bestellen
+          unsere Kunden heute schnell online und bekommen trotzdem die persönliche Betreuung,
+          die man sonst nur vom Telefon kennt.
+        </p>
+        <ul class="landing__about-points">
+          <li>Persönliche Betreuung wie im klassischen Familienbetrieb</li>
+          <li>Professioneller Webauftritt mit klaren Prozessen</li>
+          <li>Qualität, auf die sich Metzgereien jeden Tag verlassen können</li>
+        </ul>
+      </div>
+      <figure class="landing__about-media">
+        <img
+          src="https://images.unsplash.com/photo-1756982784595-b1b4e16d8b54?auto=format&fit=crop&w=1400&q=80"
+          alt="Platzhalterbild: Mann mit jugendlicher Tochter"
+          loading="lazy"
+        />
+        <figcaption>Platzhalterbild - wird durch eigenes Foto ersetzt.</figcaption>
+      </figure>
+    </section>
+
+    <section id="landing-benefits" class="landing__benefits ws-card landing__story-section" aria-label="Vorteile">
+      <p class="landing__eyebrow">Vorteile</p>
+      <h2>Alles, was für den täglichen Bestellablauf zählt.</h2>
+      <ul class="landing__benefit-list">
+        <li>Sortiment mit klaren Einheiten, Kalibern und Verfügbarkeiten</li>
+        <li>Sicheres Kundenkonto mit Freigabe und persönlicher Betreuung</li>
+        <li>Direkter Workflow bis zur Werkstatt mit Etikettendruck</li>
+      </ul>
+    </section>
+
+    <section id="landing-steps" class="landing__steps ws-card landing__story-section">
+      <p class="landing__eyebrow">Ablauf</p>
+      <h2>Bestellablauf in 4 Schritten</h2>
+      <div class="landing__step-row">
+        <div><strong>1</strong><span>Konto registrieren</span></div>
+        <div><strong>2</strong><span>Freischaltung erhalten</span></div>
+        <div><strong>3</strong><span>Produkte bestellen</span></div>
+        <div><strong>4</strong><span>Etikett & Bearbeitung</span></div>
+      </div>
+      @if (showPublicIntro()) {
+        <a class="ws-btn" routerLink="/demo/weisser-schaefer/registrieren">Jetzt starten</a>
+      } @else {
+        <a class="ws-btn" routerLink="/demo/weisser-schaefer/shop">Zum Sortiment</a>
+      }
+    </section>
+  </section>
+</section>

@@ -1,0 +1,107 @@
+@if (booking.visible()) {
+  <div
+    class="pv-booking"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="pv-booking-title"
+    (click)="close()"
+  >
+    <div class="pv-booking__panel" (click)="$event.stopPropagation()">
+      <button type="button" class="pv-booking__close" (click)="close()" aria-label="Schließen">
+        <span aria-hidden="true">×</span>
+      </button>
+
+      <header class="pv-booking__head">
+        <div class="pv-booking__logo" aria-hidden="true">
+          <img src="/reineke-fox-icon.svg" width="56" height="56" alt="" decoding="async" />
+        </div>
+        <div class="pv-booking__brand">
+          <p class="pv-booking__eyebrow">Webdesign-Studio</p>
+          <h2 id="pv-booking-title" class="pv-booking__title">{{ studio.name }}</h2>
+          <p class="pv-booking__role">{{ studio.role }}</p>
+        </div>
+      </header>
+
+      @if (submitState() === 'success') {
+        <div class="pv-booking__success" role="status">
+          <p class="pv-booking__success-title">Anfrage gesendet</p>
+          <p class="pv-booking__success-text">Danke! Wir melden uns in Kürze bei dir.</p>
+          <button type="button" class="pv-booking__submit" (click)="close()">Schließen</button>
+        </div>
+      } @else {
+        <form class="pv-booking__form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+          <div class="pv-booking__field">
+            <label for="pv-booking-name">Name</label>
+            <input id="pv-booking-name" type="text" formControlName="name" autocomplete="name" />
+            @if (form.controls.name.touched && form.controls.name.invalid) {
+              <span class="pv-booking__error">Bitte deinen Namen eingeben.</span>
+            }
+          </div>
+
+          <div class="pv-booking__field">
+            <label for="pv-booking-email">E-Mail</label>
+            <input id="pv-booking-email" type="email" formControlName="email" autocomplete="email" />
+            @if (form.controls.email.touched && form.controls.email.invalid) {
+              <span class="pv-booking__error">Gültige E-Mail-Adresse angeben.</span>
+            }
+          </div>
+
+          <div class="pv-booking__field">
+            <label for="pv-booking-phone">Telefon</label>
+            <input
+              id="pv-booking-phone"
+              type="tel"
+              formControlName="phone"
+              autocomplete="tel"
+              inputmode="tel"
+              placeholder="z. B. 015561 048098"
+            />
+            @if (form.controls.phone.touched && form.controls.phone.invalid) {
+              <span class="pv-booking__error">Bitte deine Telefonnummer angeben.</span>
+            }
+          </div>
+
+          <div class="pv-booking__field">
+            <label for="pv-booking-package">Paket</label>
+            <select id="pv-booking-package" formControlName="package">
+              @for (pkg of packages; track pkg.id) {
+                <option [value]="pkg.id">
+                  {{ pkg.name }} — {{ pkg.priceOnce }}@if (pkg.priceMonthly) { + {{ pkg.priceMonthly }}}
+                </option>
+              }
+            </select>
+          </div>
+
+          <div class="pv-booking__field">
+            <label for="pv-booking-message">Nachricht</label>
+            <textarea
+              id="pv-booking-message"
+              formControlName="message"
+              rows="4"
+              placeholder="Kurz beschreiben, was du dir vorstellst …"
+            ></textarea>
+            @if (form.controls.message.touched && form.controls.message.invalid) {
+              <span class="pv-booking__error">Mindestens 10 Zeichen.</span>
+            }
+          </div>
+
+          @if (submitState() === 'error') {
+            <p class="pv-booking__error pv-booking__error--block" role="alert">
+              Senden fehlgeschlagen. Bitte an
+              <a class="pv-booking__tel" [href]="'tel:' + studio.phoneTel">{{ studio.phone }}</a>
+              anrufen oder später erneut versuchen.
+            </p>
+          }
+
+          <button type="submit" class="pv-booking__submit" [disabled]="submitState() === 'sending'">
+            @if (submitState() === 'sending') {
+              Wird gesendet …
+            } @else {
+              Anfrage senden
+            }
+          </button>
+        </form>
+      }
+    </div>
+  </div>
+}

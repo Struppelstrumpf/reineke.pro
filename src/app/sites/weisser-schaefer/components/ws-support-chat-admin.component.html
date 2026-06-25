@@ -1,0 +1,174 @@
+<section class="ws-chat-admin ws-card">
+  <header class="ws-chat-admin__head">
+    <div>
+      <h2>Kundenchat</h2>
+      <p>Offene Unterhaltungen im Team bearbeiten und parallel Bestellungen prüfen.</p>
+    </div>
+    @if (canManageAudioSettings()) {
+      <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="toggleAudioSettings()">
+        {{ audioSettingsOpen() ? 'Audio-Menü schließen' : 'Audio-Menü öffnen' }}
+      </button>
+    }
+  </header>
+
+  @if (canManageAudioSettings() && audioSettingsOpen()) {
+    <section class="ws-chat-admin__audio" aria-label="Chat-Benachrichtigungstöne">
+      <h3>Benachrichtigungston</h3>
+      <div class="ws-chat-admin__audio-grid">
+        <label>
+          Pling für Team (Kunde/Gast schreibt)
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            [value]="audioSettings().staffVolume"
+            (input)="setStaffNotificationVolume($any($event.target).value)"
+          />
+        </label>
+        <label>
+          Klick für Kunde (Team antwortet)
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            [value]="audioSettings().customerVolume"
+            (input)="setCustomerReplyVolume($any($event.target).value)"
+          />
+        </label>
+      </div>
+      <div class="ws-chat-admin__audio-actions">
+        <label class="ws-chat-admin__upload">
+          Eigene MP3 hochladen
+          <input type="file" accept="audio/*" (change)="uploadStaffSound($event)" />
+        </label>
+        <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="previewStaffSound()">
+          Pling testen
+        </button>
+        <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="previewCustomerSound()">
+          Klick testen
+        </button>
+        <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="clearStaffSound()">
+          MP3 entfernen
+        </button>
+      </div>
+    </section>
+  }
+
+  @if (conversations().length === 0) {
+    <p class="ws-empty">Aktuell keine offenen Chats.</p>
+  } @else {
+    <div class="ws-chat-admin__layout">
+      <aside class="ws-chat-admin__list" aria-label="Offene Chats">
+        @for (conversation of conversations(); track conversation.id) {
+          <button
+            type="button"
+            class="ws-chat-admin__list-item"
+            [class.is-active]="selectedConversation().id === conversation.id"
+            (click)="selectConversation(conversation.id)"
+          >
+            <div>
+              <strong>{{ conversation.companyName || conversation.contactName }}</strong>
+              <span>{{ conversation.contactName }}</span>
+            </div>
+            <small>{{ conversation.updatedAt | date: 'HH:mm' }}</small>
+            @if (chat.isWaitingForStaff(conversation)) {
+              <span class="ws-chat-admin__badge">Neu</span>
+            }
+          </button>
+        }
+      </aside>
+
+      @if (selectedConversation(); as selected) {
+        <div class="ws-chat-admin__detail">
+          <div class="ws-chat-admin__meta">
+            <div>
+              <strong>{{ selected.companyName || 'Gastchat' }}</strong>
+              <span>{{ selected.contactName }}</span>
+              @if (selected.phone) {
+                <span>{{ selected.phone }}</span>
+              }
+              @if (selected.address) {
+                <span>{{ selected.address }}</span>
+              }
+            </div>
+            <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="closeSelectedConversation()">
+              Chat schließen
+            </button>
+          </div>
+
+          <div class="ws-chat-admin__messages" aria-label="Chatverlauf">
+            @for (msg of selected.messages; track msg.id) {
+              <article class="ws-chat-admin__message" [class.is-staff]="msg.authorRole === 'staff'">
+                <strong>{{ msg.authorName }}</strong>
+                <p>{{ msg.text }}</p>
+                <time>{{ msg.createdAt | date: 'dd.MM. HH:mm' }}</time>
+              </article>
+            }
+          </div>
+
+          <div class="ws-chat-admin__composer">
+            <div class="ws-field">
+              <label for="ws-chat-reply">Antwort</label>
+              <textarea
+                id="ws-chat-reply"
+                rows="2"
+                [value]="replyText()"
+                (input)="replyText.set($any($event.target).value)"
+                placeholder="Antwort an den Kunden..."
+              ></textarea>
+            </div>
+            <button type="button" class="ws-btn ws-chat-admin__send" (click)="sendReply()">Senden</button>
+          </div>
+
+          <section class="ws-chat-admin__orders">
+            <header>
+              <h3>Bestellungen zum Chat</h3>
+              @if (selected.companyName) {
+                <p>{{ selected.companyName }} · {{ relatedOrders().length }} Treffer</p>
+              } @else {
+                <p>Gastchat ohne Bestellkonto</p>
+              }
+            </header>
+
+            @if (selected.companyName) {
+              <div class="ws-chat-admin__orders-toolbar">
+                <input
+                  type="search"
+                  placeholder="Bestellung oder Position suchen..."
+                  [value]="orderSearch()"
+                  (input)="orderSearch.set($any($event.target).value)"
+                />
+                <select [value]="orderStatus()" (change)="orderStatus.set($any($event.target).value)">
+                  <option value="alle">Alle Status</option>
+                  <option value="neu">Neu</option>
+                  <option value="in Bearbeitung">In Bearbeitung</option>
+                  <option value="versendet">Versendet</option>
+                </select>
+              </div>
+
+              @if (relatedOrders().length === 0) {
+                <p class="ws-empty">Keine passenden Bestellungen.</p>
+              } @else {
+                <ul class="ws-chat-admin__order-list">
+                  @for (order of relatedOrders(); track order.id) {
+                    <li>
+                      <div>
+                        <strong>{{ order.id }}</strong>
+                        <span>{{ order.createdAt | date: 'dd.MM.yyyy · HH:mm' }}</span>
+                      </div>
+                      <span class="ws-chat-admin__order-status">
+                        {{ orderStatusOptionLabel(order, order.status) }}
+                      </span>
+                    </li>
+                  }
+                </ul>
+              }
+            }
+          </section>
+        </div>
+      }
+    </div>
+  }
+</section>

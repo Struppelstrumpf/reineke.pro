@@ -1,5 +1,9 @@
 <div class="app-root">
-  <pv-fiverr-sidebar />
-  <router-outlet />
-  <pv-welcome-overlay />
+  <div class="app-stage" [class.app-stage--dimmed]="booking.dimmed()">
+    <pv-fiverr-sidebar />
+    <router-outlet />
+    <pv-welcome-overlay />
+  </div>
+  <pv-booking-modal />
+  <pv-demo-code-modal />
 </div>

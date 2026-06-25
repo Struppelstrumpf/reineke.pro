@@ -86,6 +86,118 @@
   --pv-fiverr-handle-w: 2.65rem;
   /* Gutter / html base — synced to active preview site via html:has(.site-body--*) */
   --pv-shelf-bg: var(--sf-bg);
+
+  /* Global Demo-Farblayout für Weißer Schäfer */
+  --pv-ws-bg: #070b08;
+  --pv-ws-surface: #101712;
+  --pv-ws-surface-2: #172118;
+  --pv-ws-surface-3: #223025;
+  --pv-ws-border: rgba(191, 212, 165, 0.16);
+  --pv-ws-border-strong: rgba(198, 224, 126, 0.34);
+  --pv-ws-text: #f5f8ef;
+  --pv-ws-muted: #a8b8a0;
+  --pv-ws-accent: #d2ea82;
+  --pv-ws-accent-dim: #97bf46;
+  --pv-ws-gold: #e2c98e;
+  --pv-ws-danger: #f87171;
+}
+
+html[data-demo-theme='ws-green'] {
+  --pv-ws-bg: #070b08;
+  --pv-ws-surface: #101712;
+  --pv-ws-surface-2: #172118;
+  --pv-ws-surface-3: #223025;
+  --pv-ws-border: rgba(191, 212, 165, 0.16);
+  --pv-ws-border-strong: rgba(198, 224, 126, 0.34);
+  --pv-ws-text: #f5f8ef;
+  --pv-ws-muted: #a8b8a0;
+  --pv-ws-accent: #d2ea82;
+  --pv-ws-accent-dim: #97bf46;
+  --pv-ws-gold: #e2c98e;
+}
+
+html[data-demo-theme='ws-blue'] {
+  --pv-ws-bg: #070c17;
+  --pv-ws-surface: #111a2e;
+  --pv-ws-surface-2: #162444;
+  --pv-ws-surface-3: #22345c;
+  --pv-ws-border: rgba(144, 174, 228, 0.22);
+  --pv-ws-border-strong: rgba(122, 171, 255, 0.44);
+  --pv-ws-text: #f3f7ff;
+  --pv-ws-muted: #aabddf;
+  --pv-ws-accent: #8fc2ff;
+  --pv-ws-accent-dim: #507fcb;
+  --pv-ws-gold: #bfd5ff;
+}
+
+html[data-demo-theme='ws-blue-orange'] {
+  --pv-ws-bg: #0a101a;
+  --pv-ws-surface: #141f30;
+  --pv-ws-surface-2: #1c2a40;
+  --pv-ws-surface-3: #243652;
+  --pv-ws-border: rgba(132, 175, 241, 0.22);
+  --pv-ws-border-strong: rgba(251, 170, 95, 0.48);
+  --pv-ws-text: #f6f8fd;
+  --pv-ws-muted: #b3bfd7;
+  --pv-ws-accent: #77afff;
+  --pv-ws-accent-dim: #eb8e3f;
+  --pv-ws-gold: #ffc17f;
+}
+
+html[data-demo-theme='ws-light-dark'] {
+  --pv-ws-bg: #f2f4f7;
+  --pv-ws-surface: #ffffff;
+  --pv-ws-surface-2: #edf1f6;
+  --pv-ws-surface-3: #e3e8f0;
+  --pv-ws-border: rgba(38, 47, 63, 0.14);
+  --pv-ws-border-strong: rgba(31, 46, 72, 0.26);
+  --pv-ws-text: #111a27;
+  --pv-ws-muted: #5d6b80;
+  --pv-ws-accent: #1a2840;
+  --pv-ws-accent-dim: #435678;
+  --pv-ws-gold: #2d3b52;
+}
+
+html[data-demo-theme='ws-light-red'] {
+  --pv-ws-bg: #fff7f8;
+  --pv-ws-surface: #ffffff;
+  --pv-ws-surface-2: #ffedf1;
+  --pv-ws-surface-3: #ffe3e9;
+  --pv-ws-border: rgba(171, 42, 70, 0.2);
+  --pv-ws-border-strong: rgba(199, 35, 70, 0.38);
+  --pv-ws-text: #291017;
+  --pv-ws-muted: #824453;
+  --pv-ws-accent: #c83152;
+  --pv-ws-accent-dim: #9f2b45;
+  --pv-ws-gold: #e16f8c;
+}
+
+html[data-demo-theme='ws-light-orange'] {
+  --pv-ws-bg: #fff8f3;
+  --pv-ws-surface: #ffffff;
+  --pv-ws-surface-2: #fff1e6;
+  --pv-ws-surface-3: #ffe7d6;
+  --pv-ws-border: rgba(181, 102, 34, 0.2);
+  --pv-ws-border-strong: rgba(207, 111, 22, 0.37);
+  --pv-ws-text: #2a1a0b;
+  --pv-ws-muted: #815c3e;
+  --pv-ws-accent: #d68332;
+  --pv-ws-accent-dim: #a55e1a;
+  --pv-ws-gold: #e5a153;
+}
+
+html[data-demo-theme='ws-light-gray'] {
+  --pv-ws-bg: #f3f5f7;
+  --pv-ws-surface: #ffffff;
+  --pv-ws-surface-2: #edf0f4;
+  --pv-ws-surface-3: #e4e8ed;
+  --pv-ws-border: rgba(68, 81, 101, 0.18);
+  --pv-ws-border-strong: rgba(68, 81, 101, 0.3);
+  --pv-ws-text: #1b2532;
+  --pv-ws-muted: #607084;
+  --pv-ws-accent: #617186;
+  --pv-ws-accent-dim: #46566a;
+  --pv-ws-gold: #7c8a9d;
 }
 
 html:has(.site-body--sportflow) {
@@ -106,6 +218,10 @@ html:has(.site-body--pizzeria) {
 
 html:has(.site-body--sportlerklause) {
   --pv-shelf-bg: var(--sk-bg);
+}
+
+html:has(pv-weisser-schaefer-shell) {
+  --pv-shelf-bg: var(--pv-ws-bg);
 }
 
 @media (max-width: 520px) {

@@ -1,0 +1,150 @@
+.ws-label-preview__meta {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  color: var(--ws-muted);
+  text-align: center;
+}
+
+.ws-label-preview__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.ws-label-preview__sheet {
+  display: flex;
+  box-sizing: border-box;
+  background: #faf8f2;
+  color: #1a1c18;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.ws-label-preview__inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+  min-height: 0;
+}
+
+.ws-label-preview__top {
+  display: grid;
+  grid-template-columns: 1fr minmax(110px, 34%);
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.ws-label-preview__order {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.ws-label-preview__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  text-align: center;
+}
+
+.ws-label-preview__items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  flex: 1 1 auto;
+  padding-top: 0.2rem;
+}
+
+.ws-label-preview__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-top: auto;
+  padding-top: 0.35rem;
+}
+
+.ws-label-preview__logo {
+  display: block;
+  width: 100%;
+  max-width: 132px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.ws-label-preview__sub {
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.15;
+}
+
+.ws-label-preview__body {
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.ws-label-preview__spacer {
+  display: block;
+  min-height: 0.48rem;
+}
+
+.ws-label-preview__items-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ws-label-preview__item {
+  font-weight: 400;
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.ws-label-preview__note {
+  font-size: 0.78rem;
+  color: #444;
+  margin-top: 0.15rem;
+}
+
+.ws-label-preview__meta-line {
+  font-size: 0.72rem;
+  color: #444;
+}
+
+.ws-label-preview__meta-line--center {
+  text-align: center;
+}
+
+.ws-label-preview__divider {
+  border: 0;
+  border-top: 1px dashed #bbb;
+  margin: 0.35rem 0;
+}
+
+.ws-label-preview__contact {
+  font-size: 0.68rem;
+  line-height: 1.3;
+  color: #333;
+}
+
+.ws-label-preview__page {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #555;
+  text-align: center;
+}
+
+.ws-label-preview__barcode {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  text-align: center;
+}

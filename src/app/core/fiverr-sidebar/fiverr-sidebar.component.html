@@ -1,12 +1,10 @@
 <aside
   class="fiverr"
   [class.fiverr--collapsed]="!open()"
-  [class.fiverr--sportflow]="currentSite().id === 'sportflow'"
-  [class.fiverr--cardealer]="currentSite().id === 'cardealer'"
-  [class.fiverr--restaurant]="currentSite().id === 'restaurant'"
-  [class.fiverr--sportlerklause]="currentSite().id === 'sportlerklause'"
+  [class.fiverr--spotlight]="spotlight()"
   [class.fiverr--pizzeria]="currentSite().id === 'pizzeria'"
-  aria-label="Reineke Fuchs studio preview"
+  [class.fiverr--weisser-schaefer]="currentSite().id === 'weisser-schaefer'"
+  aria-label="Reineke Fuchs Studio-Vorschau"
 >
   @if (open()) {
     <div id="fiverr-panel-pv" class="fiverr__panel">
@@ -26,35 +24,94 @@
             <div class="fiverr__brand-copy">
               <span class="fiverr__brand-name">Reineke Fuchs</span>
               <span class="fiverr__brand-line"></span>
-              <span class="fiverr__brand-sub">Webdesign Studio</span>
+              <span class="fiverr__brand-sub">Webdesign-Studio</span>
             </div>
           </div>
 
           <p class="fiverr__studio-role">{{ studio.role }}</p>
 
-          <p class="fiverr__badge">Pricing</p>
-          <ul class="fiverr__pricing fiverr__pricing--tight" aria-label="Package pricing">
-            <li class="fiverr__pricing-row">
-              <span class="fiverr__pricing-name">Basic</span>
-              <span class="fiverr__pricing-amount">from €95</span>
-            </li>
-            <li class="fiverr__pricing-row">
-              <span class="fiverr__pricing-name">Standard</span>
-              <span class="fiverr__pricing-amount">€195</span>
-            </li>
-            <li class="fiverr__pricing-row">
-              <span class="fiverr__pricing-name">Premium</span>
-              <span class="fiverr__pricing-amount">€295</span>
-            </li>
+          <p class="fiverr__badge">Pakete &amp; Preise</p>
+          <p class="fiverr__monthly-hint">
+            Monatliche Gebühren bei laufender Betreuung, Hosting und Enterprise-Betrieb.
+          </p>
+          <ul class="fiverr__packages" aria-label="Website-Pakete">
+            @for (pkg of packages; track pkg.id) {
+              <li class="fiverr__pkg">
+                <button
+                  type="button"
+                  class="fiverr__pkg-head"
+                  [class.is-open]="isPackageOpen(pkg.id)"
+                  [attr.aria-expanded]="isPackageOpen(pkg.id)"
+                  [attr.aria-controls]="'pkg-body-' + pkg.id"
+                  (click)="togglePackage(pkg.id)"
+                >
+                  <span class="fiverr__pkg-head-main">
+                    <span class="fiverr__pkg-name">{{ pkg.name }}</span>
+                    <span class="fiverr__pkg-prices">
+                      <span class="fiverr__pkg-once">{{ pkg.priceOnce }}</span>
+                      @if (pkg.priceMonthly) {
+                        <span class="fiverr__pkg-monthly">+ {{ pkg.priceMonthly }}</span>
+                      }
+                    </span>
+                  </span>
+                  <span class="fiverr__pkg-chevron" aria-hidden="true"></span>
+                </button>
+                @if (isPackageOpen(pkg.id)) {
+                  <div class="fiverr__pkg-body" [id]="'pkg-body-' + pkg.id">
+                    <div class="fiverr__pkg-body-inner">
+                      <p class="fiverr__pkg-subtitle">{{ pkg.subtitle }}</p>
+                      <p class="fiverr__pkg-desc">{{ pkg.description }}</p>
+                      <ul class="fiverr__pkg-features">
+                        @for (feature of pkg.features; track feature.label) {
+                          <li [class.is-muted]="!feature.included">
+                            <span class="fiverr__pkg-tick" aria-hidden="true">✔</span>
+                            {{ feature.label }}
+                          </li>
+                        }
+                        @if (!pkg.quoteOnly) {
+                          <li>
+                            <span class="fiverr__pkg-tick" aria-hidden="true">✔</span>
+                            Seiten: {{ pkg.pages }}
+                          </li>
+                          <li>
+                            <span class="fiverr__pkg-tick" aria-hidden="true">✔</span>
+                            Revisionen: {{ pkg.revisions }}
+                          </li>
+                          <li>
+                            <span class="fiverr__pkg-tick" aria-hidden="true">✔</span>
+                            Lieferzeit: {{ pkg.deliveryDays }} Tage
+                          </li>
+                        } @else {
+                          <li>
+                            <span class="fiverr__pkg-tick" aria-hidden="true">✔</span>
+                            Umfang, Preis &amp; Termin nach Absprache
+                          </li>
+                        }
+                      </ul>
+                      <div class="fiverr__pkg-actions">
+                        <button type="button" class="fiverr__pkg-book" (click)="openBooking(pkg.id)">
+                          Jetzt buchen
+                        </button>
+                        @if (pkg.id === 'individual') {
+                          <button type="button" class="fiverr__pkg-demo" (click)="openDemoCode()">
+                            Democode
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </li>
+            }
           </ul>
 
-          <ul class="fiverr__list fiverr__list--compact fiverr__list--grid" aria-label="What you get">
-            <li><span class="fiverr__tick" aria-hidden="true">✔</span> 24–48h</li>
-            <li><span class="fiverr__tick" aria-hidden="true">✔</span> Custom UI</li>
-            <li><span class="fiverr__tick" aria-hidden="true">✔</span> Mobile</li>
-            <li><span class="fiverr__tick" aria-hidden="true">✔</span> SEO</li>
+          <ul class="fiverr__list fiverr__list--compact fiverr__list--grid" aria-label="Immer enthalten">
+            <li><span class="fiverr__tick" aria-hidden="true">✔</span> Individuelles Design</li>
+            <li><span class="fiverr__tick" aria-hidden="true">✔</span> Mobil optimiert</li>
+            <li><span class="fiverr__tick" aria-hidden="true">✔</span> SEO-Basics</li>
             <li><span class="fiverr__tick" aria-hidden="true">✔</span> DE / EN</li>
-            <li><span class="fiverr__tick" aria-hidden="true">✔</span> Modern</li>
+            <li><span class="fiverr__tick" aria-hidden="true">✔</span> Schnelle Lieferung</li>
+            <li><span class="fiverr__tick" aria-hidden="true">✔</span> Modern &amp; schnell</li>
           </ul>
         </div>
 
@@ -62,41 +119,37 @@
           class="fiverr__panel-templates"
           tabindex="0"
           role="region"
-          aria-label="Switch preview template"
+          aria-label="Aktive Demo-Vorlage"
         >
           <div class="fiverr__current" aria-current="page">
-            <span class="fiverr__current-label">Active</span>
+            <span class="fiverr__current-label">Aktiv</span>
             <span class="fiverr__current-name">{{ currentSite().label }}</span>
             <span class="fiverr__current-hint">{{ currentSite().hint }}</span>
           </div>
 
-          <p class="fiverr__nav-label">
-            More templates
-            <span class="fiverr__nav-count">({{ otherSites().length }})</span>
-          </p>
-          <ul class="fiverr__nav">
-            @for (site of otherSites(); track site.id) {
-              <li>
-                <a class="fiverr__link" [routerLink]="site.href">
-                  <span class="fiverr__link-title">{{ site.label }}</span>
-                  <span class="fiverr__link-hint">{{ site.hint }}</span>
-                </a>
-              </li>
-            }
-          </ul>
+          @if (otherSites().length > 0) {
+            <p class="fiverr__nav-label">
+              Weitere Vorlagen
+              <span class="fiverr__nav-count">({{ otherSites().length }})</span>
+            </p>
+            <ul class="fiverr__nav">
+              @for (site of otherSites(); track site.id) {
+                <li>
+                  <a class="fiverr__link" [routerLink]="site.href">
+                    <span class="fiverr__link-title">{{ site.label }}</span>
+                    <span class="fiverr__link-hint">{{ site.hint }}</span>
+                  </a>
+                </li>
+              }
+            </ul>
+          }
         </div>
       </div>
 
       <div class="fiverr__panel-foot">
-        <p class="fiverr__note">Commission a similar build on Fiverr.</p>
-        <a
-          class="fiverr__cta"
-          [href]="studio.fiverrUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Get your Website!
-        </a>
+        <button type="button" class="fiverr__cta" (click)="openBooking()">
+          Jetzt buchen
+        </button>
       </div>
     </div>
   }
@@ -107,7 +160,7 @@
     (click)="toggle()"
     [attr.aria-expanded]="open()"
     [attr.aria-controls]="'fiverr-panel-pv'"
-    title="{{ open() ? 'Hide panel' : 'Show studio panel' }}"
+    title="{{ open() ? 'Panel schließen' : 'Studio öffnen' }}"
   >
     <span class="fiverr__handle-inner">
       <span class="fiverr__handle-fox" aria-hidden="true">
@@ -121,7 +174,7 @@
         />
       </span>
       <span class="fiverr__handle-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">{{ open() ? 'Collapse panel' : 'Expand panel' }}</span>
+      <span class="visually-hidden">{{ open() ? 'Panel einklappen' : 'Panel ausklappen' }}</span>
       <span class="fiverr__handle-label" aria-hidden="true">Studio</span>
     </span>
   </button>

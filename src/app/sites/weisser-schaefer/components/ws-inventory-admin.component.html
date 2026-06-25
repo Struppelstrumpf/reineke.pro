@@ -1,0 +1,178 @@
+<div class="inventory-admin">
+  <header class="inventory-admin__head">
+    <div>
+      <h2>Lager & Bestände</h2>
+      <p>Wareneingänge erfassen — alle Produkte unter Schwelle erscheinen auf einem Lagerwarn-Etikett.</p>
+    </div>
+    @if (inventory.lowStockRows().length > 0) {
+      <span class="inventory-admin__badge">{{ inventory.lowStockRows().length }} unter Schwelle</span>
+    }
+  </header>
+
+  @if (inventory.lowStockRows().length > 0 && auth.isAdmin()) {
+    <section class="inventory-admin__combined ws-card">
+      <div class="inventory-admin__combined-head">
+        <div>
+          <h3>Lagerwarn-Etikett</h3>
+          <p>{{ inventory.lowStockRows().length }} Produkt(e) unter Schwelle — alle auf einem Etikett.</p>
+        </div>
+        <div class="inventory-admin__combined-actions">
+          @if (print.connected() && !print.supportsStockLabels()) {
+            <p class="inventory-admin__version-warn">
+              Etiketten-App v{{ print.agent()?.version }} — bitte v1.2+ neu starten, damit Druck = Vorschau.
+            </p>
+          }
+          <div class="inventory-admin__combined-actions-row">
+            <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="toggleCombinedPreview()">
+              {{ showCombinedPreview() ? 'Vorschau schließen' : 'Vorschau' }}
+            </button>
+            <button type="button" class="ws-btn ws-btn--sm" (click)="printCombinedAlert()">Drucken</button>
+          </div>
+        </div>
+      </div>
+      @if (showCombinedPreview()) {
+        <pv-ws-label-preview [pages]="combinedPreviewPages()" [showMeta]="false" />
+      }
+    </section>
+  }
+
+  <section class="inventory-admin__list ws-card" aria-label="Produktbestände">
+    <h3>Bestände</h3>
+    @if (inventory.rows().length === 0) {
+      <p class="ws-empty">Keine aktiven Produkte im Sortiment.</p>
+    } @else {
+      <div class="inventory-admin__table-wrap">
+        <table class="inventory-admin__table">
+          @if (auth.isAdmin()) {
+            <colgroup>
+              <col class="inventory-admin__col-product" />
+              <col class="inventory-admin__col-stock" />
+              <col class="inventory-admin__col-threshold" />
+              <col class="inventory-admin__col-adjust" />
+            </colgroup>
+          } @else {
+            <colgroup>
+              <col class="inventory-admin__col-product" />
+              <col class="inventory-admin__col-stock" />
+              <col class="inventory-admin__col-adjust" />
+            </colgroup>
+          }
+          <thead>
+            <tr>
+              <th>Produkt</th>
+              <th>Bestand</th>
+              @if (auth.isAdmin()) {
+                <th>Schwelle</th>
+              }
+              <th>Bestand ändern</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of inventory.rows(); track row.productId) {
+              <tr [class.is-low]="row.isLow">
+                <td>
+                  <strong>{{ row.productName }}</strong>
+                  <span class="inventory-admin__meta">{{ row.categoryName }} · {{ row.spec }}</span>
+                </td>
+                <td>
+                  <span class="inventory-admin__qty" [class.is-low]="row.isLow">
+                    {{ row.quantity }}× {{ row.unit }}
+                  </span>
+                  @if (row.isLow) {
+                    <span class="inventory-admin__low-tag">Niedrig</span>
+                  }
+                </td>
+                @if (auth.isAdmin()) {
+                  <td>
+                    <div class="inventory-admin__threshold">
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        [value]="thresholdFor(row.productId, row.alertThreshold)"
+                        (input)="setThresholdDraft(row.productId, $any($event.target).value)"
+                      />
+                      <button type="button" class="ws-btn ws-btn--ghost ws-btn--sm" (click)="saveThreshold(row.productId)">
+                        OK
+                      </button>
+                    </div>
+                  </td>
+                }
+                <td>
+                  <div class="inventory-admin__adjust-shell" [class.is-editing]="isEditing(row.productId)">
+                    <div class="inventory-admin__adjust-idle">
+                      <button
+                        type="button"
+                        class="ws-btn ws-btn--ghost ws-btn--sm inventory-admin__cell-btn"
+                        (click)="startAdjust(row.productId)"
+                      >
+                        Bearbeiten
+                      </button>
+                    </div>
+                    <div class="inventory-admin__adjust-editor">
+                      <div class="inventory-admin__adjust-mode" role="group" aria-label="Bestandsmodus">
+                        <button
+                          type="button"
+                          class="ws-btn ws-btn--ghost ws-btn--sm inventory-admin__mode-btn"
+                          [class.is-active]="modeFor(row.productId) === 'add'"
+                          (click)="setMode(row.productId, 'add')"
+                        >
+                          +
+                        </button>
+                        <button
+                          type="button"
+                          class="ws-btn ws-btn--ghost ws-btn--sm inventory-admin__mode-btn"
+                          [class.is-active]="modeFor(row.productId) === 'remove'"
+                          (click)="setMode(row.productId, 'remove')"
+                        >
+                          -
+                        </button>
+                      </div>
+                      <input
+                        class="inventory-admin__adjust-input"
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="Menge"
+                        [value]="amountFor(row.productId)"
+                        (input)="setAmount(row.productId, $any($event.target).value)"
+                      />
+                      <button type="button" class="ws-btn ws-btn--sm inventory-admin__apply-btn" (click)="requestStockChange(row.productId, row.productName)">
+                        Menge ändern
+                      </button>
+                      <button
+                        type="button"
+                        class="ws-btn ws-btn--ghost ws-btn--sm inventory-admin__adjust-close"
+                        (click)="cancelAdjust()"
+                        aria-label="Bearbeitung schließen"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  @if (pendingStockChange(); as pending) {
+    <div class="inventory-admin__confirm-backdrop" (click)="closeStockChangeDialog()">
+      <section class="inventory-admin__confirm ws-card" (click)="$event.stopPropagation()" aria-label="Bestandsänderung bestätigen">
+        <h3>Bestandsänderung bestätigen</h3>
+        <p>
+          <strong>{{ pending.productName }}</strong>:
+          {{ pending.mode === 'add' ? '+' : '-' }}{{ pending.amount }} Stück
+          {{ pending.mode === 'add' ? 'hinzufügen' : 'entfernen' }}?
+        </p>
+        <div class="inventory-admin__confirm-actions">
+          <button type="button" class="ws-btn ws-btn--ghost" (click)="closeStockChangeDialog()">Abbrechen</button>
+          <button type="button" class="ws-btn" (click)="confirmStockChange()">Bestätigen</button>
+        </div>
+      </section>
+    </div>
+  }
+</div>
