@@ -3,6 +3,7 @@
 # Compiled output
 /dist
 /apps/ws-label-print/dist
+/apps/ws-backend/data
 /tmp
 /out-tsc
 /bazel-out

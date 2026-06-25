@@ -1,0 +1,14 @@
+{
+  "name": "ws-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Weißer Schäfer – kleines Datei-Datenbank-Backend (zero dependencies)",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
