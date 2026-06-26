@@ -10,12 +10,12 @@ import {
   viewChild,
 } from '@angular/core';
 import * as L from 'leaflet';
-import 'leaflet.markercluster';
 import { DOG_SPOT_EMOJI, type DogAlert, type DogSpot } from '../dog.data';
+import { groupSpotsForDisplay } from '../dog-map-cluster';
 import { DogExploreService } from '../dog-explore.service';
 import {
   alertMarkerHtml,
-  dominantSpotKind,
+  dominantSpotKindFromSpots,
   spotClusterHtml,
   spotMarkerHtml,
   type DogSpotMarkerOptions,
@@ -47,7 +47,8 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
 
   private map?: L.Map;
   private mapReady = signal(false);
-  private spotCluster?: L.MarkerClusterGroup;
+  private mapZoom = signal(15);
+  private spotLayer = L.layerGroup();
   private alertLayer = L.layerGroup();
   private gameLayer = L.layerGroup();
   private pickLayer = L.layerGroup();
@@ -80,7 +81,18 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
       const gameOn = this.mapGame.playing();
       const gameEntities = this.mapGame.entities();
       const pinPick = this.pins.mapPickActive();
-      this.renderMarkers(c, spots, alerts, selectedSpot, selectedAlert, gameOn, community, pinPick);
+      const zoom = this.mapZoom();
+      this.renderMarkers(
+        c,
+        spots,
+        alerts,
+        selectedSpot,
+        selectedAlert,
+        gameOn,
+        community,
+        pinPick,
+        zoom,
+      );
       this.renderGameEntities(gameOn ? gameEntities : []);
     });
 
@@ -154,12 +166,14 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
     }).setView([c.lat, c.lng], 15);
 
     this.applyTiles(this.theme.isDark());
-    this.spotCluster = this.createSpotCluster();
-    this.spotCluster.addTo(this.map);
+    this.spotLayer.addTo(this.map);
     this.alertLayer.addTo(this.map);
     this.gameLayer.addTo(this.map);
     this.pickLayer.addTo(this.map);
     L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+
+    this.mapZoom.set(this.map.getZoom());
+    this.map.on('zoomend', () => this.mapZoom.set(this.map!.getZoom()));
 
     this.map.on('click', (e: L.LeafletMouseEvent) => {
       if (this.pins.mapPickActive()) {
@@ -196,30 +210,6 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
     this.tileLayer.bringToBack();
   }
 
-  private createSpotCluster(): L.MarkerClusterGroup {
-    return L.markerClusterGroup({
-      maxClusterRadius: 56,
-      disableClusteringAtZoom: 16,
-      spiderfyOnMaxZoom: true,
-      showCoverageOnHover: false,
-      zoomToBoundsOnClick: true,
-      animate: true,
-      animateAddingMarkers: false,
-      iconCreateFunction: (cluster) => {
-        const markers = cluster.getAllChildMarkers();
-        const kind = dominantSpotKind(markers);
-        const count = cluster.getChildCount();
-        const size = count >= 100 ? 48 : count >= 10 ? 44 : 40;
-        return L.divIcon({
-          className: 'leaflet-div-icon dog-map__cluster-wrap',
-          html: spotClusterHtml(kind, count),
-          iconSize: [size, size],
-          iconAnchor: [size / 2, size / 2],
-        });
-      },
-    });
-  }
-
   private applyMapPickMode(active: boolean, preview: { lat: number; lng: number } | null): void {
     const host = this.mapHost()?.nativeElement;
     host?.classList.toggle('dog-map--picking', active);
@@ -247,10 +237,11 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
     gameOn: boolean,
     community: Set<string>,
     pinPick: boolean,
+    zoom: number,
   ): void {
     if (!this.map) return;
 
-    this.spotCluster?.clearLayers();
+    this.spotLayer.clearLayers();
     this.alertLayer.clearLayers();
 
     if (this.userMarker) {
@@ -276,7 +267,6 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
             : 'Du bist hier — Nasebär',
     );
 
-    const el = this.userMarker.getElement();
     this.applyDogMarkerFx(fx, moving);
 
     if (!gameOn && !pinPick) {
@@ -300,7 +290,29 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
         this.alertLayer.addLayer(marker);
       }
 
-      for (const spot of spots) {
+      for (const item of groupSpotsForDisplay(spots, zoom)) {
+        if (item.type === 'cluster') {
+          const count = item.spots.length;
+          const kind = dominantSpotKindFromSpots(item.spots);
+          const size = count >= 100 ? 48 : count >= 10 ? 44 : 40;
+          const icon = L.divIcon({
+            className: 'leaflet-div-icon dog-map__cluster-wrap',
+            html: spotClusterHtml(kind, count),
+            iconSize: [size, size],
+            iconAnchor: [size / 2, size / 2],
+          });
+          const marker = L.marker([item.lat, item.lng], { icon, zIndexOffset: 750 });
+          const label = count === 1 ? '1 Ort' : `${count} Orte`;
+          marker.bindTooltip(label, { direction: 'top', offset: [0, -12] });
+          marker.on('click', () => {
+            const nextZoom = Math.min(Math.max(zoom + 2, 15), 17);
+            this.map?.setView([item.lat, item.lng], nextZoom, { animate: true });
+          });
+          this.spotLayer.addLayer(marker);
+          continue;
+        }
+
+        const spot = item.spot;
         const isSelected = spot.id === selectedSpotId;
         const icon = L.divIcon({
           className: 'leaflet-div-icon dog-map__spot-wrap',
@@ -318,13 +330,11 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
           offset: [0, -12],
         });
         marker.on('click', () => this.explore.selectSpot(spot.id));
-        this.spotCluster?.addLayer(marker);
+        this.spotLayer.addLayer(marker);
       }
-
-      this.spotCluster?.refreshClusters();
     }
 
-    const centerKey = `${center.lat.toFixed(5)}:${center.lng.toFixed(5)}:${spots.length}:${alerts.length}:${gameOn}`;
+    const centerKey = `${center.lat.toFixed(5)}:${center.lng.toFixed(5)}:${spots.length}:${alerts.length}:${gameOn}:${zoom}`;
     if (gameOn) {
       this.map.panTo([center.lat, center.lng], { animate: true, duration: 0.25 });
       return;
@@ -336,7 +346,6 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  /** Karte auf Standort + nahe Pins zoomen — Hinweise aus der Liste bleiben sichtbar. */
   private fitMapToContent(
     center: { lat: number; lng: number },
     spots: DogSpot[],

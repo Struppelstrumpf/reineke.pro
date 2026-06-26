@@ -37,6 +37,18 @@ export function dominantSpotKind(markers: L.Marker[]): DogSpotKind {
     if (!kind) continue;
     counts.set(kind, (counts.get(kind) ?? 0) + 1);
   }
+  return pickDominantKind(counts);
+}
+
+export function dominantSpotKindFromSpots(spots: DogSpot[]): DogSpotKind {
+  const counts = new Map<DogSpotKind, number>();
+  for (const spot of spots) {
+    counts.set(spot.kind, (counts.get(spot.kind) ?? 0) + 1);
+  }
+  return pickDominantKind(counts);
+}
+
+function pickDominantKind(counts: Map<DogSpotKind, number>): DogSpotKind {
   let best: DogSpotKind = 'wald';
   let bestCount = 0;
   for (const [kind, n] of counts) {
