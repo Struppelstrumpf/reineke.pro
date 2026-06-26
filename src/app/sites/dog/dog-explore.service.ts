@@ -67,6 +67,8 @@ export class DogExploreService {
 
   private loadingStartedAt = 0;
   private persistTimer = 0;
+  /** Verhindert veraltete Hintergrund-Updates nach schnellem Standortwechsel. */
+  private refreshGeneration = 0;
 
   readonly filteredSpots = computed(() => {
     const f = this.filters();
@@ -412,22 +414,25 @@ export class DogExploreService {
     }
     this.beginLoading();
     try {
-      await new Promise<void>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            this.setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-            resolve();
-          },
-          () => reject(new Error('geo')),
-          { enableHighAccuracy: true, timeout: 12000 },
-        );
-      });
+      const pos = await this.readUserPosition();
+      this.setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
       await this.refreshAroundCenter();
     } catch {
       this.error.set('Standort konnte nicht ermittelt werden.');
     } finally {
       await this.endLoading();
     }
+  }
+
+  /** Schneller GPS-Fix: zuerst gecachte / grobe Position, kein High-Accuracy-Warten. */
+  private readUserPosition(): Promise<GeolocationPosition> {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: false,
+        timeout: 6000,
+        maximumAge: 180_000,
+      });
+    });
   }
 
   async searchAddress(): Promise<void> {
@@ -475,37 +480,73 @@ export class DogExploreService {
 
   async refreshAroundCenter(): Promise<void> {
     const c = this.center();
+    const radius = this.filters().radiusKm;
+    const generation = ++this.refreshGeneration;
     this.error.set('');
     try {
-      const radius = this.filters().radiusKm;
-      const [osmSpots, realAlerts, weather] = await Promise.all([
-        this.fetchOsmSpots(c.lat, c.lng, radius),
-        this.fetchRealAlerts(c.lat, c.lng, radius),
+      const [osmSpots, weather, pins] = await Promise.all([
+        this.fetchOsmSpots(c.lat, c.lng, radius, false),
         this.weatherService.loadFor(c.lat, c.lng),
+        this.pinsService.loadNearby(c.lat, c.lng, radius),
       ]);
+      if (generation !== this.refreshGeneration) return;
+
       const extras = osmSpots.length < 4 ? this.buildContextualMocks(c.lat, c.lng) : [];
       const merged = this.dedupeSpots([...osmSpots, ...extras]);
       this.spots.set(merged);
-      this.alerts.set(this.withDemoGiftkoeder(realAlerts, c.lat, c.lng));
+      this.alerts.set(this.withDemoGiftkoeder(this.buildSeasonalAlerts(c.lat, c.lng), c.lat, c.lng));
       this.weather.set(weather);
       this.weatherSlotId.set('now');
       this.tips.set(this.buildTips(merged));
-      await this.loadMapExtras(c.lat, c.lng, merged.map((s) => s.id));
+      this.userPins.set(pins);
       if (!this.selectedSpotId() && merged.length) {
         this.selectedSpotId.set(merged[0].id);
       }
+
+      void this.finishRefreshInBackground(c.lat, c.lng, radius, merged, generation);
     } catch {
+      if (generation !== this.refreshGeneration) return;
       const fallback = this.buildContextualMocks(c.lat, c.lng);
       this.spots.set(fallback);
-      const [alerts, weather] = await Promise.all([
-        this.fetchRealAlerts(c.lat, c.lng, this.filters().radiusKm),
+      const [weather, pins] = await Promise.all([
         this.weatherService.loadFor(c.lat, c.lng),
+        this.pinsService.loadNearby(c.lat, c.lng, radius),
       ]);
-      this.alerts.set(this.withDemoGiftkoeder(alerts, c.lat, c.lng));
+      this.alerts.set(this.withDemoGiftkoeder(this.buildSeasonalAlerts(c.lat, c.lng), c.lat, c.lng));
       this.weather.set(weather);
       this.weatherSlotId.set('now');
       this.tips.set(this.buildTips(fallback));
-      await this.loadMapExtras(c.lat, c.lng, fallback.map((s) => s.id));
+      this.userPins.set(pins);
+      void this.finishRefreshInBackground(c.lat, c.lng, radius, fallback, generation);
+    }
+  }
+
+  /** Bilder, OSM-Hinweise und Community-Metadaten nachladen — blockiert die Karte nicht. */
+  private async finishRefreshInBackground(
+    lat: number,
+    lng: number,
+    radiusKm: number,
+    spots: DogSpot[],
+    generation: number,
+  ): Promise<void> {
+    try {
+      const spotIds = spots.map((s) => s.id);
+      const [enriched, notes, leashZones, meta] = await Promise.all([
+        enrichSpotImages(spots),
+        this.fetchOsmNotes(lat, lng, radiusKm),
+        this.fetchLeashZones(lat, lng, radiusKm),
+        this.spotSocial.loadSpotMetaBatch(spotIds),
+      ]);
+      if (generation !== this.refreshGeneration) return;
+
+      this.spots.set(enriched);
+      const seasonal = this.buildSeasonalAlerts(lat, lng);
+      this.alerts.set(this.withDemoGiftkoeder([...notes, ...leashZones, ...seasonal], lat, lng));
+      this.spotsWithCommunity.set(new Set(meta.communityIds));
+      this.blockedSpotIds.set(new Set(meta.blockedIds));
+      this.userPins.update((pins) => pins.filter((p) => !meta.blockedIds.includes(p.id)));
+    } catch {
+      /* Hintergrund optional */
     }
   }
 
@@ -545,15 +586,6 @@ export class DogExploreService {
     return true;
   }
 
-  private async loadMapExtras(lat: number, lng: number, spotIds: string[]): Promise<void> {
-    const pins = await this.pinsService.loadNearby(lat, lng, this.filters().radiusKm);
-    const allIds = [...new Set([...spotIds, ...pins.map((p) => p.id)])];
-    const meta = await this.spotSocial.loadSpotMetaBatch(allIds);
-    this.spotsWithCommunity.set(new Set(meta.communityIds));
-    this.blockedSpotIds.set(new Set(meta.blockedIds));
-    this.userPins.set(pins.filter((p) => !meta.blockedIds.includes(p.id)));
-  }
-
   private beginLoading(): void {
     if (!this.loading()) {
       this.loadingStartedAt = Date.now();
@@ -562,7 +594,7 @@ export class DogExploreService {
   }
 
   private async endLoading(): Promise<void> {
-    const minMs = 720;
+    const minMs = 280;
     const elapsed = Date.now() - this.loadingStartedAt;
     if (elapsed < minMs) {
       await new Promise((resolve) => setTimeout(resolve, minMs - elapsed));
@@ -580,7 +612,12 @@ export class DogExploreService {
     });
   }
 
-  private async fetchOsmSpots(lat: number, lng: number, radiusKm: number): Promise<DogSpot[]> {
+  private async fetchOsmSpots(
+    lat: number,
+    lng: number,
+    radiusKm: number,
+    enrichImages = true,
+  ): Promise<DogSpot[]> {
     const radiusM = Math.min(Math.round(radiusKm * 1000), 12000);
     const query = buildOverpassSpotQuery(lat, lng, radiusM);
     const endpoints = [
@@ -590,11 +627,15 @@ export class DogExploreService {
 
     for (const endpoint of endpoints) {
       try {
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          body: `data=${encodeURIComponent(query)}`,
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        });
+        const res = await this.fetchWithTimeout(
+          endpoint,
+          {
+            method: 'POST',
+            body: `data=${encodeURIComponent(query)}`,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          },
+          9000,
+        );
         if (!res.ok) continue;
         const data = (await res.json()) as {
           elements: Array<{
@@ -609,12 +650,20 @@ export class DogExploreService {
         const raw = data.elements
           .map((el) => osmElementToSpot(el))
           .filter((s): s is DogSpot => s !== null);
-        return enrichSpotImages(raw);
+        return enrichImages ? enrichSpotImages(raw) : raw;
       } catch {
         continue;
       }
     }
     return [];
+  }
+
+  private fetchWithTimeout(url: string, init: RequestInit, ms: number): Promise<Response> {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), ms);
+    return fetch(url, { ...init, signal: controller.signal }).finally(() =>
+      window.clearTimeout(timer),
+    );
   }
 
   private buildContextualMocks(lat: number, lng: number): DogSpot[] {
@@ -685,16 +734,6 @@ export class DogExploreService {
     return pick[Math.floor(Date.now() / 60000) % pick.length];
   }
 
-  private async fetchRealAlerts(lat: number, lng: number, radiusKm: number): Promise<DogAlert[]> {
-    const [notes, leashZones, seasonal] = await Promise.all([
-      this.fetchOsmNotes(lat, lng, radiusKm),
-      this.fetchLeashZones(lat, lng, radiusKm),
-      Promise.resolve(this.buildSeasonalAlerts(lat, lng)),
-    ]);
-    return [...notes, ...leashZones, ...seasonal];
-  }
-
-  /** OSM Notes — echte Meldungen aus der OpenStreetMap-Community */
   private async fetchOsmNotes(lat: number, lng: number, radiusKm: number): Promise<DogAlert[]> {
     const d = radiusKm / 111;
     const bbox = `${lng - d * 1.3},${lat - d},${lng + d * 1.3},${lat + d}`;
@@ -775,11 +814,15 @@ export class DogExploreService {
       out center 6;
     `;
     try {
-      const res = await fetch('https://overpass-api.de/api/interpreter', {
-        method: 'POST',
-        body: query,
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      });
+      const res = await this.fetchWithTimeout(
+        'https://overpass-api.de/api/interpreter',
+        {
+          method: 'POST',
+          body: query,
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        },
+        8000,
+      );
       if (!res.ok) return [];
       const data = (await res.json()) as {
         elements: Array<{ id: number; center?: { lat: number; lon: number }; tags?: Record<string, string> }>;
