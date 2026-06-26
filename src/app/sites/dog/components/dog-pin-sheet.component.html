@@ -1,0 +1,78 @@
+@if (pins.sheetOpen()) {
+  <div class="dog-pin-sheet" role="dialog" aria-modal="true" aria-labelledby="dog-pin-title">
+    <button type="button" class="dog-pin-sheet__backdrop" aria-label="Schließen" (click)="close()"></button>
+    <div class="dog-pin-sheet__panel">
+      <header class="dog-pin-sheet__head">
+        <div>
+          <p class="dog-pin-sheet__kicker">Eigener Ort</p>
+          <h2 id="dog-pin-title" class="dog-pin-sheet__title">Marker setzen</h2>
+        </div>
+        <button type="button" class="dog-pin-sheet__close" (click)="close()" aria-label="Schließen">×</button>
+      </header>
+
+      <div class="dog-pin-sheet__emoji-row">
+        @for (e of emojis; track e) {
+          <button
+            type="button"
+            class="dog-pin-sheet__emoji"
+            [class.is-active]="emoji() === e"
+            (click)="emoji.set(e)"
+          >
+            {{ e }}
+          </button>
+        }
+      </div>
+
+      <label class="dog-pin-sheet__field">
+        <span>Titel</span>
+        <input [ngModel]="title()" (ngModelChange)="title.set($event)" name="pinTitle" placeholder="Lieblingswiese …" />
+      </label>
+
+      <label class="dog-pin-sheet__field">
+        <span>Beschreibung</span>
+        <textarea rows="3" [ngModel]="description()" (ngModelChange)="description.set($event)" name="pinDesc" placeholder="Ruhig, viel Schatten, Wasserhahn …"></textarea>
+      </label>
+
+      <label class="dog-pin-sheet__field">
+        <span>Adresse (optional)</span>
+        <input [ngModel]="address()" (ngModelChange)="address.set($event)" name="pinAddr" placeholder="Straße, Ort …" />
+      </label>
+
+      <div class="dog-pin-sheet__coords">
+        <label class="dog-pin-sheet__field">
+          <span>Breite</span>
+          <input type="number" step="0.000001" [ngModel]="lat()" (ngModelChange)="lat.set(+$event)" name="pinLat" />
+        </label>
+        <label class="dog-pin-sheet__field">
+          <span>Länge</span>
+          <input type="number" step="0.000001" [ngModel]="lng()" (ngModelChange)="lng.set(+$event)" name="pinLng" />
+        </label>
+      </div>
+
+      <div class="dog-pin-sheet__loc-actions">
+        <button type="button" class="dog-pin-sheet__ghost" (click)="startMapPick()">Auf Karte wählen</button>
+        <button type="button" class="dog-pin-sheet__ghost" (click)="useMyLocation()">Kartenmitte</button>
+      </div>
+
+      <fieldset class="dog-pin-sheet__vis">
+        <legend>Sichtbarkeit</legend>
+        <label class="dog-pin-sheet__radio">
+          <input type="radio" name="vis" [checked]="visibility() === 'public'" (change)="visibility.set('public')" />
+          Für alle sichtbar
+        </label>
+        <label class="dog-pin-sheet__radio">
+          <input type="radio" name="vis" [checked]="visibility() === 'private'" (change)="visibility.set('private')" />
+          Nur für mich
+        </label>
+      </fieldset>
+
+      @if (error()) {
+        <p class="dog-pin-sheet__err" role="alert">{{ error() }}</p>
+      }
+
+      <button type="button" class="dog-pin-sheet__save" [disabled]="saving()" (click)="save()">
+        Marker speichern
+      </button>
+    </div>
+  </div>
+}

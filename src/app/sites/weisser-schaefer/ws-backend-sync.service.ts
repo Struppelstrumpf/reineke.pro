@@ -39,6 +39,10 @@ const SYNC_KEYS: readonly string[] = [
   'ws-demo-print-routing-v1',
   'ws-auto-print-enabled',
   'ws-agent-token',
+  'nasebaer-demo-state',
+  'pfotenatlas-demo-state',
+  'nasenbaer-demo-state',
+  'dog-demo-state',
 ];
 
 const SYNC_KEY_SET = new Set(SYNC_KEYS);

@@ -1,0 +1,97 @@
+.dog-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.45rem;
+  padding: 0.5rem 0.85rem;
+  margin: 0;
+  margin-top: 0.4rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-family: var(--dog-font, "Outfit", system-ui, sans-serif);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    color 0.15s ease;
+}
+
+.dog-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.dog-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--dog-accent) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.dog-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+  transform: none;
+}
+
+.dog-btn--accent {
+  width: 100%;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--dog-accent), var(--dog-accent-strong));
+  color: #14210a;
+  box-shadow: 0 2px 12px color-mix(in srgb, var(--dog-accent) 38%, transparent);
+}
+
+.dog-btn--accent:hover:not(:disabled) {
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--dog-accent) 48%, transparent);
+}
+
+.dog-btn--ghost {
+  flex-shrink: 0;
+  border-color: var(--dog-border);
+  background: color-mix(in srgb, var(--dog-surface) 90%, transparent);
+  color: var(--dog-text);
+}
+
+.dog-btn--ghost:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--dog-accent) 40%, var(--dog-border));
+  background: color-mix(in srgb, var(--dog-accent) 10%, var(--dog-surface));
+  color: var(--dog-accent-strong);
+}
+
+.dog-btn--sm {
+  min-height: auto;
+  margin-top: 0;
+  padding: 0.28rem 0.55rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.02em;
+}
+
+.dog-btn--inline {
+  margin-top: 0;
+  width: auto;
+  min-height: 2.2rem;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.76rem;
+}
+
+.dog-btn--split {
+  flex: 1;
+  margin-top: 0;
+  min-height: 2.2rem;
+  font-size: 0.76rem;
+}
+
+a.dog-btn {
+  text-decoration: none;
+}

@@ -1,0 +1,201 @@
+:host {
+  display: block;
+}
+
+.dog-pin-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 1550;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.dog-pin-sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  cursor: pointer;
+}
+
+.dog-pin-sheet__panel {
+  position: relative;
+  z-index: 1;
+  width: min(26rem, 100%);
+  max-height: min(88dvh, 36rem);
+  overflow: auto;
+  padding: 1rem;
+  border-radius: 22px;
+  border: 1px solid var(--dog-border);
+  background: var(--dog-surface-solid, #fff);
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.22);
+  scrollbar-width: none;
+}
+
+.dog-pin-sheet__panel::-webkit-scrollbar {
+  display: none;
+}
+
+.dog-pin-sheet__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.dog-pin-sheet__kicker {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--dog-accent-strong);
+}
+
+.dog-pin-sheet__title {
+  margin: 0.15rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.dog-pin-sheet__close {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1px solid var(--dog-border);
+  background: transparent;
+  cursor: pointer;
+}
+
+.dog-pin-sheet__hint {
+  margin: 0.65rem 0 0;
+  padding: 0.45rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  background: color-mix(in srgb, var(--dog-accent) 10%, transparent);
+  color: var(--dog-accent-strong);
+}
+
+.dog-pin-sheet__hint--pick {
+  animation: dog-pin-pulse 1.4s ease infinite;
+}
+
+@keyframes dog-pin-pulse {
+  50% {
+    opacity: 0.75;
+  }
+}
+
+.dog-pin-sheet__emoji-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+.dog-pin-sheet__emoji {
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 12px;
+  border: 1px solid var(--dog-border);
+  background: color-mix(in srgb, var(--dog-bg) 30%, var(--dog-surface));
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.dog-pin-sheet__emoji.is-active {
+  border-color: var(--dog-accent);
+  background: color-mix(in srgb, var(--dog-accent) 14%, var(--dog-surface));
+}
+
+.dog-pin-sheet__field {
+  display: grid;
+  gap: 0.28rem;
+  margin-top: 0.6rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--dog-muted);
+}
+
+.dog-pin-sheet__field input,
+.dog-pin-sheet__field textarea {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-radius: 11px;
+  border: 1px solid var(--dog-border);
+  font: inherit;
+  font-size: 0.76rem;
+  color: var(--dog-text);
+  background: color-mix(in srgb, var(--dog-bg) 20%, var(--dog-surface));
+}
+
+.dog-pin-sheet__coords {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+
+.dog-pin-sheet__loc-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+}
+
+.dog-pin-sheet__ghost {
+  flex: 1;
+  min-height: 2rem;
+  border-radius: 999px;
+  border: 1px solid var(--dog-border);
+  background: transparent;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dog-pin-sheet__vis {
+  margin: 0.75rem 0 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 12px;
+  border: 1px solid var(--dog-border);
+}
+
+.dog-pin-sheet__vis legend {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--dog-muted);
+}
+
+.dog-pin-sheet__radio {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  font-size: 0.74rem;
+}
+
+.dog-pin-sheet__err {
+  margin: 0.5rem 0 0;
+  font-size: 0.72rem;
+  color: #c0392b;
+}
+
+.dog-pin-sheet__save {
+  width: 100%;
+  margin-top: 0.75rem;
+  min-height: 2.45rem;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--dog-accent), var(--dog-accent-strong));
+  color: #fff;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dog-pin-sheet__save:disabled {
+  opacity: 0.6;
+}

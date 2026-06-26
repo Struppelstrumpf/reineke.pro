@@ -1,0 +1,60 @@
+@use '../dog-buttons';
+
+.dog-cookie {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  z-index: 1300;
+  transform: translateX(-50%);
+  width: min(22rem, calc(100% - 1.5rem));
+  padding: 0.9rem 1rem;
+  border-radius: 18px;
+  border: 1px solid var(--dog-border);
+  background: var(--dog-surface-solid, #fff);
+  box-shadow: var(--dog-shadow);
+  font-family: var(--dog-font);
+  color: var(--dog-text);
+}
+
+.dog-cookie__title {
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.dog-cookie__text {
+  margin: 0 0 0.65rem;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--dog-muted);
+}
+
+.dog-cookie__text a {
+  color: var(--dog-accent-strong);
+  font-weight: 600;
+}
+
+.dog-cookie__opts {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+  font-size: 0.72rem;
+}
+
+.dog-cookie__opts label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dog-cookie__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.dog-cookie__actions .dog-btn {
+  margin-top: 0;
+  flex: 1 1 auto;
+  min-width: 5.5rem;
+}

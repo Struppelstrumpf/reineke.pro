@@ -1,0 +1,116 @@
+:host {
+  display: contents;
+}
+
+.dog-pin-map-pick {
+  position: absolute;
+  inset: 0;
+  z-index: 620;
+  pointer-events: none;
+}
+
+.dog-pin-map-pick__halo {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 42%, rgba(124, 181, 24, 0.07) 100%),
+    linear-gradient(180deg, rgba(124, 181, 24, 0.06), transparent 35%, transparent 65%, rgba(0, 0, 0, 0.08));
+  animation: dog-pin-map-pick-halo 2s ease-in-out infinite;
+}
+
+@keyframes dog-pin-map-pick-halo {
+  50% {
+    opacity: 0.65;
+  }
+}
+
+.dog-pin-map-pick__bar {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1rem, 4vw, 1.75rem);
+  transform: translateX(-50%);
+  width: min(28rem, calc(100% - 2rem));
+  padding: 0.85rem 1rem;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--dog-accent) 35%, var(--dog-border));
+  background: color-mix(in srgb, var(--dog-surface-solid, #fff) 96%, transparent);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.18),
+    0 0 0 1px color-mix(in srgb, var(--dog-accent) 12%, transparent);
+  pointer-events: auto;
+  backdrop-filter: blur(12px);
+}
+
+.dog-pin-map-pick__text {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--dog-text);
+}
+
+.dog-pin-map-pick__text--pulse {
+  animation: dog-pin-map-pick-text 1.6s ease-in-out infinite;
+}
+
+@keyframes dog-pin-map-pick-text {
+  50% {
+    opacity: 0.72;
+  }
+}
+
+.dog-pin-map-pick__coords {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--dog-muted);
+}
+
+.dog-pin-map-pick__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+  justify-content: center;
+}
+
+.dog-pin-map-pick__btn {
+  flex: 1 1 auto;
+  min-width: 5.5rem;
+  min-height: 2.15rem;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--dog-border);
+  background: color-mix(in srgb, var(--dog-bg) 25%, var(--dog-surface));
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.dog-pin-map-pick__btn:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--dog-accent) 40%, var(--dog-border));
+}
+
+.dog-pin-map-pick__btn--primary {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--dog-accent), var(--dog-accent-strong));
+  color: #fff;
+}
+
+.dog-pin-map-pick__btn--ghost {
+  background: transparent;
+}
+
+@media (max-width: 520px) {
+  .dog-pin-map-pick__actions {
+    flex-direction: column;
+  }
+
+  .dog-pin-map-pick__btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,104 @@
+<div #root class="dog-nav-filters" [class.dog-nav-filters--embedded]="embedded()">
+  @if (!embedded()) {
+  <button
+    type="button"
+    class="dog-nav-filters__more"
+    [class.is-open]="popupOpen()"
+    [class.has-custom]="!allFiltersOn() || explore.filters().radiusKm !== 5"
+    (click)="togglePopup()"
+    [attr.aria-expanded]="popupOpen()"
+    aria-haspopup="dialog"
+    aria-label="Filter & Reichweite"
+  >
+    <svg class="dog-nav-filters__more-ico" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M4 6h16v2H4V6zm3 5h10v2H7v-2zm3 5h4v2h-4v-2z"
+      />
+    </svg>
+    <span class="dog-nav-filters__more-label">Filter</span>
+    @if (!allFiltersOn()) {
+      <span class="dog-nav-filters__badge">{{ activeFilterCount() }}</span>
+    }
+  </button>
+  }
+
+  @if (embedded() || popupOpen()) {
+    <div class="dog-nav-filters__popup" role="dialog" aria-label="Orte filtern">
+      <p class="dog-nav-filters__popup-title">Was soll die Nase finden?</p>
+
+      <div class="dog-nav-filters__popup-chips">
+        @for (kind of kindKeys; track kind) {
+          <button
+            type="button"
+            class="dog-nav-filters__popup-chip"
+            [class.is-on]="explore.filters().kinds[kind]"
+            [attr.aria-pressed]="explore.filters().kinds[kind]"
+            (click)="toggleKind(kind)"
+          >
+            <span aria-hidden="true">{{ spotEmoji[kind] }}</span>
+            {{ spotLabels[kind] }}
+          </button>
+        }
+      </div>
+
+      <p class="dog-nav-filters__popup-title dog-nav-filters__popup-title--sub">Benutzer-Marker</p>
+      <div class="dog-nav-filters__popup-chips">
+        <button
+          type="button"
+          class="dog-nav-filters__popup-chip"
+          [class.is-on]="explore.filters().ownPins"
+          [class.is-disabled]="!auth.user()"
+          [disabled]="!auth.user()"
+          [attr.aria-pressed]="explore.filters().ownPins"
+          (click)="toggleOwnPins()"
+        >
+          <span aria-hidden="true">📍</span>
+          Eigene Marker
+        </button>
+        <button
+          type="button"
+          class="dog-nav-filters__popup-chip"
+          [class.is-on]="explore.filters().otherUserPins"
+          [attr.aria-pressed]="explore.filters().otherUserPins"
+          (click)="toggleOtherUserPins()"
+        >
+          <span aria-hidden="true">👤</span>
+          Fremde Marker (Benutzer)
+        </button>
+      </div>
+
+      @if (!auth.user()) {
+        <p class="dog-nav-filters__popup-hint">Eigene Marker sind nach der Anmeldung filterbar.</p>
+      }
+
+      <div class="dog-nav-filters__popup-row">
+        <label class="dog-nav-filters__popup-label" for="dog-nav-radius">Reichweite</label>
+        <select
+          id="dog-nav-radius"
+          class="dog-nav-filters__popup-select"
+          [ngModel]="explore.filters().radiusKm"
+          (ngModelChange)="onRadiusChange(+$event)"
+        >
+          @for (km of radiusOptions; track km) {
+            <option [value]="km">{{ km }} km</option>
+          }
+        </select>
+      </div>
+
+      <div class="dog-nav-filters__popup-actions">
+        <button type="button" class="dog-btn dog-btn--ghost dog-btn--split" (click)="setAllKinds(true)">
+          Alle an
+        </button>
+        <button type="button" class="dog-btn dog-btn--accent dog-btn--split" (click)="closePopup()">
+          Fertig
+        </button>
+      </div>
+
+      <p class="dog-nav-filters__popup-foot">
+        Karte ©
+        <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>
+      </p>
+    </div>
+  }
+</div>

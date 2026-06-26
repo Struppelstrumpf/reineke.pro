@@ -1,0 +1,171 @@
+:host {
+  display: block;
+}
+
+.dog-profile {
+  position: fixed;
+  inset: 0;
+  z-index: 1450;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.dog-profile__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.dog-profile__panel {
+  position: relative;
+  z-index: 1;
+  width: min(24rem, 100%);
+  padding: 1rem 1.05rem 1.1rem;
+  border-radius: 20px;
+  border: 1px solid var(--dog-border);
+  background: var(--dog-surface-solid, #fff);
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.22);
+}
+
+.dog-profile__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.dog-profile__kicker {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dog-accent-strong);
+}
+
+.dog-profile__title {
+  margin: 0.15rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.dog-profile__close {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1px solid var(--dog-border);
+  background: transparent;
+  cursor: pointer;
+}
+
+.dog-profile__tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem;
+  margin-top: 0.85rem;
+  padding: 0.18rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dog-bg) 40%, var(--dog-surface));
+}
+
+.dog-profile__tab {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.42rem;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--dog-muted);
+  cursor: pointer;
+}
+
+.dog-profile__tab.is-active {
+  background: var(--dog-surface-solid, #fff);
+  color: var(--dog-text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.dog-profile__who {
+  margin: 0.65rem 0 0;
+  font-size: 0.68rem;
+  color: var(--dog-muted);
+}
+
+.dog-profile__form {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+}
+
+.dog-profile__field {
+  display: grid;
+  gap: 0.28rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--dog-muted);
+}
+
+.dog-profile__field input {
+  width: 100%;
+  min-height: 2.35rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 12px;
+  border: 1px solid var(--dog-border);
+  background: color-mix(in srgb, var(--dog-bg) 25%, var(--dog-surface));
+  color: var(--dog-text);
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.dog-profile__pw {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.dog-profile__pw input {
+  flex: 1;
+}
+
+.dog-profile__pw-toggle {
+  flex-shrink: 0;
+  width: 2.35rem;
+  border-radius: 12px;
+  border: 1px solid var(--dog-border);
+  background: transparent;
+  cursor: pointer;
+}
+
+.dog-profile__submit {
+  margin-top: 0.25rem;
+  min-height: 2.45rem;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--dog-accent), var(--dog-accent-strong));
+  color: #fff;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dog-profile__submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.dog-profile__err {
+  margin: 0.55rem 0 0;
+  font-size: 0.72rem;
+  color: #c0392b;
+}
+
+.dog-profile__ok {
+  margin: 0.55rem 0 0;
+  font-size: 0.72rem;
+  color: var(--dog-accent-strong);
+  font-weight: 600;
+}

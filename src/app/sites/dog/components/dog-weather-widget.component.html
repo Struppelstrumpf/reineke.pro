@@ -1,0 +1,68 @@
+@if (active(); as w) {
+  <article [class]="'dog-wx ' + weatherClass(w)" aria-live="polite">
+    <div class="dog-wx__main">
+      <span class="dog-wx__emoji" aria-hidden="true">{{ w.weatherEmoji }}</span>
+      <div class="dog-wx__nums">
+        <span class="dog-wx__temp">{{ w.tempC }}°</span>
+        <span class="dog-wx__meta">{{ w.weatherLabel }} · gefühlt {{ w.feelsLikeC }}°</span>
+      </div>
+      <button type="button" class="dog-wx__tip" (click)="openTip(w.tipId)">Tipps</button>
+    </div>
+    <p class="dog-wx__headline">{{ w.headline }}</p>
+    <p class="dog-wx__detail">{{ w.detail }}</p>
+    <p class="dog-wx__pill" [class.dog-wx__pill--stop]="w.avoidNow">
+      <span class="dog-wx__pill-dot" [class.dog-wx__pill-dot--stop]="w.avoidNow" aria-hidden="true"></span>
+      {{ w.walkHint }}
+    </p>
+
+    @if (heatWarnings().length) {
+      <div class="dog-wx__heat" role="group" aria-label="Hitze-Hinweise">
+        @for (warn of heatWarnings(); track warn.tipId) {
+          <button type="button" class="dog-wx__heat-btn" (click)="openTip(warn.tipId)">
+            <span aria-hidden="true">{{ warn.emoji }}</span>
+            {{ warn.label }}
+          </button>
+        }
+      </div>
+    }
+
+    <div class="dog-wx__timeline" role="tablist" aria-label="Wetter nach Uhrzeit">
+      @for (slot of blockSlots(); track slot.id) {
+        <button
+          type="button"
+          role="tab"
+          class="dog-wx__slot"
+          [class.is-active]="explore.weatherSlotId() === slot.id"
+          [attr.aria-selected]="explore.weatherSlotId() === slot.id"
+          (click)="selectSlot(slot.id)"
+        >
+          <span class="dog-wx__slot-label">{{ slot.shortLabel }}</span>
+          <span class="dog-wx__slot-ico" aria-hidden="true">{{ slot.weatherEmoji }}</span>
+          <span class="dog-wx__slot-temp">{{ slot.tempC }}°</span>
+        </button>
+      }
+    </div>
+
+    @if (daySlots().length) {
+      <div class="dog-wx__days" role="tablist" aria-label="Wetter nach Tag">
+        @for (slot of daySlots(); track slot.id) {
+          <button
+            type="button"
+            role="tab"
+            class="dog-wx__day"
+            [class.is-active]="explore.weatherSlotId() === slot.id"
+            (click)="selectSlot(slot.id)"
+          >
+            <span>{{ slot.shortLabel }}</span>
+            <span aria-hidden="true">{{ slot.weatherEmoji }}</span>
+            <span>{{ slot.tempC }}°</span>
+          </button>
+        }
+      </div>
+    }
+  </article>
+} @else if (explore.loading()) {
+  <article class="dog-wx dog-wx--loading" aria-busy="true">
+    <p class="dog-wx__headline">Wetter wird geschnüffelt …</p>
+  </article>
+}

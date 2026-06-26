@@ -1,0 +1,43 @@
+<div #root class="dog-address-search" [class.dog-address-search--mobile]="mobile()">
+  <input
+    type="search"
+    class="dog-address-search__input"
+    placeholder="Adresse oder Ort …"
+    autocomplete="off"
+    autocapitalize="off"
+    spellcheck="false"
+    role="combobox"
+    aria-autocomplete="list"
+    [attr.aria-expanded]="dropdownOpen()"
+    aria-controls="dog-address-suggest-list"
+    [value]="explore.addressQuery()"
+    (input)="onInput($any($event.target).value)"
+    (focus)="onFocus()"
+    (keydown)="onKeydown($event)"
+  />
+
+  @if (dropdownOpen()) {
+    <ul id="dog-address-suggest-list" class="dog-address-search__list" role="listbox">
+      @if (loadingSuggestions()) {
+        <li class="dog-address-search__hint">Schnüffle Vorschläge …</li>
+      }
+      @for (item of suggestions(); track item.id; let i = $index) {
+        <li role="presentation">
+          <button
+            type="button"
+            class="dog-address-search__item"
+            role="option"
+            [class.is-active]="activeIndex() === i"
+            [attr.aria-selected]="activeIndex() === i"
+            (click)="pick(item)"
+          >
+            <span class="dog-address-search__item-label">{{ item.label }}</span>
+            @if (item.subtitle) {
+              <span class="dog-address-search__item-sub">{{ item.subtitle }}</span>
+            }
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

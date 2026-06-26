@@ -1,0 +1,87 @@
+@if (social.profileOpen()) {
+  <div class="dog-profile" role="dialog" aria-modal="true" aria-labelledby="dog-profile-title">
+    <button type="button" class="dog-profile__backdrop" aria-label="Schließen" (click)="close()"></button>
+    <div class="dog-profile__panel">
+      <header class="dog-profile__head">
+        <div>
+          <p class="dog-profile__kicker">Dein Konto</p>
+          <h2 id="dog-profile-title" class="dog-profile__title">Profil</h2>
+        </div>
+        <button type="button" class="dog-profile__close" (click)="close()" aria-label="Schließen">×</button>
+      </header>
+
+      <div class="dog-profile__tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          class="dog-profile__tab"
+          [class.is-active]="tab() === 'email'"
+          (click)="switchTab('email')"
+        >
+          E-Mail
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="dog-profile__tab"
+          [class.is-active]="tab() === 'password'"
+          (click)="switchTab('password')"
+        >
+          Passwort
+        </button>
+      </div>
+
+      @if (auth.user(); as user) {
+        <p class="dog-profile__who">{{ user.name }} · {{ user.email }}</p>
+      }
+
+      @if (success()) {
+        <p class="dog-profile__ok" role="status">{{ success() }}</p>
+      }
+      @if (social.error()) {
+        <p class="dog-profile__err" role="alert">{{ social.error() }}</p>
+      }
+
+      @if (tab() === 'email') {
+        <form class="dog-profile__form" (submit)="$event.preventDefault(); submitEmail()">
+          <label class="dog-profile__field">
+            <span>Neue E-Mail</span>
+            <input type="email" autocomplete="email" [ngModel]="newEmail()" (ngModelChange)="newEmail.set($event)" name="newEmail" />
+          </label>
+          <label class="dog-profile__field">
+            <span>Aktuelles Passwort zur Bestätigung</span>
+            <input type="password" autocomplete="current-password" [ngModel]="emailPassword()" (ngModelChange)="emailPassword.set($event)" name="emailPw" />
+          </label>
+          <button type="submit" class="dog-profile__submit" [disabled]="social.loading()">E-Mail speichern</button>
+        </form>
+      } @else {
+        <form class="dog-profile__form" (submit)="$event.preventDefault(); submitPassword()">
+          <label class="dog-profile__field">
+            <span>Aktuelles Passwort</span>
+            <input type="password" autocomplete="current-password" [ngModel]="currentPassword()" (ngModelChange)="currentPassword.set($event)" name="curPw" />
+          </label>
+          <label class="dog-profile__field">
+            <span>Neues Passwort</span>
+            <div class="dog-profile__pw">
+              <input
+                [type]="showPw() ? 'text' : 'password'"
+                autocomplete="new-password"
+                [ngModel]="newPassword()"
+                (ngModelChange)="newPassword.set($event)"
+                name="newPw"
+              />
+              <button type="button" class="dog-profile__pw-toggle" (click)="togglePw()" [attr.aria-label]="showPw() ? 'Verbergen' : 'Anzeigen'">
+                {{ showPw() ? '🙈' : '👁' }}
+              </button>
+            </div>
+          </label>
+          <label class="dog-profile__field">
+            <span>Neues Passwort wiederholen</span>
+            <input type="password" autocomplete="new-password" [ngModel]="newPasswordConfirm()" (ngModelChange)="newPasswordConfirm.set($event)" name="newPw2" />
+          </label>
+          <button type="submit" class="dog-profile__submit" [disabled]="social.loading()">Passwort speichern</button>
+        </form>
+      }
+    </div>
+  </div>
+}

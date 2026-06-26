@@ -1,0 +1,228 @@
+:host {
+  display: block;
+}
+
+.dog-wx {
+  padding: 0.85rem 0.9rem 0.75rem;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--dog-accent) 22%, var(--dog-border));
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--dog-surface-solid, #fff) 96%, var(--dog-accent) 4%) 0%,
+    color-mix(in srgb, var(--dog-bg) 10%, var(--dog-surface-solid, #fff)) 100%
+  );
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 50%, transparent) inset,
+    0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+.dog-wx--loading {
+  opacity: 0.85;
+}
+
+.dog-wx__main {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.dog-wx__emoji {
+  font-size: 1.65rem;
+  line-height: 1;
+}
+
+.dog-wx__nums {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+
+.dog-wx__temp {
+  font-size: 1.55rem;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.dog-wx__meta {
+  margin-top: 0.15rem;
+  font-size: 0.68rem;
+  color: var(--dog-muted);
+  font-weight: 600;
+}
+
+.dog-wx__tip {
+  flex-shrink: 0;
+  min-height: 1.85rem;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--dog-border);
+  background: color-mix(in srgb, var(--dog-bg) 35%, var(--dog-surface));
+  font: inherit;
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dog-wx__headline {
+  margin: 0.55rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.dog-wx__detail {
+  margin: 0.25rem 0 0;
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: var(--dog-muted);
+}
+
+.dog-wx__pill {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.55rem 0 0;
+  padding: 0.38rem 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dog-accent) 10%, transparent);
+  font-size: 0.66rem;
+  font-weight: 650;
+}
+
+.dog-wx__pill--stop {
+  background: color-mix(in srgb, #e85d4a 12%, transparent);
+  color: #b83222;
+}
+
+.dog-wx__pill-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--dog-accent);
+}
+
+.dog-wx__pill-dot--stop {
+  background: #e85d4a;
+}
+
+.dog-wx__heat {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.55rem;
+}
+
+.dog-wx__heat-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.32rem 0.58rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, #e8a84a 45%, var(--dog-border));
+  background: color-mix(in srgb, #e8a84a 12%, var(--dog-surface-solid, #fff));
+  color: #9a5b12;
+  font: inherit;
+  font-size: 0.62rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.dog-wx__heat-btn:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, #e8a84a 18%, var(--dog-surface-solid, #fff));
+}
+
+.dog-wx__timeline {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.7rem;
+  padding: 0.35rem 0 0.15rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  border-top: 1px solid color-mix(in srgb, var(--dog-border) 70%, transparent);
+}
+
+.dog-wx__timeline::-webkit-scrollbar {
+  display: none;
+}
+
+.dog-wx__slot {
+  flex-shrink: 0;
+  display: grid;
+  justify-items: center;
+  gap: 0.12rem;
+  min-width: 2.85rem;
+  padding: 0.35rem 0.4rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  font: inherit;
+  color: var(--dog-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.dog-wx__slot.is-active {
+  border-color: color-mix(in srgb, var(--dog-accent) 40%, var(--dog-border));
+  background: color-mix(in srgb, var(--dog-accent) 12%, var(--dog-surface-solid, #fff));
+  color: var(--dog-text);
+}
+
+.dog-wx__slot-label {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.dog-wx__slot-ico {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.dog-wx__slot-temp {
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.dog-wx__days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.45rem;
+}
+
+.dog-wx__day {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.28rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--dog-border);
+  background: color-mix(in srgb, var(--dog-bg) 25%, var(--dog-surface));
+  font: inherit;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--dog-muted);
+  cursor: pointer;
+}
+
+.dog-wx__day.is-active {
+  border-color: color-mix(in srgb, var(--dog-accent) 45%, var(--dog-border));
+  background: color-mix(in srgb, var(--dog-accent) 14%, var(--dog-surface));
+  color: var(--dog-text);
+}
+
+.dog-wx.dog-weather--calm {
+  border-color: color-mix(in srgb, var(--dog-accent) 30%, var(--dog-border));
+}
+
+.dog-wx.dog-weather--warm {
+  border-color: color-mix(in srgb, #e8a84a 35%, var(--dog-border));
+}
+
+.dog-wx.dog-weather--alert {
+  border-color: color-mix(in srgb, #e85d4a 40%, var(--dog-border));
+}

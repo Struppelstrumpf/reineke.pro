@@ -1,0 +1,62 @@
+.dog-theme {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.dog-theme__label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dog-muted);
+  white-space: nowrap;
+}
+
+.dog-theme__track {
+  display: flex;
+  align-items: center;
+  width: 2.4rem;
+}
+
+.dog-theme__slider {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 0.32rem;
+  margin: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dog-accent) 55%, var(--dog-border));
+  cursor: pointer;
+}
+
+.dog-theme__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  border: 2px solid var(--dog-bg);
+  background: var(--dog-accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dog-theme__slider::-moz-range-thumb {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  border: 2px solid var(--dog-bg);
+  background: var(--dog-accent);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

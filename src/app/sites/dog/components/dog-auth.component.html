@@ -1,0 +1,47 @@
+<div #root class="dog-auth">
+  @if (auth.user(); as user) {
+    <button
+      type="button"
+      class="dog-auth__circle"
+      [attr.aria-expanded]="auth.menuOpen()"
+      aria-haspopup="menu"
+      [attr.aria-label]="user.name + ' — Konto'"
+      (click)="toggleAccountMenu($event)"
+    >
+      @if (user.avatarUrl) {
+        <img [src]="user.avatarUrl" alt="" class="dog-auth__circle-img" width="36" height="36" />
+      } @else {
+        <span class="dog-auth__circle-initial" aria-hidden="true">{{ auth.providerInitial(user) }}</span>
+      }
+    </button>
+    @if (auth.menuOpen()) {
+      <div class="dog-auth__menu" role="menu">
+        <p class="dog-auth__name">{{ user.name }}</p>
+        @if (user.email) {
+          <p class="dog-auth__mail">{{ user.email }}</p>
+        }
+        <button type="button" class="dog-auth__item" role="menuitem" (click)="openProfile()">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+            <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+          </svg>
+          Profil
+        </button>
+        <button type="button" class="dog-auth__out" role="menuitem" (click)="logout()">Abmelden</button>
+      </div>
+    }
+  } @else {
+    <button
+      type="button"
+      class="dog-auth__circle dog-auth__circle--login"
+      aria-label="Anmelden oder registrieren"
+      (click)="openLogin()"
+    >
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+        />
+      </svg>
+    </button>
+  }
+</div>

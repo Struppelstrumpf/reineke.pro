@@ -82,6 +82,14 @@ export class FiverrSidebarComponent {
     if (url.includes('weisser-schaefer')) {
       return 'weisser-schaefer';
     }
+    if (
+      url.includes('nasebaer') ||
+      url.includes('pfotenatlas') ||
+      url.includes('nasenbaer') ||
+      url.includes('/demo/dog')
+    ) {
+      return 'nasebaer';
+    }
     return 'pizzeria';
   }
 }

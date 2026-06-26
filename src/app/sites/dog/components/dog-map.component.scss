@@ -1,0 +1,577 @@
+:host {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
+.dog-map {
+  width: 100%;
+  height: 100%;
+  background: var(--dog-map-fallback);
+}
+
+:host ::ng-deep .leaflet-container {
+  width: 100%;
+  height: 100%;
+  font-family: var(--dog-font);
+  background: var(--dog-map-fallback);
+}
+
+:host ::ng-deep .dog-map__user-wrap {
+  background: transparent;
+  border: 0;
+}
+
+:host ::ng-deep .dog-map__user {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  line-height: 0;
+}
+
+:host ::ng-deep .dog-map__user-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2.5px solid #7cb518;
+  box-shadow:
+    0 3px 14px rgba(0, 0, 0, 0.28),
+    0 0 0 4px rgba(124, 181, 24, 0.18);
+}
+
+:host ::ng-deep .dog-map__user-dog {
+  position: relative;
+  z-index: 1;
+  transform: translate(1px, -1px);
+}
+
+:host ::ng-deep .dog-map__user-tail {
+  transform-origin: 12px 14px;
+  animation: dog-map-tail-wag 0.55s ease-in-out infinite alternate;
+}
+
+@keyframes dog-map-tail-wag {
+  from { transform: rotate(-16deg); }
+  to { transform: rotate(20deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host ::ng-deep .dog-map__user-tail {
+    animation: none;
+  }
+}
+
+:host ::ng-deep .dog-map__user-wrap--run .dog-map__user-dog {
+  animation: dog-map-trot 0.28s ease-in-out infinite alternate;
+}
+
+@keyframes dog-map-trot {
+  from {
+    transform: translate(1px, -1px) rotate(-4deg);
+  }
+  to {
+    transform: translate(1px, -3px) rotate(4deg);
+  }
+}
+
+:host ::ng-deep .dog-map__spot-wrap,
+:host ::ng-deep .dog-map__alert-wrap {
+  background: transparent;
+  border: 0;
+}
+
+:host ::ng-deep .dog-map__spot-pin {
+  position: relative;
+}
+
+:host ::ng-deep .dog-map__spot-pin-star {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  font-size: 0.82rem;
+  line-height: 1;
+  text-shadow:
+    0 0 4px rgba(255, 255, 255, 0.95),
+    0 1px 3px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+:host ::ng-deep .dog-map__spot-pin-star--community {
+  color: #e8b84a;
+}
+
+:host ::ng-deep .dog-map__spot-pin-star--user {
+  color: #4a90e8;
+}
+
+:host ::ng-deep .dog-map__spot-pin--private {
+  opacity: 0.88;
+  outline: 1px dashed color-mix(in srgb, var(--dog-muted) 50%, transparent);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+:host ::ng-deep .dog-map__spot-pin,
+:host ::ng-deep .dog-map__alert-pin {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+:host ::ng-deep .dog-map__spot-pin-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, #fff 92%, transparent);
+  border: 2px solid color-mix(in srgb, var(--dog-accent, #7cb518) 55%, white);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+:host ::ng-deep .dog-map__spot-pin--selected .dog-map__spot-pin-glow {
+  border-color: #fff;
+  box-shadow:
+    0 0 0 3px var(--dog-accent-strong),
+    0 6px 18px rgba(0, 0, 0, 0.22);
+  transform: scale(1.08);
+}
+
+:host ::ng-deep .dog-map__spot-pin-ico {
+  position: relative;
+  z-index: 1;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+:host ::ng-deep .dog-map__cluster-wrap,
+:host ::ng-deep .marker-cluster {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+:host ::ng-deep .dog-map__cluster {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.65rem;
+  height: 2.65rem;
+}
+
+:host ::ng-deep .dog-map__cluster-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, #fff 94%, transparent);
+  border: 2.5px solid color-mix(in srgb, var(--dog-accent, #7cb518) 65%, white);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    0 0 0 3px color-mix(in srgb, var(--dog-accent, #7cb518) 12%, transparent);
+}
+
+:host ::ng-deep .dog-map__cluster-ico {
+  position: relative;
+  z-index: 1;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+:host ::ng-deep .dog-map__cluster-count {
+  position: absolute;
+  top: -0.15rem;
+  right: -0.2rem;
+  z-index: 2;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 0.58rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  background: var(--dog-accent-strong, #5a8f0e);
+  border: 1.5px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+}
+
+:host ::ng-deep .marker-cluster-small,
+:host ::ng-deep .marker-cluster-medium,
+:host ::ng-deep .marker-cluster-large {
+  background: transparent !important;
+}
+
+:host ::ng-deep .marker-cluster-small div,
+:host ::ng-deep .marker-cluster-medium div,
+:host ::ng-deep .marker-cluster-large div {
+  background: transparent !important;
+}
+
+:host ::ng-deep .dog-map__alert-pin-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #f59e0b;
+  border: 2px solid #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+:host ::ng-deep .dog-map__alert-pin--danger .dog-map__alert-pin-ring {
+  background: #dc2626;
+  animation: dog-map-alert-pulse 1.4s ease-in-out infinite;
+}
+
+:host ::ng-deep .dog-map__alert-pin--warn .dog-map__alert-pin-ring {
+  background: #f59e0b;
+}
+
+:host ::ng-deep .dog-map__alert-pin--info .dog-map__alert-pin-ring {
+  background: #3b82f6;
+}
+
+:host ::ng-deep .dog-map__alert-pin--selected .dog-map__alert-pin-ring {
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.95),
+    0 0 0 6px color-mix(in srgb, #dc2626 45%, transparent);
+  transform: scale(1.1);
+}
+
+:host ::ng-deep .dog-map__alert-pin-ico {
+  position: relative;
+  z-index: 1;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes dog-map-alert-pulse {
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.22);
+  }
+}
+
+:host ::ng-deep .dog-map__user-wrap--shock .dog-map__user-dog {
+  animation: dog-map-shock-flash 0.11s step-end 6;
+}
+
+:host ::ng-deep .dog-map__user-wrap--shock::after {
+  content: '⚡';
+  position: absolute;
+  inset: -0.35rem;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  font-size: 1.35rem;
+  pointer-events: none;
+  animation: dog-map-bolt 0.11s step-end 6;
+}
+
+@keyframes dog-map-shock-flash {
+  0%,
+  100% {
+    filter: none;
+    opacity: 1;
+  }
+  50% {
+    filter: invert(1) brightness(1.8);
+    opacity: 0.55;
+  }
+}
+
+@keyframes dog-map-bolt {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.2;
+    transform: scale(0.85);
+  }
+}
+
+:host ::ng-deep .dog-map__user-wrap--steamed .dog-map__user-dog {
+  filter: brightness(0.1) grayscale(1);
+  transition: filter 0.25s ease;
+}
+
+:host ::ng-deep .dog-map__user-wrap--steamed .dog-map__user-glow {
+  background: #2a2a2a;
+  border-color: #555;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.45);
+}
+
+:host ::ng-deep .dog-map__user-wrap--steamed::before {
+  content: '💨';
+  position: absolute;
+  top: -0.55rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.85rem;
+  z-index: 2;
+  pointer-events: none;
+  animation: dog-map-steam 0.55s ease-in-out infinite alternate;
+}
+
+@keyframes dog-map-steam {
+  from {
+    opacity: 0.55;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px);
+  }
+}
+
+:host ::ng-deep .dog-map__user-wrap--dizzy .dog-map__user-dog {
+  animation: dog-map-dizzy 0.35s ease-in-out infinite alternate;
+}
+
+:host ::ng-deep .dog-map__user-wrap--sad .dog-map__user-dog {
+  animation: dog-map-sad 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes dog-map-dizzy {
+  from {
+    transform: translate(1px, -1px) rotate(-8deg);
+  }
+  to {
+    transform: translate(1px, -1px) rotate(8deg);
+  }
+}
+
+@keyframes dog-map-sad {
+  from {
+    transform: translate(1px, 0) scale(0.96);
+  }
+  to {
+    transform: translate(1px, -1px) scale(1);
+  }
+}
+
+:host ::ng-deep .dog-map__game-pin--bad .dog-map__game-pin-glow {
+  border-color: color-mix(in srgb, #fb923c 45%, white);
+  background: color-mix(in srgb, #fff7ed 75%, white);
+}
+
+:host ::ng-deep .dog-map__game-wrap {
+  background: transparent;
+  border: 0;
+}
+
+:host ::ng-deep .dog-map__game-wrap--new .dog-map__game-pin {
+  animation: dog-map-pop 0.45s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+:host ::ng-deep .dog-map__game-pin {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+:host ::ng-deep .dog-map__game-pin--lg {
+  width: 3.85rem;
+  height: 3.85rem;
+}
+
+:host ::ng-deep .dog-map__game-pin--storm {
+  cursor: pointer;
+  opacity: 0.92;
+  filter: saturate(1.15);
+}
+
+:host ::ng-deep .dog-map__game-pin--storm .dog-map__game-pin-glow {
+  border-radius: 42% 58% 52% 48% / 48% 42% 58% 52%;
+  background: color-mix(in srgb, #94a3b8 55%, #475569);
+  border-color: color-mix(in srgb, #64748b 70%, #1e293b);
+  box-shadow: 0 8px 24px rgba(30, 41, 59, 0.35);
+  animation: dog-map-cloud-float 3.2s ease-in-out infinite alternate;
+}
+
+:host ::ng-deep .dog-map__game-pin--storm:hover {
+  animation: dog-map-storm-warn 0.35s ease;
+}
+
+:host ::ng-deep .dog-map__game-pin--rain .dog-map__game-pin-glow {
+  border-radius: 45% 55% 50% 50% / 55% 45% 55% 45%;
+  background: color-mix(in srgb, #dbeafe 88%, white);
+  border-color: color-mix(in srgb, #60a5fa 50%, white);
+  animation: dog-map-cloud-float 2.8s ease-in-out infinite alternate;
+}
+
+:host ::ng-deep .dog-map__game-bubble {
+  position: absolute;
+  top: -0.15rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%);
+  padding: 0.12rem 0.42rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--dog-surface-solid, #fff) 96%, transparent);
+  border: 1px solid color-mix(in srgb, var(--dog-accent) 35%, var(--dog-border));
+  font-size: 0.58rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--dog-text);
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: dog-map-bubble 0.35s ease;
+}
+
+@keyframes dog-map-bubble {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-80%) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-100%) scale(1);
+  }
+}
+
+:host ::ng-deep .dog-map__game-pin-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, #fff 92%, transparent);
+  border: 2px solid color-mix(in srgb, var(--dog-accent, #7cb518) 55%, white);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+}
+
+:host ::ng-deep .dog-map__game-pin--cloud .dog-map__game-pin-glow,
+:host ::ng-deep .dog-map__game-pin--rain .dog-map__game-pin-glow {
+  animation: dog-map-cloud-float 2.8s ease-in-out infinite alternate;
+}
+
+:host ::ng-deep .dog-map__game-pin-ico {
+  position: relative;
+  z-index: 1;
+  font-size: 1.35rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+}
+
+:host ::ng-deep .dog-map__game-pin--lg .dog-map__game-pin-ico {
+  font-size: 1.75rem;
+}
+
+@keyframes dog-map-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes dog-map-cloud-float {
+  from {
+    transform: translateY(-2px);
+  }
+  to {
+    transform: translateY(3px);
+  }
+}
+
+@keyframes dog-map-storm-warn {
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+:host ::ng-deep .leaflet-control-attribution {
+  font-size: 0.58rem;
+  background: color-mix(in srgb, var(--dog-surface) 82%, transparent) !important;
+  color: var(--dog-muted) !important;
+  border-radius: 8px 0 0 0;
+  max-width: 45vw;
+}
+
+:host ::ng-deep .leaflet-control-zoom {
+  margin-bottom: 0.5rem !important;
+  margin-right: 0.5rem !important;
+}
+
+:host ::ng-deep .leaflet-control-zoom a {
+  background: color-mix(in srgb, var(--dog-surface) 92%, transparent) !important;
+  color: var(--dog-text) !important;
+  border-color: var(--dog-border) !important;
+}
+
+.dog-map--picking,
+.dog-map--picking ::ng-deep .leaflet-container {
+  cursor: crosshair !important;
+}
+
+.dog-map--picking ::ng-deep .leaflet-interactive {
+  cursor: crosshair !important;
+}
+
+:host ::ng-deep .dog-map__pick-wrap {
+  background: transparent;
+  border: 0;
+}
+
+:host ::ng-deep .dog-map__pick-preview {
+  position: relative;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:host ::ng-deep .dog-map__pick-pin {
+  position: relative;
+  z-index: 1;
+  font-size: 1.35rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+}
+
+:host ::ng-deep .dog-map__pick-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--dog-accent) 70%, #fff);
+  background: color-mix(in srgb, var(--dog-accent) 18%, transparent);
+  animation: dog-map-pick-ring 1.4s ease-out infinite;
+}
+
+@keyframes dog-map-pick-ring {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}

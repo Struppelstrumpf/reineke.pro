@@ -1,0 +1,104 @@
+@use '../dog-buttons';
+
+:host {
+  display: contents;
+}
+
+.dog-tip-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--dog-bg) 55%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.dog-tip-modal__panel {
+  position: relative;
+  width: min(22rem, 100%);
+  max-height: min(85dvh, 32rem);
+  overflow: auto;
+  padding: 1.15rem 1.1rem 1rem;
+  border-radius: 18px;
+  border: 1px solid var(--dog-border);
+  background: color-mix(in srgb, var(--dog-surface-solid, #fff) 98%, transparent);
+  color: var(--dog-text);
+  font-family: var(--dog-font);
+  box-shadow: var(--dog-shadow);
+}
+
+.dog-tip-modal__close {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border: 1px solid var(--dog-border);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--dog-surface) 92%, transparent);
+  color: var(--dog-muted);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.dog-tip-modal__close:hover {
+  color: var(--dog-text);
+  background: color-mix(in srgb, var(--dog-accent) 12%, var(--dog-surface));
+  transform: scale(1.04);
+}
+
+.dog-tip-modal__emoji {
+  margin: 0;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.dog-tip-modal__title {
+  margin: 0.35rem 0 0;
+  font-family: var(--dog-font);
+  font-size: 1.22rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.32;
+}
+
+.dog-tip-modal__lead {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--dog-accent-strong);
+}
+
+.dog-tip-modal__section + .dog-tip-modal__section {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px dashed var(--dog-border);
+}
+
+.dog-tip-modal__heading {
+  margin: 0 0 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dog-muted);
+}
+
+.dog-tip-modal__body {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--dog-text);
+}
+
+.dog-tip-modal__panel .dog-btn {
+  margin-top: 0.9rem;
+}

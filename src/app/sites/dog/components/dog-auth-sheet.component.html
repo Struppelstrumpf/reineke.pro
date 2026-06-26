@@ -1,0 +1,178 @@
+@if (auth.sheetOpen()) {
+  <div class="dog-auth-sheet" role="dialog" aria-modal="true" aria-labelledby="dog-auth-sheet-title">
+    <button type="button" class="dog-auth-sheet__backdrop" aria-label="Schließen" (click)="closeSheet()"></button>
+    <div class="dog-auth-sheet__panel" [class.dog-auth-sheet__panel--mobile]="mobile.isMobile()">
+      <div class="dog-auth-sheet__head">
+        <h2 id="dog-auth-sheet-title" class="dog-auth-sheet__title">
+          @if (auth.sheetMode() === 'register') {
+            Konto erstellen
+          } @else {
+            Anmelden
+          }
+        </h2>
+        <button type="button" class="dog-auth-sheet__close" aria-label="Schließen" (click)="closeSheet()">×</button>
+      </div>
+
+      <div class="dog-auth-sheet__tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          class="dog-auth-sheet__tab"
+          [class.is-active]="auth.sheetMode() === 'login'"
+          [attr.aria-selected]="auth.sheetMode() === 'login'"
+          (click)="switchMode('login')"
+        >
+          Anmelden
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="dog-auth-sheet__tab"
+          [class.is-active]="auth.sheetMode() === 'register'"
+          [attr.aria-selected]="auth.sheetMode() === 'register'"
+          (click)="switchMode('register')"
+        >
+          Registrieren
+        </button>
+      </div>
+
+      <form class="dog-auth-sheet__form" (submit)="$event.preventDefault(); submitEmail()">
+        @if (auth.sheetMode() === 'register') {
+          <label class="dog-auth-sheet__field">
+            <span>Name (optional)</span>
+            <input
+              type="text"
+              autocomplete="name"
+              [ngModel]="name()"
+              (ngModelChange)="name.set($event)"
+              name="name"
+              placeholder="Nasebär-Fan"
+            />
+          </label>
+        }
+
+        <label class="dog-auth-sheet__field">
+          <span>E-Mail</span>
+          <input
+            type="email"
+            autocomplete="email"
+            inputmode="email"
+            required
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
+            name="email"
+            placeholder="du@beispiel.de"
+          />
+        </label>
+
+        @if (auth.sheetMode() === 'register') {
+          <label class="dog-auth-sheet__field">
+            <span>E-Mail wiederholen</span>
+            <input
+              type="email"
+              autocomplete="email"
+              inputmode="email"
+              required
+              [ngModel]="emailConfirm()"
+              (ngModelChange)="emailConfirm.set($event)"
+              name="emailConfirm"
+              placeholder="du@beispiel.de"
+            />
+          </label>
+        }
+
+        <label class="dog-auth-sheet__field">
+          <span>Passwort</span>
+          <div class="dog-auth-sheet__pw">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              [attr.autocomplete]="auth.sheetMode() === 'register' ? 'new-password' : 'current-password'"
+              required
+              [ngModel]="password()"
+              (ngModelChange)="password.set($event)"
+              name="password"
+              [placeholder]="auth.sheetMode() === 'register' ? 'Min. 10 Zeichen, Groß/Klein, Zahl/Sonderzeichen' : 'Passwort'"
+            />
+            <button
+              type="button"
+              class="dog-auth-sheet__pw-toggle"
+              [attr.aria-label]="showPassword() ? 'Passwort verbergen' : 'Passwort anzeigen'"
+              [attr.aria-pressed]="showPassword()"
+              (click)="togglePassword()"
+            >
+              @if (showPassword()) {
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M12 6.5c3.79 0 7.17 2.13 8.82 5.5-1.65 3.37-5.03 5.5-8.82 5.5S4.83 15.37 3.18 12 6.61 6.5 12 6.5m0-2C6.48 4.5 2.23 7.61 1 12c1.23 4.39 5.48 7.5 11 7.5s9.77-3.11 11-7.5C21.77 7.61 17.52 4.5 12 4.5zm0 5a2.5 2.5 0 0 1 0 5 2.5 2.5 0 0 1 0-5z"
+                  />
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M12 6.5c3.79 0 7.17 2.13 8.82 5.5-.67 1.37-1.63 2.58-2.79 3.53L15.5 11.5A2.5 2.5 0 0 0 12 6.5m0-2C6.48 4.5 2.23 7.61 1 12c.69 2.47 2.23 4.57 4.26 6.03L3.27 20.02 4.68 21.43 20.1 6.01 18.69 4.6 16.04 7.25C14.83 6.75 13.45 6.5 12 6.5M12 17.5c-3.79 0-7.17-2.13-8.82-5.5.67-1.37 1.63-2.58 2.79-3.53L8.5 12.5A2.5 2.5 0 0 0 12 17.5z"
+                  />
+                </svg>
+              }
+            </button>
+          </div>
+        </label>
+
+        @if (auth.sheetMode() === 'register') {
+          <label class="dog-auth-sheet__field">
+            <span>Passwort wiederholen</span>
+            <div class="dog-auth-sheet__pw">
+              <input
+                [type]="showPasswordConfirm() ? 'text' : 'password'"
+                autocomplete="new-password"
+                required
+                [ngModel]="passwordConfirm()"
+                (ngModelChange)="passwordConfirm.set($event)"
+                name="passwordConfirm"
+                placeholder="Passwort erneut eingeben"
+              />
+              <button
+                type="button"
+                class="dog-auth-sheet__pw-toggle"
+                [attr.aria-label]="showPasswordConfirm() ? 'Passwort verbergen' : 'Passwort anzeigen'"
+                [attr.aria-pressed]="showPasswordConfirm()"
+                (click)="togglePasswordConfirm()"
+              >
+                @if (showPasswordConfirm()) {
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <path
+                      fill="currentColor"
+                      d="M12 6.5c3.79 0 7.17 2.13 8.82 5.5-1.65 3.37-5.03 5.5-8.82 5.5S4.83 15.37 3.18 12 6.61 6.5 12 6.5m0-2C6.48 4.5 2.23 7.61 1 12c1.23 4.39 5.48 7.5 11 7.5s9.77-3.11 11-7.5C21.77 7.61 17.52 4.5 12 4.5zm0 5a2.5 2.5 0 0 1 0 5 2.5 2.5 0 0 1 0-5z"
+                    />
+                  </svg>
+                } @else {
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <path
+                      fill="currentColor"
+                      d="M12 6.5c3.79 0 7.17 2.13 8.82 5.5-.67 1.37-1.63 2.58-2.79 3.53L15.5 11.5A2.5 2.5 0 0 0 12 6.5m0-2C6.48 4.5 2.23 7.61 1 12c.69 2.47 2.23 4.57 4.26 6.03L3.27 20.02 4.68 21.43 20.1 6.01 18.69 4.6 16.04 7.25C14.83 6.75 13.45 6.5 12 6.5M12 17.5c-3.79 0-7.17-2.13-8.82-5.5.67-1.37 1.63-2.58 2.79-3.53L8.5 12.5A2.5 2.5 0 0 0 12 17.5z"
+                    />
+                  </svg>
+                }
+              </button>
+            </div>
+          </label>
+        }
+
+        @if (auth.error()) {
+          <p class="dog-auth-sheet__err" role="alert">{{ auth.error() }}</p>
+        }
+
+        <button type="submit" class="dog-auth-sheet__submit" [disabled]="auth.loading()">
+          @if (auth.loading()) {
+            …
+          } @else if (auth.sheetMode() === 'register') {
+            Registrieren
+          } @else {
+            Anmelden
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+}

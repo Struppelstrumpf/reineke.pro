@@ -17,6 +17,11 @@
   padding-left: calc(var(--pv-fiverr-panel-w) + var(--pv-fiverr-handle-w));
 }
 
+.app-stage:has(pv-dog-shell) {
+  position: relative;
+  min-height: 100dvh;
+}
+
 .app-stage--dimmed {
   opacity: 0.1;
   pointer-events: none;

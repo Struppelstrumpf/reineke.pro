@@ -94,6 +94,18 @@
   --fv-warm-dim: color-mix(in srgb, var(--pv-ws-accent-dim, #a3b84a) 16%, transparent);
 }
 
+.fiverr--nasebaer {
+  --fv-surface: rgba(30, 34, 24, 0.94);
+  --fv-surface-2: #2a3020;
+  --fv-border: rgba(124, 181, 24, 0.28);
+  --fv-text: #f7faf2;
+  --fv-muted: #c8d4b8;
+  --fv-accent: #7cb518;
+  --fv-accent-soft: rgba(124, 181, 24, 0.18);
+  --fv-glow: rgba(124, 181, 24, 0.22);
+  --fv-warm-dim: rgba(124, 181, 24, 0.12);
+}
+
 /* ─── Panel ─── */
 .fiverr__panel {
   width: var(--pv-fiverr-panel-w);

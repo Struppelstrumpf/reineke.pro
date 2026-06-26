@@ -2,7 +2,7 @@
  * Reineke GbR — portfolio preview links (single deployment).
  * Paths are relative to site origin (e.g. https://example.com/pizzeria-demo).
  */
-export type PreviewSiteId = 'pizzeria' | 'weisser-schaefer';
+export type PreviewSiteId = 'pizzeria' | 'weisser-schaefer' | 'nasebaer';
 
 export const PREVIEW_STUDIO = {
   name: 'Reineke GbR',
@@ -29,5 +29,11 @@ export const PREVIEW_SITES: ReadonlyArray<{
     label: 'Weißer Schäfer (Demo)',
     hint: 'B2B · Bestellportal · Naturdärme',
     href: '/demo/weisser-schaefer',
+  },
+  {
+    id: 'nasebaer',
+    label: 'Nasebär (Demo)',
+    hint: 'Der Pfoten-Atlas · Karte & Spots',
+    href: '/demo/nasebaer',
   },
 ];

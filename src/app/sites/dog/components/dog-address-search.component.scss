@@ -1,0 +1,96 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dog-address-search {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dog-address-search__input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--dog-text);
+  font: inherit;
+  font-size: 0.78rem;
+  outline: none;
+}
+
+.dog-address-search__input::placeholder {
+  color: var(--dog-muted);
+}
+
+.dog-address-search__list {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  left: -0.55rem;
+  right: -0.2rem;
+  z-index: 800;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--dog-accent) 22%, var(--dog-border));
+  background: color-mix(in srgb, var(--dog-surface-solid, #fff) 97%, transparent);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.14),
+    0 0 0 1px color-mix(in srgb, var(--dog-accent) 8%, transparent);
+  backdrop-filter: blur(14px);
+  max-height: min(16rem, 42dvh);
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.dog-address-search__list::-webkit-scrollbar {
+  display: none;
+}
+
+.dog-address-search__hint {
+  padding: 0.55rem 0.65rem;
+  font-size: 0.68rem;
+  color: var(--dog-muted);
+}
+
+.dog-address-search__item {
+  width: 100%;
+  display: grid;
+  gap: 0.12rem;
+  padding: 0.5rem 0.6rem;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.dog-address-search__item:hover,
+.dog-address-search__item.is-active {
+  background: color-mix(in srgb, var(--dog-accent) 12%, var(--dog-surface));
+}
+
+.dog-address-search__item-label {
+  font-size: 0.74rem;
+  font-weight: 650;
+  color: var(--dog-text);
+  line-height: 1.3;
+}
+
+.dog-address-search__item-sub {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--dog-muted);
+}
+
+.dog-address-search--mobile .dog-address-search__list {
+  position: static;
+  margin-top: 0.45rem;
+  left: auto;
+  right: auto;
+  max-height: min(12rem, 32dvh);
+}

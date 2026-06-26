@@ -21,6 +21,36 @@ export const routes: Routes = [
   },
 
   {
+    path: 'demo/nasebaer',
+    loadComponent: () =>
+      import('./sites/dog/dog-shell.component').then((m) => m.DogShellComponent),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./sites/dog/pages/explore/explore.component').then((m) => m.DogExploreComponent),
+      },
+      {
+        path: 'datenschutz',
+        loadComponent: () =>
+          import('./sites/dog/pages/datenschutz/datenschutz.component').then(
+            (m) => m.DogDatenschutzComponent,
+          ),
+      },
+      {
+        path: 'auth/callback',
+        loadComponent: () =>
+          import('./sites/dog/pages/auth-callback/auth-callback.component').then(
+            (m) => m.DogAuthCallbackComponent,
+          ),
+      },
+    ],
+  },
+  { path: 'demo/pfotenatlas', redirectTo: 'demo/nasebaer', pathMatch: 'full' },
+  { path: 'demo/nasenbaer', redirectTo: 'demo/nasebaer', pathMatch: 'full' },
+  { path: 'demo/dog', redirectTo: 'demo/nasebaer', pathMatch: 'full' },
+
+  {
 
     path: 'demo/weisser-schaefer',
 

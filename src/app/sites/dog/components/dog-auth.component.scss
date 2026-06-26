@@ -1,0 +1,105 @@
+:host {
+  display: contents;
+}
+
+.dog-auth {
+  position: relative;
+}
+
+.dog-auth__circle {
+  width: 2.15rem;
+  height: 2.15rem;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--dog-accent) 40%, var(--dog-border));
+  background: color-mix(in srgb, var(--dog-bg) 45%, var(--dog-surface));
+  color: var(--dog-accent-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.dog-auth__circle:hover {
+  transform: scale(1.04);
+  border-color: var(--dog-accent);
+}
+
+.dog-auth__circle--login {
+  background: color-mix(in srgb, var(--dog-accent) 14%, var(--dog-surface));
+}
+
+.dog-auth__circle-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dog-auth__circle-initial {
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.dog-auth__menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 750;
+  min-width: 11.5rem;
+  padding: 0.65rem 0.7rem;
+  border-radius: 14px;
+  border: 1px solid var(--dog-border);
+  background: var(--dog-surface-solid, #fff);
+  box-shadow: var(--dog-shadow);
+}
+
+.dog-auth__name {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.dog-auth__mail {
+  margin: 0.15rem 0 0.45rem;
+  font-size: 0.65rem;
+  color: var(--dog-muted);
+  word-break: break-all;
+}
+
+.dog-auth__item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 2rem;
+  margin-bottom: 0.35rem;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--dog-border);
+  background: color-mix(in srgb, var(--dog-accent) 8%, transparent);
+  color: var(--dog-text);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dog-auth__item:hover {
+  border-color: color-mix(in srgb, var(--dog-accent) 40%, var(--dog-border));
+}
+
+.dog-auth__out {
+  width: 100%;
+  min-height: 2rem;
+  border-radius: 999px;
+  border: 1px solid var(--dog-border);
+  background: transparent;
+  color: var(--dog-text);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}

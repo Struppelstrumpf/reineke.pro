@@ -1,0 +1,132 @@
+<div class="dog" [class.dog--mobile]="mobile.isMobile()">
+  @if (mobile.isMobile()) {
+    <div class="dog__nav-cluster dog__nav-cluster--mobile">
+      <header class="dog__nav dog__nav--mobile">
+        <div class="dog__nav-brand">
+          <pv-dog-logo />
+        </div>
+        <div class="dog__nav-actions">
+          <pv-dog-theme-toggle />
+          <pv-dog-friends-nav />
+          <pv-dog-auth />
+        </div>
+      </header>
+      <pv-dog-pin-fab />
+    </div>
+
+    @if (mobile.searchOpen()) {
+      <div class="dog__mobile-sheet" role="dialog" aria-label="Standort suchen">
+        <button
+          type="button"
+          class="dog__mobile-backdrop"
+          aria-label="Schließen"
+          (click)="mobile.closeSearch()"
+        ></button>
+        <div class="dog__mobile-panel">
+          <p class="dog__mobile-title">Standort suchen</p>
+          <div class="dog__search dog__search--mobile">
+            <pv-dog-address-search [mobile]="true" (searchRequested)="search()" />
+            <button
+              type="button"
+              class="dog__icon-btn dog__icon-btn--accent"
+              aria-label="Suchen"
+              (click)="search()"
+              [disabled]="explore.loading()"
+            >
+              ⌕
+            </button>
+          </div>
+          <button type="button" class="dog__locate-btn dog__locate-btn--block" (click)="locate()" [disabled]="explore.loading()">
+            Meinen Standort anzeigen
+          </button>
+          <button type="button" class="dog__mobile-close" (click)="mobile.closeSearch()">Schließen</button>
+        </div>
+      </div>
+    }
+
+    @if (mobile.menuOpen()) {
+      <div class="dog__mobile-sheet" role="dialog" aria-label="Menü">
+        <button
+          type="button"
+          class="dog__mobile-backdrop"
+          aria-label="Schließen"
+          (click)="mobile.closeMenu()"
+        ></button>
+        <div class="dog__mobile-panel dog__mobile-panel--menu">
+          <p class="dog__mobile-title">Filter & Karte</p>
+          <pv-dog-nav-filters [embedded]="true" />
+          <button type="button" class="dog__mobile-close" (click)="mobile.closeMenu()">Schließen</button>
+        </div>
+      </div>
+    }
+
+    <pv-dog-mobile-nav />
+  } @else {
+    <header class="dog__nav">
+      <div class="dog__nav-brand">
+        <pv-dog-logo />
+      </div>
+
+      <div class="dog__nav-sep" aria-hidden="true"></div>
+
+      <div class="dog__nav-tools">
+        <div class="dog__search" aria-label="Standort suchen">
+          <pv-dog-address-search (searchRequested)="search()" />
+          <button
+            type="button"
+            class="dog__icon-btn"
+            title="Adresse suchen"
+            aria-label="Adresse suchen"
+            (click)="search()"
+            [disabled]="explore.loading()"
+          >
+            ⌕
+          </button>
+          <button
+            type="button"
+            class="dog__locate-btn"
+            title="Meinen Standort auf der Karte anzeigen"
+            aria-label="Meinen Standort auf der Karte anzeigen"
+            (click)="locate()"
+            [disabled]="explore.loading()"
+          >
+            <svg class="dog__locate-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <circle cx="12" cy="12" r="3.25" fill="currentColor" />
+              <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.75" />
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+            </svg>
+            <span class="dog__locate-label">Standort</span>
+          </button>
+        </div>
+        <pv-dog-nav-filters />
+      </div>
+
+      <div class="dog__nav-sep" aria-hidden="true"></div>
+
+      <div class="dog__nav-actions">
+        <pv-dog-theme-toggle />
+        <pv-dog-friends-nav />
+        <pv-dog-auth />
+      </div>
+
+      <div class="dog__nav-pin">
+        <pv-dog-pin-fab />
+      </div>
+    </header>
+  }
+
+  @if (explore.error()) {
+    <p class="dog__error" role="alert">{{ explore.error() }}</p>
+  }
+
+  <main class="dog__main">
+    <router-outlet />
+    <pv-dog-search-loader />
+  </main>
+
+  <pv-dog-pet-widget />
+  <pv-dog-auth-sheet />
+  <pv-dog-profile-sheet />
+  <pv-dog-friends-hub />
+  <pv-dog-cookie-banner />
+</div>

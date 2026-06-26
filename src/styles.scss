@@ -224,6 +224,14 @@ html:has(pv-weisser-schaefer-shell) {
   --pv-shelf-bg: var(--pv-ws-bg);
 }
 
+html:has(pv-dog-shell) {
+  --pv-shelf-bg: #dfeccd;
+}
+
+html:has(pv-dog-shell[data-dog-theme='dark']) {
+  --pv-shelf-bg: #3d4238;
+}
+
 @media (max-width: 520px) {
   :root {
     --pv-fiverr-panel-w: min(19rem, calc(100vw - 3.2rem));

@@ -1,0 +1,220 @@
+<aside class="dog-panel" [class.dog-panel--collapsed]="!explore.panelOpen()">
+  <button type="button" class="dog-panel__toggle" (click)="togglePanel()" [attr.aria-expanded]="explore.panelOpen()">
+    <span aria-hidden="true">{{ explore.panelOpen() ? '›' : '‹' }}</span>
+    <span class="sr-only">Panel {{ explore.panelOpen() ? 'einklappen' : 'ausklappen' }}</span>
+  </button>
+
+  @if (explore.panelOpen()) {
+    <div #panelBody class="dog-panel__body">
+      <header class="dog-panel__weather-head">
+        <pv-dog-weather-widget />
+        <div class="dog-panel__tagline" aria-live="polite">
+          <span class="dog-panel__tagline-mark" aria-hidden="true"></span>
+          <span class="dog-panel__tagline-slot">
+            <span class="dog-panel__tagline-measure" aria-hidden="true">{{ taglineMeasure }}</span>
+            <span
+              class="dog-panel__tagline-text"
+              [class.is-exit]="taglineAnim() === 'exit'"
+              [class.is-enter]="taglineAnim() === 'enter'"
+            >
+              {{ taglineWord() }}
+            </span>
+          </span>
+        </div>
+      </header>
+
+      <div #panelScroll class="dog-panel__scroll">
+        <article class="dog-card dog-card--status" [class]="leashClass()" aria-live="polite">
+          <div class="dog-card__row dog-card__row--status">
+            <div class="dog-card__status-copy">
+              <p class="dog-card__lead">{{ explore.leashStatus().headline }}</p>
+              <p class="dog-card__copy">{{ explore.leashStatus().detail }}</p>
+            </div>
+            <button type="button" class="dog-btn dog-btn--sm dog-btn--ghost" (click)="openTip(explore.leashStatus().tipId)">
+              Tipps
+            </button>
+          </div>
+        </article>
+
+        @if (explore.nearbyAlerts().length) {
+          <section class="dog-panel__block" aria-label="Hinweise in der Nähe">
+            <h2 class="dog-panel__section-label">In der Nähe</h2>
+            <div class="dog-panel__stack">
+              @for (alert of explore.nearbyAlerts(); track alert.id) {
+                @if (explore.isAlertHidden(alert.id)) {
+                  <article
+                    class="dog-alert dog-alert--hidden-card"
+                    [class]="'dog-alert--' + alert.severity"
+                    [class.is-active]="explore.selectedAlertId() === alert.id"
+                  >
+                    <button
+                      type="button"
+                      class="dog-alert__hidden-body"
+                      (click)="selectAlert(alert.id)"
+                    >
+                      <span
+                        class="dog-alert__hidden-ico"
+                        [class.dog-alert__hidden-ico--danger]="alert.severity === 'danger'"
+                        aria-hidden="true"
+                      >
+                        {{ alert.kind === 'giftkoeder' ? '!' : '⚠' }}
+                      </span>
+                      <span class="dog-alert__hidden-copy">
+                        <span class="dog-alert__title">{{ alert.title }}</span>
+                        <span class="dog-alert__hidden-sub">
+                          Ausgeblendet@if (alert.distanceKm != null) { · {{ alert.distanceKm | number: '1.1-1' }} km }
+                        </span>
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      class="dog-alert__restore"
+                      (click)="showAlert(alert.id, $event)"
+                    >
+                      Einblenden
+                    </button>
+                  </article>
+                } @else {
+                  <article
+                    class="dog-alert dog-alert--clickable"
+                    [class]="'dog-alert--' + alert.severity"
+                    [class.is-active]="explore.selectedAlertId() === alert.id"
+                    role="button"
+                    tabindex="0"
+                    (click)="selectAlert(alert.id)"
+                    (keydown.enter)="selectAlert(alert.id)"
+                  >
+                    <div class="dog-alert__row">
+                      <div>
+                        <p class="dog-alert__title">{{ alert.title }}</p>
+                        <p class="dog-alert__detail">{{ alert.detail }}</p>
+                      </div>
+                      <button type="button" class="dog-btn dog-btn--sm dog-btn--ghost dog-tip-btn--compact" (click)="openTip(alertTipId(alert)); $event.stopPropagation()">
+                        Tipps
+                      </button>
+                    </div>
+                    <p class="dog-alert__meta">
+                      {{ alert.ago }}@if (alert.distanceKm != null) { · {{ alert.distanceKm | number: '1.1-1' }} km }
+                      · Quelle:
+                      @if (alert.sourceUrl) {
+                        <a [href]="alert.sourceUrl" target="_blank" rel="noopener noreferrer">{{ alert.source }}</a>
+                      } @else {
+                        {{ alert.source }}
+                      }
+                    </p>
+                  </article>
+                }
+              }
+            </div>
+          </section>
+        }
+
+        <section class="dog-panel__block" aria-label="Orte in der Nähe">
+          <h2 class="dog-panel__section-label">Schöne Orte</h2>
+          @if (!explore.allMapSpots().length && !explore.loading()) {
+            <p class="dog-panel__empty">Noch nichts gefunden — Standort setzen oder Filter lockern.</p>
+          } @else {
+            <ul class="dog-spot-list">
+              @for (spot of explore.allMapSpots(); track spot.id) {
+                <li>
+                  <button
+                    type="button"
+                    class="dog-spot"
+                    [class.is-active]="explore.selectedSpotId() === spot.id"
+                    (click)="selectSpot(spot.id)"
+                  >
+                    <span class="dog-spot__ico" aria-hidden="true">{{ spot.isUserPin ? (spot.pinEmoji ?? '📍') : spotEmoji[spot.kind] }}</span>
+                    <span class="dog-spot__main">
+                      <span class="dog-spot__name">
+                        {{ spot.name }}
+                        @if (spot.isUserPin) {
+                          <span
+                            class="dog-spot__star dog-spot__star--user"
+                            [class.dog-spot__star--own]="explore.isOwnUserPin(spot)"
+                            [attr.aria-label]="explore.userPinListLabel(spot)"
+                          >★</span>
+                        } @else if (explore.spotsWithCommunity().has(spot.id)) {
+                          <span class="dog-spot__star" aria-label="Nutzerkommentare">★</span>
+                        }
+                      </span>
+                      <span class="dog-spot__meta">
+                        @if (spot.isUserPin) {
+                          {{ explore.userPinListLabel(spot) }} · {{ spot.distanceKm | number: '1.1-1' }} km
+                          @if (spot.pinVisibility === 'private') { · Nur für mich }
+                        } @else {
+                          {{ spotLabels[spot.kind] }} · {{ spot.distanceKm | number: '1.1-1' }} km ·
+                          Leine: {{ spot.leash }}
+                          @if (spot.source === 'osm') { · OSM }
+                        }
+                      </span>
+                      <span class="dog-spot__snippet">{{ spot.snippet }}</span>
+                    </span>
+                    @if (!spot.isUserPin) {
+                      <span class="dog-spot__rating" aria-label="Bewertung">★ {{ spot.rating | number: '1.1-1' }}</span>
+                    }
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+
+        @if (explore.selectedSpot(); as spot) {
+          <section #detailBlock class="dog-panel__block dog-panel__detail" aria-label="Ortsdetails">
+            <h2 class="dog-panel__section-label">Ausgewählt</h2>
+            <article class="dog-card dog-card--detail">
+              <p class="dog-card__spot-name">
+                <span aria-hidden="true">{{ spot.isUserPin ? spot.pinEmoji : spotEmoji[spot.kind] }}</span>
+                {{ spot.name }}
+              </p>
+              <div class="dog-panel__nav-actions">
+                <a
+                  class="dog-btn dog-btn--accent dog-btn--inline"
+                  [href]="mapsRouteUrl(spot.lat, spot.lng)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Route planen
+                </a>
+                <a
+                  class="dog-btn dog-btn--ghost dog-btn--inline"
+                  [href]="mapsOpenUrl(spot.lat, spot.lng)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  In Google Maps
+                </a>
+                @if (explore.isOwnUserPin(spot)) {
+                  <button
+                    type="button"
+                    class="dog-btn dog-btn--ghost dog-btn--inline dog-panel__remove-pin"
+                    [disabled]="removingPin()"
+                    (click)="removeOwnPin(spot.id)"
+                  >
+                    {{ removingPin() ? 'Entfernen …' : 'Marker entfernen' }}
+                  </button>
+                }
+              </div>
+              @if (spot.isUserPin) {
+                <p class="dog-panel__detail-lead">
+                  {{ explore.userPinListLabel(spot) }}
+                  @if (spot.pinVisibility === 'private') { · Privat }
+                </p>
+              } @else {
+              <p class="dog-panel__detail-lead">{{ spot.tipCount }} Tipps · Leine: {{ spot.leash }}</p>
+              }
+              <ul class="dog-tips">
+                @for (tip of explore.spotTips(); track tip.id) {
+                  <li class="dog-tip">
+                    <p class="dog-tip__text">„{{ tip.text }}“</p>
+                    <p class="dog-tip__meta">{{ tip.author }} · vor {{ tip.ago }}</p>
+                  </li>
+                }
+              </ul>
+            </article>
+          </section>
+        }
+      </div>
+    </div>
+  }
+</aside>

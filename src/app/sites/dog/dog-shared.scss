@@ -1,0 +1,44 @@
+@use './dog-buttons';
+
+:host {
+  --dog-green: #7cb518;
+  --dog-green-strong: #6aa015;
+  --dog-gray: #646464;
+  --dog-font: "Outfit", system-ui, sans-serif;
+  --dog-font-display: var(--dog-font);
+  --dog-logo-eye: #ffffff;
+  --dog-logo-nose: #2d3318;
+  --dog-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+  --dog-map-fallback: #d8e8c0;
+
+  display: block;
+  min-height: 100dvh;
+  font-family: var(--dog-font);
+  color: var(--dog-text);
+  background: var(--dog-bg);
+}
+
+:host([data-dog-theme='light']) {
+  --dog-bg: #ffffff;
+  --dog-surface: rgba(255, 255, 255, 0.92);
+  --dog-surface-solid: #ffffff;
+  --dog-border: rgba(100, 100, 100, 0.16);
+  --dog-text: #1a2210;
+  --dog-muted: #5a6348;
+  --dog-accent: var(--dog-green);
+  --dog-accent-strong: var(--dog-green-strong);
+  --dog-map-fallback: #e8f4d4;
+}
+
+:host([data-dog-theme='dark']) {
+  --dog-bg: var(--dog-gray);
+  --dog-surface: rgba(82, 82, 82, 0.94);
+  --dog-surface-solid: #525252;
+  --dog-border: rgba(255, 255, 255, 0.14);
+  --dog-text: #f7faf2;
+  --dog-muted: #d0d8c4;
+  --dog-accent: var(--dog-green);
+  --dog-accent-strong: #8fd424;
+  --dog-map-fallback: #4a5240;
+  --dog-shadow: 0 18px 52px rgba(0, 0, 0, 0.35);
+}

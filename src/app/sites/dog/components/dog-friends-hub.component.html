@@ -1,0 +1,315 @@
+@if (social.hubOpen()) {
+  <div class="dog-hub" role="dialog" aria-modal="true" aria-labelledby="dog-hub-title">
+    <button type="button" class="dog-hub__backdrop" aria-label="Schließen" (click)="close()"></button>
+
+    <div class="dog-hub__panel">
+      <header class="dog-hub__head">
+        <div>
+          <p class="dog-hub__kicker">Community · Spaziergänge · Verabredungen</p>
+          <h2 id="dog-hub-title" class="dog-hub__title">Freunde & Treffen</h2>
+        </div>
+        <button type="button" class="dog-hub__close" (click)="close()" aria-label="Schließen">×</button>
+      </header>
+
+      <nav class="dog-hub__tabs" aria-label="Bereiche">
+        @for (t of tabs; track t.id) {
+          <button
+            type="button"
+            class="dog-hub__tab"
+            [class.is-active]="social.hubTab() === t.id"
+            (click)="switchTab(t.id)"
+          >
+            <span aria-hidden="true">{{ t.icon }}</span>
+            {{ t.label }}
+            @if (t.id === 'friends' && social.social().requestsIn.length) {
+              <span class="dog-hub__tab-dot">{{ social.social().requestsIn.length }}</span>
+            }
+          </button>
+        }
+      </nav>
+
+      @if (social.error()) {
+        <p class="dog-hub__err" role="alert">{{ social.error() }}</p>
+      }
+
+      <div class="dog-hub__body">
+        @if (social.hubTab() === 'discover') {
+          <section class="dog-hub__card dog-hub__card--glow">
+            <div class="dog-hub__card-head">
+              <h3>Standort teilen</h3>
+              <p>Für <strong>20 Minuten</strong> sichtbar für andere Nasebär-Nutzer in deiner Nähe.</p>
+            </div>
+
+            <label class="dog-hub__range">
+              <span>Sichtbarkeits-Radius · {{ shareRadius() }} km</span>
+              <input
+                type="range"
+                min="1"
+                max="25"
+                step="1"
+                [ngModel]="shareRadius()"
+                (ngModelChange)="shareRadius.set(+$event)"
+                name="shareRadius"
+                [disabled]="social.shareActive()"
+              />
+            </label>
+
+            <div class="dog-hub__share-row">
+              @if (social.shareActive()) {
+                <div class="dog-hub__share-on">
+                  <span class="dog-hub__pulse" aria-hidden="true"></span>
+                  Live · noch {{ social.shareMinutesLeft() }} Min.
+                </div>
+                <button type="button" class="dog-hub__btn dog-hub__btn--ghost" (click)="toggleShare()">
+                  Beenden
+                </button>
+              } @else {
+                <button type="button" class="dog-hub__btn dog-hub__btn--accent" (click)="toggleShare()" [disabled]="social.loading()">
+                  Standort freigeben
+                </button>
+              }
+              <button type="button" class="dog-hub__btn dog-hub__btn--ghost" (click)="refreshNearby()">Aktualisieren</button>
+            </div>
+          </section>
+
+          <section class="dog-hub__section">
+            <h3 class="dog-hub__section-title">In der Nähe</h3>
+            @if (!social.nearby().length) {
+              <p class="dog-hub__empty">
+                Noch niemand in Reichweite. Aktiviere die Freigabe — oder warte, bis andere Hundebesitzer:innen online sind.
+              </p>
+            } @else {
+              <ul class="dog-hub__people">
+                @for (person of social.nearby(); track person.id) {
+                  <li class="dog-hub__person" [class.is-open]="social.selectedNearby()?.id === person.id">
+                    <button type="button" class="dog-hub__person-head" (click)="selectNearby(person)">
+                      <span class="dog-hub__avatar">{{ person.name.charAt(0) }}</span>
+                      <span class="dog-hub__person-meta">
+                        <strong>{{ person.name }}</strong>
+                        <small>{{ person.distanceKm | number: '1.1-1' }} km · {{ person.dogs.length }} Hund(e)</small>
+                      </span>
+                      @if (person.isFriend) {
+                        <span class="dog-hub__pill dog-hub__pill--ok">Freund</span>
+                      } @else if (person.requestPending) {
+                        <span class="dog-hub__pill">Angefragt</span>
+                      }
+                    </button>
+
+                    @if (social.selectedNearby()?.id === person.id) {
+                      <div class="dog-hub__person-body">
+                        @if (person.dogs.length) {
+                          @for (dog of person.dogs; track dog.id) {
+                            <article class="dog-hub__dog-card">
+                              <h4>{{ dog.name }}</h4>
+                              <p>{{ dog.breed || 'Mischling' }} · {{ dog.size }} · {{ dog.weightKg }} kg</p>
+                              @if (dog.traits) {
+                                <p class="dog-hub__traits">„{{ dog.traits }}“</p>
+                              }
+                            </article>
+                          }
+                        } @else {
+                          <p class="dog-hub__muted">Noch keine Hunde hinterlegt.</p>
+                        }
+                        @if (!person.isFriend && !person.requestPending) {
+                          <button type="button" class="dog-hub__btn dog-hub__btn--accent dog-hub__btn--block" (click)="requestFriend(person.id)">
+                            Freundschaft anfragen
+                          </button>
+                        }
+                      </div>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+        }
+
+        @if (social.hubTab() === 'dogs') {
+          <section class="dog-hub__card">
+            <h3>{{ editingDogId() ? 'Hund bearbeiten' : 'Neuen Hund anlegen' }}</h3>
+            <div class="dog-hub__grid">
+              <label class="dog-hub__field">
+                <span>Name</span>
+                <input [ngModel]="dogForm().name" (ngModelChange)="patchDog({ name: $event })" name="dogName" />
+              </label>
+              <label class="dog-hub__field">
+                <span>Rasse</span>
+                <input [ngModel]="dogForm().breed" (ngModelChange)="patchDog({ breed: $event })" name="dogBreed" />
+              </label>
+              <label class="dog-hub__field">
+                <span>Größe</span>
+                <select [ngModel]="dogForm().size" (ngModelChange)="patchDog({ size: $event })" name="dogSize">
+                  <option value="klein">Klein</option>
+                  <option value="mittel">Mittel</option>
+                  <option value="groß">Groß</option>
+                </select>
+              </label>
+              <label class="dog-hub__field">
+                <span>Gewicht (kg)</span>
+                <input type="number" min="0" max="120" [ngModel]="dogForm().weightKg" (ngModelChange)="patchDog({ weightKg: +$event })" name="dogWeight" />
+              </label>
+            </div>
+            <label class="dog-hub__field">
+              <span>Charakter & Besonderheiten</span>
+              <textarea rows="3" [ngModel]="dogForm().traits" (ngModelChange)="patchDog({ traits: $event })" name="dogTraits" placeholder="Verspielt, mag Wasser, etwas scheu …"></textarea>
+            </label>
+            <div class="dog-hub__share-row">
+              <button type="button" class="dog-hub__btn dog-hub__btn--accent" (click)="saveDog()" [disabled]="social.loading()">Speichern</button>
+              @if (editingDogId()) {
+                <button type="button" class="dog-hub__btn dog-hub__btn--ghost" (click)="startNewDog()">Abbrechen</button>
+              }
+            </div>
+          </section>
+
+          <section class="dog-hub__section">
+            <h3 class="dog-hub__section-title">Deine Hunde</h3>
+            @if (!social.dogs().length) {
+              <p class="dog-hub__empty">Lege deinen ersten Vierbeiner an — so können andere euch auf der Karte besser kennenlernen.</p>
+            } @else {
+              <ul class="dog-hub__dog-list">
+                @for (dog of social.dogs(); track dog.id) {
+                  <li class="dog-hub__dog-row">
+                    <div>
+                      <strong>{{ dog.name }}</strong>
+                      <small>{{ dog.breed || '—' }} · {{ dog.size }} · {{ dog.weightKg }} kg</small>
+                    </div>
+                    <div class="dog-hub__row-actions">
+                      <button type="button" class="dog-hub__link" (click)="editDog(dog)">Bearbeiten</button>
+                      <button type="button" class="dog-hub__link dog-hub__link--danger" (click)="removeDog(dog.id)">Löschen</button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+        }
+
+        @if (social.hubTab() === 'friends') {
+          @if (social.notifications().length) {
+            <section class="dog-hub__card">
+              <div class="dog-hub__card-head">
+                <h3>Benachrichtigungen</h3>
+                <button type="button" class="dog-hub__link" (click)="readNotifications()">Alle gelesen</button>
+              </div>
+              <ul class="dog-hub__notifs">
+                @for (n of social.notifications().slice(0, 6); track n.id) {
+                  <li [class.is-unread]="!n.read">
+                    <strong>{{ n.title }}</strong>
+                    <p>{{ n.body }}</p>
+                    <small>{{ n.createdAt | date: 'dd.MM. HH:mm' }}</small>
+                  </li>
+                }
+              </ul>
+            </section>
+          }
+
+          @if (social.social().requestsIn.length) {
+            <section class="dog-hub__section">
+              <h3 class="dog-hub__section-title">Anfragen</h3>
+              <ul class="dog-hub__requests">
+                @for (req of social.social().requestsIn; track req.id) {
+                  <li>
+                    <span>{{ req.name }} möchte sich vernetzen</span>
+                    <div class="dog-hub__row-actions">
+                      <button type="button" class="dog-hub__btn dog-hub__btn--accent dog-hub__btn--sm" (click)="respondRequest(req.id, true)">Annehmen</button>
+                      <button type="button" class="dog-hub__btn dog-hub__btn--ghost dog-hub__btn--sm" (click)="respondRequest(req.id, false)">Ablehnen</button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            </section>
+          }
+
+          <section class="dog-hub__section">
+            <h3 class="dog-hub__section-title">Deine Freunde</h3>
+            @if (!social.social().friends.length) {
+              <p class="dog-hub__empty">Noch keine Freunde — entdecke Hundebesitzer:innen in der Nähe und sende eine Anfrage.</p>
+            } @else {
+              <ul class="dog-hub__friends">
+                @for (f of social.social().friends; track f.userId) {
+                  <li>
+                    <span class="dog-hub__avatar">{{ f.name.charAt(0) }}</span>
+                    <span>
+                      <strong>{{ f.name }}</strong>
+                      <small>Seit {{ f.since | date: 'dd.MM.yyyy' }}</small>
+                    </span>
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+        }
+
+        @if (social.hubTab() === 'meetups') {
+          @if (social.meetupDraft(); as draft) {
+            <section class="dog-hub__card dog-hub__card--meet">
+              <h3>Treffen planen</h3>
+              <p class="dog-hub__spot">📍 {{ draft.spotName }}</p>
+              <label class="dog-hub__field">
+                <span>Datum & Uhrzeit</span>
+                <input type="datetime-local" [ngModel]="meetTime()" (ngModelChange)="meetTime.set($event)" name="meetTime" />
+              </label>
+              <label class="dog-hub__field">
+                <span>Nachricht (optional)</span>
+                <textarea rows="2" [ngModel]="meetMessage()" (ngModelChange)="meetMessage.set($event)" name="meetMsg" placeholder="Wir bringen Leckerlis mit …"></textarea>
+              </label>
+              @if (social.social().friends.length) {
+                <p class="dog-hub__label">Freunde einladen</p>
+                <ul class="dog-hub__invite-list">
+                  @for (f of social.social().friends; track f.userId) {
+                    <li>
+                      <label class="dog-hub__check">
+                        <input type="checkbox" [checked]="meetInviteIds().includes(f.userId)" (change)="toggleMeetInvite(f.userId)" />
+                        {{ f.name }}
+                      </label>
+                    </li>
+                  }
+                </ul>
+              }
+              <button type="button" class="dog-hub__btn dog-hub__btn--accent dog-hub__btn--block" (click)="submitMeetup()" [disabled]="social.loading()">
+                Treffen anfragen
+              </button>
+            </section>
+          } @else {
+            <p class="dog-hub__hint">Tippe auf der Karte einen Ort an und wähle „Treffen vorschlagen“.</p>
+          }
+
+          <section class="dog-hub__section">
+            <h3 class="dog-hub__section-title">Deine Treffen</h3>
+            @if (!social.meetups().length) {
+              <p class="dog-hub__empty">Noch keine Verabredungen — wähle eine Wiese oder einen Hundeauslauf auf der Karte.</p>
+            } @else {
+              <ul class="dog-hub__meetups">
+                @for (m of social.meetups(); track m.id) {
+                  <li class="dog-hub__meet">
+                    <div class="dog-hub__meet-head">
+                      <strong>{{ m.spotName }}</strong>
+                      <small>{{ m.scheduledAt | date: 'EE, dd.MM. · HH:mm' }} Uhr</small>
+                    </div>
+                    @if (m.message) {
+                      <p class="dog-hub__traits">„{{ m.message }}“</p>
+                    }
+                    <p class="dog-hub__muted">Host: {{ m.hostName }}</p>
+                    <ul class="dog-hub__invite-status">
+                      @for (inv of m.invites; track inv.userId) {
+                        <li>{{ inv.name }} · {{ meetupStatusLabel(inv.status) }}</li>
+                      }
+                    </ul>
+                    @if (m.hostUserId !== auth.user()?.id) {
+                      @if (invPending(m)) {
+                        <div class="dog-hub__row-actions">
+                          <button type="button" class="dog-hub__btn dog-hub__btn--accent dog-hub__btn--sm" (click)="respondMeetup(m.id, true)">Zusagen</button>
+                          <button type="button" class="dog-hub__btn dog-hub__btn--ghost dog-hub__btn--sm" (click)="respondMeetup(m.id, false)">Absagen</button>
+                        </div>
+                      }
+                    }
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+        }
+      </div>
+    </div>
+  </div>
+}
