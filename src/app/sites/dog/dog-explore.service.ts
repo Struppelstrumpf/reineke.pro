@@ -649,7 +649,8 @@ export class DogExploreService {
         };
         const raw = data.elements
           .map((el) => osmElementToSpot(el))
-          .filter((s): s is DogSpot => s !== null);
+          .filter((s): s is DogSpot => s !== null)
+          .filter((s) => dogDistanceKm(lat, lng, s.lat, s.lng) <= radiusKm);
         return enrichImages ? enrichSpotImages(raw) : raw;
       } catch {
         continue;

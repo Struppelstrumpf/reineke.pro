@@ -78,6 +78,16 @@
   }
 }
 
+:host ::ng-deep .leaflet-div-icon {
+  background: transparent;
+  border: 0;
+}
+
+:host ::ng-deep .leaflet-marker-icon {
+  background: transparent;
+  border: 0;
+}
+
 :host ::ng-deep .dog-map__spot-wrap,
 :host ::ng-deep .dog-map__alert-wrap {
   background: transparent;

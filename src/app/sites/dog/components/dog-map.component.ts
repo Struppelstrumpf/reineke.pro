@@ -6,6 +6,7 @@ import {
   OnDestroy,
   effect,
   inject,
+  signal,
   viewChild,
 } from '@angular/core';
 import * as L from 'leaflet';
@@ -45,6 +46,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
   private readonly mapHost = viewChild<ElementRef<HTMLDivElement>>('mapHost');
 
   private map?: L.Map;
+  private mapReady = signal(false);
   private spotCluster?: L.MarkerClusterGroup;
   private alertLayer = L.layerGroup();
   private gameLayer = L.layerGroup();
@@ -59,7 +61,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
   private zoomBeforeGame = 15;
 
   private readonly dogIcon = L.divIcon({
-    className: 'dog-map__user-wrap',
+    className: 'leaflet-div-icon dog-map__user-wrap',
     html: dogMascotMarkerHtml(),
     iconSize: [38, 38],
     iconAnchor: [19, 19],
@@ -67,6 +69,8 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
 
   constructor() {
     effect(() => {
+      const ready = this.mapReady();
+      if (!ready) return;
       const c = this.explore.center();
       const spots = this.explore.allMapSpots();
       const community = this.explore.spotsWithCommunity();
@@ -172,6 +176,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
       this.map?.invalidateSize();
     });
     this.resizeObserver.observe(host);
+    this.mapReady.set(true);
   }
 
   ngOnDestroy(): void {
@@ -206,7 +211,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
         const count = cluster.getChildCount();
         const size = count >= 100 ? 48 : count >= 10 ? 44 : 40;
         return L.divIcon({
-          className: 'dog-map__cluster-wrap',
+          className: 'leaflet-div-icon dog-map__cluster-wrap',
           html: spotClusterHtml(kind, count),
           iconSize: [size, size],
           iconAnchor: [size / 2, size / 2],
@@ -225,7 +230,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
     if (!active || !preview) return;
 
     const icon = L.divIcon({
-      className: 'dog-map__pick-wrap',
+      className: 'leaflet-div-icon dog-map__pick-wrap',
       html: `<div class="dog-map__pick-preview" aria-hidden="true"><span class="dog-map__pick-ring"></span><span class="dog-map__pick-pin">📍</span></div>`,
       iconSize: [44, 44],
       iconAnchor: [22, 22],
@@ -278,7 +283,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
       for (const alert of alerts) {
         const isSelected = alert.id === selectedAlertId;
         const icon = L.divIcon({
-          className: 'dog-map__alert-wrap',
+          className: 'leaflet-div-icon dog-map__alert-wrap',
           html: alertMarkerHtml(alert, isSelected),
           iconSize: [36, 36],
           iconAnchor: [18, 18],
@@ -298,7 +303,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
       for (const spot of spots) {
         const isSelected = spot.id === selectedSpotId;
         const icon = L.divIcon({
-          className: 'dog-map__spot-wrap',
+          className: 'leaflet-div-icon dog-map__spot-wrap',
           html: spotMarkerHtml(spot, isSelected, community.has(spot.id)),
           iconSize: [40, 40],
           iconAnchor: [20, 20],
@@ -315,9 +320,11 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
         marker.on('click', () => this.explore.selectSpot(spot.id));
         this.spotCluster?.addLayer(marker);
       }
+
+      this.spotCluster?.refreshClusters();
     }
 
-    const centerKey = `${center.lat.toFixed(5)}:${center.lng.toFixed(5)}:${spots.length}:${gameOn}`;
+    const centerKey = `${center.lat.toFixed(5)}:${center.lng.toFixed(5)}:${spots.length}:${alerts.length}:${gameOn}`;
     if (gameOn) {
       this.map.panTo([center.lat, center.lng], { animate: true, duration: 0.25 });
       return;
@@ -325,15 +332,35 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
 
     if (centerKey !== this.lastCenterKey) {
       this.lastCenterKey = centerKey;
-      if (spots.length) {
-        const bounds = L.latLngBounds([
-          [center.lat, center.lng],
-          ...spots.map((s) => [s.lat, s.lng] as [number, number]),
-        ]);
-        this.map.fitBounds(bounds.pad(0.15), { animate: true, maxZoom: 14 });
-      } else {
-        this.map.setView([center.lat, center.lng], 15, { animate: true });
-      }
+      this.fitMapToContent(center, spots, alerts);
+    }
+  }
+
+  /** Karte auf Standort + nahe Pins zoomen — Hinweise aus der Liste bleiben sichtbar. */
+  private fitMapToContent(
+    center: { lat: number; lng: number },
+    spots: DogSpot[],
+    alerts: DogAlert[],
+  ): void {
+    if (!this.map) return;
+
+    const points: [number, number][] = [[center.lat, center.lng]];
+    for (const spot of spots) {
+      points.push([spot.lat, spot.lng]);
+    }
+    for (const alert of alerts) {
+      points.push([alert.lat, alert.lng]);
+    }
+
+    if (points.length <= 1) {
+      this.map.setView([center.lat, center.lng], 14, { animate: true });
+      return;
+    }
+
+    const bounds = L.latLngBounds(points);
+    this.map.fitBounds(bounds.pad(0.14), { animate: true, maxZoom: 15 });
+    if (this.map.getZoom() < 13) {
+      this.map.setZoom(13, { animate: true });
     }
   }
 
