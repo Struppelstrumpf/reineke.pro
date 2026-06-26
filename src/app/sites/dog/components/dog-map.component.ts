@@ -10,13 +10,10 @@ import {
   viewChild,
 } from '@angular/core';
 import * as L from 'leaflet';
-import 'leaflet.markercluster';
 import { DOG_SPOT_EMOJI, type DogAlert, type DogSpot } from '../dog.data';
 import { DogExploreService } from '../dog-explore.service';
 import {
   alertMarkerHtml,
-  dominantSpotKind,
-  spotClusterHtml,
   spotMarkerHtml,
   type DogSpotMarkerOptions,
 } from '../dog-map-markers';
@@ -47,7 +44,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
 
   private map?: L.Map;
   private mapReady = signal(false);
-  private spotCluster?: L.MarkerClusterGroup;
+  private spotLayer = L.layerGroup();
   private alertLayer = L.layerGroup();
   private gameLayer = L.layerGroup();
   private pickLayer = L.layerGroup();
@@ -78,19 +75,23 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
       const selectedSpot = this.explore.selectedSpotId();
       const selectedAlert = this.explore.selectedAlertId();
       const gameOn = this.mapGame.playing();
+      const gameEntities = this.mapGame.entities();
       const pinPick = this.pins.mapPickActive();
       this.renderMarkers(c, spots, alerts, selectedSpot, selectedAlert, gameOn, community, pinPick);
+      this.renderGameEntities(gameOn ? gameEntities : []);
     });
 
     effect(() => {
+      const ready = this.mapReady();
       const pinPick = this.pins.mapPickActive();
       const preview = this.pins.mapPickPreview();
+      if (!ready) return;
       this.applyMapPickMode(pinPick, preview);
     });
 
     effect(() => {
       const target = this.explore.mapPopupTarget();
-      if (!this.map || !target || this.mapGame.playing()) return;
+      if (!this.mapReady() || !this.map || !target || this.mapGame.playing()) return;
       const item =
         target.type === 'spot'
           ? this.explore.selectedSpot()
@@ -102,18 +103,13 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
 
     effect(() => {
       const dark = this.theme.isDark();
+      if (!this.mapReady()) return;
       this.applyTiles(dark);
     });
 
     effect(() => {
-      const entities = this.mapGame.entities();
       const playing = this.mapGame.playing();
-      this.renderGameEntities(playing ? entities : []);
-    });
-
-    effect(() => {
-      const playing = this.mapGame.playing();
-      if (!this.map) return;
+      if (!this.mapReady() || !this.map) return;
       const c = this.explore.center();
       if (playing && !this.gameZoomActive) {
         this.zoomBeforeGame = this.map.getZoom();
@@ -155,8 +151,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
     }).setView([c.lat, c.lng], 15);
 
     this.applyTiles(this.theme.isDark());
-    this.spotCluster = this.createSpotCluster();
-    this.spotCluster.addTo(this.map);
+    this.spotLayer.addTo(this.map);
     this.alertLayer.addTo(this.map);
     this.gameLayer.addTo(this.map);
     this.pickLayer.addTo(this.map);
@@ -194,30 +189,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
       ? '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> · <a href="https://carto.com/">CARTO</a>'
       : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
     this.tileLayer = L.tileLayer(url, { maxZoom: 19, attribution }).addTo(this.map);
-  }
-
-  private createSpotCluster(): L.MarkerClusterGroup {
-    return L.markerClusterGroup({
-      maxClusterRadius: 52,
-      disableClusteringAtZoom: 16,
-      spiderfyOnMaxZoom: true,
-      showCoverageOnHover: false,
-      zoomToBoundsOnClick: true,
-      animate: true,
-      animateAddingMarkers: false,
-      iconCreateFunction: (cluster) => {
-        const markers = cluster.getAllChildMarkers();
-        const kind = dominantSpotKind(markers);
-        const count = cluster.getChildCount();
-        const size = count >= 100 ? 48 : count >= 10 ? 44 : 40;
-        return L.divIcon({
-          className: 'leaflet-div-icon dog-map__cluster-wrap',
-          html: spotClusterHtml(kind, count),
-          iconSize: [size, size],
-          iconAnchor: [size / 2, size / 2],
-        });
-      },
-    });
+    this.tileLayer.bringToBack();
   }
 
   private applyMapPickMode(active: boolean, preview: { lat: number; lng: number } | null): void {
@@ -250,7 +222,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
   ): void {
     if (!this.map) return;
 
-    this.spotCluster?.clearLayers();
+    this.spotLayer.clearLayers();
     this.alertLayer.clearLayers();
 
     if (this.userMarker) {
@@ -318,10 +290,8 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
           offset: [0, -12],
         });
         marker.on('click', () => this.explore.selectSpot(spot.id));
-        this.spotCluster?.addLayer(marker);
+        this.spotLayer.addLayer(marker);
       }
-
-      this.spotCluster?.refreshClusters();
     }
 
     const centerKey = `${center.lat.toFixed(5)}:${center.lng.toFixed(5)}:${spots.length}:${alerts.length}:${gameOn}`;
@@ -395,7 +365,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
         if (this.gameMarkerKeys.get(entity.id) !== renderKey) {
           existing.setIcon(
             L.divIcon({
-              className: 'dog-map__game-wrap',
+              className: 'leaflet-div-icon dog-map__game-wrap',
               html: gameMarkerHtml(entity),
               iconSize: [iconSize, iconSize + (entity.bubble ? 14 : 0)],
               iconAnchor: [iconSize / 2, iconSize / 2 + (entity.bubble ? 8 : 0)],
@@ -409,7 +379,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
       }
 
       const icon = L.divIcon({
-        className: 'dog-map__game-wrap dog-map__game-wrap--new',
+        className: 'leaflet-div-icon dog-map__game-wrap dog-map__game-wrap--new',
         html: gameMarkerHtml(entity),
         iconSize: [iconSize, iconSize + (entity.bubble ? 14 : 0)],
         iconAnchor: [iconSize / 2, iconSize / 2 + (entity.bubble ? 8 : 0)],

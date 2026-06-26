@@ -78,6 +78,11 @@
   }
 }
 
+:host ::ng-deep .leaflet-marker-pane,
+:host ::ng-deep .leaflet-overlay-pane {
+  z-index: 500;
+}
+
 :host ::ng-deep .leaflet-div-icon {
   background: transparent;
   border: 0;
