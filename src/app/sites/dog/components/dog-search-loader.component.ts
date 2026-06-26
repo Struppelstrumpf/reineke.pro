@@ -44,6 +44,12 @@ const BARKS = ['Wuff!', 'Wau!', 'Miau?', 'Schnüff…', 'Pfot!', 'Hier?', 'Hmm!'
         </div>
       }
       <p class="dog-loader__caption" aria-hidden="true">Schnüffelt im Netz …</p>
+      @if (explore.loading() && !animating()) {
+        <div class="dog-loader__fallback" aria-hidden="true">
+          <span class="dog-loader__fallback-dog">🐕</span>
+          <span class="dog-loader__fallback-trail"></span>
+        </div>
+      }
     </div>
   `,
   styleUrl: './dog-search-loader.component.scss',
@@ -54,7 +60,9 @@ export class DogSearchLoaderComponent implements AfterViewInit, OnDestroy {
   private readonly canvasRef = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
 
   readonly bubble = signal<Bubble | null>(null);
+  readonly animating = signal(false);
 
+  private readonly viewReady = signal(false);
   private ctx?: CanvasRenderingContext2D;
   private raf = 0;
   private resizeObs?: ResizeObserver;
@@ -80,9 +88,9 @@ export class DogSearchLoaderComponent implements AfterViewInit, OnDestroy {
 
   constructor() {
     effect(() => {
-      if (this.explore.loading()) {
-        queueMicrotask(() => this.start());
-      } else {
+      if (this.explore.loading() && this.viewReady()) {
+        queueMicrotask(() => this.tryStart());
+      } else if (!this.explore.loading()) {
         this.stop();
       }
     });
@@ -92,9 +100,15 @@ export class DogSearchLoaderComponent implements AfterViewInit, OnDestroy {
     this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const canvas = this.canvasRef()?.nativeElement;
     if (!canvas) return;
-    this.resizeObs = new ResizeObserver(() => this.resize());
+    this.resizeObs = new ResizeObserver(() => {
+      this.resize();
+      if (this.explore.loading() && !this.running) {
+        this.tryStart();
+      }
+    });
     this.resizeObs.observe(canvas.parentElement ?? canvas);
     this.resize();
+    this.viewReady.set(true);
   }
 
   ngOnDestroy(): void {
@@ -118,11 +132,24 @@ export class DogSearchLoaderComponent implements AfterViewInit, OnDestroy {
     this.ctx?.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
   }
 
+  private tryStart(): void {
+    if (!this.explore.loading() || this.running) return;
+    this.resize();
+    if (!this.canvasRef()?.nativeElement || !this.ctx) return;
+    if (this.w < 48 || this.h < 48) {
+      requestAnimationFrame(() => this.tryStart());
+      return;
+    }
+    this.start();
+  }
+
   private start(): void {
     if (this.running) return;
     if (!this.canvasRef()?.nativeElement || !this.ctx) return;
+    if (this.w < 48 || this.h < 48) return;
 
     this.running = true;
+    this.animating.set(true);
     this.startedAt = performance.now();
     this.trail = [];
     this.markers = [];
@@ -153,9 +180,15 @@ export class DogSearchLoaderComponent implements AfterViewInit, OnDestroy {
 
   private stop(): void {
     this.running = false;
+    this.animating.set(false);
     if (this.raf) cancelAnimationFrame(this.raf);
     this.raf = 0;
     this.bubble.set(null);
+    const canvas = this.canvasRef()?.nativeElement;
+    this.ctx?.clearRect(0, 0, this.w, this.h);
+    if (canvas) {
+      canvas.width = canvas.width;
+    }
   }
 
   private step(dt: number, elapsed: number): void {

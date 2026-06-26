@@ -173,10 +173,18 @@ export class DogExploreService {
   private async initialLoad(): Promise<void> {
     this.beginLoading();
     try {
-      await this.refreshAroundCenter();
+      await this.runWithLoadingCap(() => this.refreshAroundCenter());
     } finally {
       await this.endLoading();
     }
+  }
+
+  /** Verhindert endloses „Schnüffelt im Netz …“ wenn externe APIs hängen. */
+  private runWithLoadingCap(task: () => Promise<void>, capMs = 12_000): Promise<void> {
+    return Promise.race([
+      task(),
+      new Promise<void>((resolve) => window.setTimeout(resolve, capMs)),
+    ]);
   }
 
   loadFilters(): DogExploreFilters {
@@ -416,7 +424,7 @@ export class DogExploreService {
     try {
       const pos = await this.readUserPosition();
       this.setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-      await this.refreshAroundCenter();
+      await this.runWithLoadingCap(() => this.refreshAroundCenter());
     } catch {
       this.error.set('Standort konnte nicht ermittelt werden.');
     } finally {
@@ -449,7 +457,7 @@ export class DogExploreService {
       }
       this.addressQuery.set(first.label);
       this.setCenter({ lat: first.lat, lng: first.lng });
-      await this.refreshAroundCenter();
+      await this.runWithLoadingCap(() => this.refreshAroundCenter());
     } catch {
       this.error.set('Adresssuche gerade nicht erreichbar.');
     } finally {
@@ -463,7 +471,7 @@ export class DogExploreService {
     this.error.set('');
     try {
       this.setCenter({ lat, lng });
-      await this.refreshAroundCenter();
+      await this.runWithLoadingCap(() => this.refreshAroundCenter());
     } finally {
       await this.endLoading();
     }
@@ -472,7 +480,7 @@ export class DogExploreService {
   async reloadWithLoader(): Promise<void> {
     this.beginLoading();
     try {
-      await this.refreshAroundCenter();
+      await this.runWithLoadingCap(() => this.refreshAroundCenter());
     } finally {
       await this.endLoading();
     }
