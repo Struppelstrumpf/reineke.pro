@@ -1675,10 +1675,6 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === '/api/pins' && method === 'GET') {
     const session = requireAuth(req);
-    if (!session) {
-      sendJson(res, 401, { ok: false, error: 'Nicht angemeldet' });
-      return;
-    }
     const lat = Number(url.searchParams.get('lat'));
     const lng = Number(url.searchParams.get('lng'));
     let radiusKm = Number(url.searchParams.get('radiusKm')) || 15;
@@ -1686,11 +1682,11 @@ const server = http.createServer(async (req, res) => {
     const pins = readAllPins().filter((p) => {
       if (!p || !Number.isFinite(p.lat) || !Number.isFinite(p.lng)) return false;
       if (isSpotBlocked(p.id)) return false;
-      if (p.visibility === 'public' || p.userId === session.user.id) {
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return true;
-        return haversineKm(lat, lng, p.lat, p.lng) <= radiusKm;
-      }
-      return false;
+      const isPublic = p.visibility === 'public';
+      const isOwn = session && p.userId === session.user.id;
+      if (!isPublic && !isOwn) return false;
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return true;
+      return haversineKm(lat, lng, p.lat, p.lng) <= radiusKm;
     });
     sendJson(res, 200, { ok: true, pins });
     return;

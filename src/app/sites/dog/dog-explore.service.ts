@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import {
   DOG_DEFAULT_FILTERS,
   DOG_SPOT_LABELS,
@@ -167,6 +167,18 @@ export class DogExploreService {
   readonly leashStatus = computed((): LeashStatus => this.buildLeashStatus());
 
   constructor() {
+    let prevUserId: string | null | undefined;
+    effect(() => {
+      const userId = this.auth.user()?.id ?? null;
+      if (prevUserId === undefined) {
+        prevUserId = userId;
+        return;
+      }
+      if (prevUserId !== userId) {
+        prevUserId = userId;
+        void this.reloadPins();
+      }
+    });
     void this.initialLoad();
   }
 

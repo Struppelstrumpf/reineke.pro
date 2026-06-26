@@ -77,11 +77,12 @@ export class DogPinsService {
 
   async loadNearby(lat: number, lng: number, radiusKm: number): Promise<DogUserPin[]> {
     const token = this.auth.sessionToken();
-    if (!token) return [];
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     try {
       const res = await fetch(
         `/api/pins?lat=${lat}&lng=${lng}&radiusKm=${radiusKm}`,
-        { headers: { Authorization: `Bearer ${token}` } },
+        { headers },
       );
       if (!res.ok) return [];
       const data = (await res.json()) as { pins?: DogUserPin[] };
