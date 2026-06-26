@@ -56,7 +56,31 @@ GitHub → Settings → Developer settings → Personal access tokens → Token 
 echo DEIN_GITHUB_TOKEN | docker login ghcr.io -u Struppelstrumpf --password-stdin
 ```
 
-### 4) Neue Images ziehen und Container starten
+### 4) Neue Images ziehen und Container starten (manuell, wie bisher)
+
+```bash
+docker network create reineke-net 2>/dev/null || true
+
+docker pull ghcr.io/struppelstrumpf/reineke.pro-api:latest
+docker stop reineke-api 2>/dev/null; docker rm reineke-api 2>/dev/null
+docker run -d --name reineke-api --restart unless-stopped \
+  --network reineke-net --network-alias api \
+  -p 127.0.0.1:19290:19290 \
+  -v reineke_data:/data \
+  -e TZ=Europe/Berlin \
+  ghcr.io/struppelstrumpf/reineke.pro-api:latest
+
+docker pull ghcr.io/struppelstrumpf/reineke.pro:latest
+docker stop reineke-pro 2>/dev/null; docker rm reineke-pro 2>/dev/null
+docker run -d --name reineke-pro --restart unless-stopped \
+  --network reineke-net \
+  -p 8080:80 \
+  ghcr.io/struppelstrumpf/reineke.pro:latest
+```
+
+> **Wichtig:** Beide Container müssen im Netzwerk `reineke-net` sein. Sonst startet `reineke-pro` nicht (nginx kann `api` nicht auflösen).
+
+Alternativ per Compose (falls `/opt/reineke.pro` mit `docker-compose.yml` existiert):
 
 ```bash
 cd /opt/reineke.pro
@@ -64,21 +88,14 @@ docker compose pull
 docker compose up -d --no-build
 ```
 
-Das startet:
-
-- **web** — Angular-App auf Port `8080` (nginx, `/api` wird intern weitergeleitet)
-- **api** — Backend mit Volume `reineke_data` → `/data/ws-store.json` (Daten bleiben erhalten)
-
 ### 5) Funktion prüfen
 
 ```bash
-docker compose ps
-docker compose logs --tail=80 web
-docker compose logs --tail=80 api
-curl -s http://127.0.0.1:8080/api/health
+docker ps
+curl -s http://127.0.0.1:19290/api/health
+curl -I http://localhost:8080
+curl -s https://www.reineke.pro/api/health
 ```
-
-Im Browser (Inkognito / Strg+F5):
 
 - https://www.reineke.pro
 - Sidebar → **Nasebär (Demo)** → `/demo/nasebaer`
