@@ -334,14 +334,14 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
       }
     }
 
-    const centerKey = `${center.lat.toFixed(5)}:${center.lng.toFixed(5)}:${spots.length}:${alerts.length}:${gameOn}:${zoom}`;
+    const fitKey = `${center.lat.toFixed(5)}:${center.lng.toFixed(5)}:${spots.length}:${alerts.length}:${gameOn}`;
     if (gameOn) {
       this.map.panTo([center.lat, center.lng], { animate: true, duration: 0.25 });
       return;
     }
 
-    if (centerKey !== this.lastCenterKey) {
-      this.lastCenterKey = centerKey;
+    if (fitKey !== this.lastCenterKey) {
+      this.lastCenterKey = fitKey;
       this.fitMapToContent(center, spots, alerts);
     }
   }
@@ -368,9 +368,6 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
 
     const bounds = L.latLngBounds(points);
     this.map.fitBounds(bounds.pad(0.14), { animate: true, maxZoom: 15 });
-    if (this.map.getZoom() < 13) {
-      this.map.setZoom(13, { animate: true });
-    }
   }
 
   private renderGameEntities(entities: MapGameEntity[]): void {
