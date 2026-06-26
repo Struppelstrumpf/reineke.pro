@@ -10,10 +10,13 @@ import {
   viewChild,
 } from '@angular/core';
 import * as L from 'leaflet';
+import 'leaflet.markercluster';
 import { DOG_SPOT_EMOJI, type DogAlert, type DogSpot } from '../dog.data';
 import { DogExploreService } from '../dog-explore.service';
 import {
   alertMarkerHtml,
+  dominantSpotKind,
+  spotClusterHtml,
   spotMarkerHtml,
   type DogSpotMarkerOptions,
 } from '../dog-map-markers';
@@ -44,7 +47,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
 
   private map?: L.Map;
   private mapReady = signal(false);
-  private spotLayer = L.layerGroup();
+  private spotCluster?: L.MarkerClusterGroup;
   private alertLayer = L.layerGroup();
   private gameLayer = L.layerGroup();
   private pickLayer = L.layerGroup();
@@ -151,7 +154,8 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
     }).setView([c.lat, c.lng], 15);
 
     this.applyTiles(this.theme.isDark());
-    this.spotLayer.addTo(this.map);
+    this.spotCluster = this.createSpotCluster();
+    this.spotCluster.addTo(this.map);
     this.alertLayer.addTo(this.map);
     this.gameLayer.addTo(this.map);
     this.pickLayer.addTo(this.map);
@@ -192,6 +196,30 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
     this.tileLayer.bringToBack();
   }
 
+  private createSpotCluster(): L.MarkerClusterGroup {
+    return L.markerClusterGroup({
+      maxClusterRadius: 56,
+      disableClusteringAtZoom: 16,
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      animate: true,
+      animateAddingMarkers: false,
+      iconCreateFunction: (cluster) => {
+        const markers = cluster.getAllChildMarkers();
+        const kind = dominantSpotKind(markers);
+        const count = cluster.getChildCount();
+        const size = count >= 100 ? 48 : count >= 10 ? 44 : 40;
+        return L.divIcon({
+          className: 'leaflet-div-icon dog-map__cluster-wrap',
+          html: spotClusterHtml(kind, count),
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2],
+        });
+      },
+    });
+  }
+
   private applyMapPickMode(active: boolean, preview: { lat: number; lng: number } | null): void {
     const host = this.mapHost()?.nativeElement;
     host?.classList.toggle('dog-map--picking', active);
@@ -222,7 +250,7 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
   ): void {
     if (!this.map) return;
 
-    this.spotLayer.clearLayers();
+    this.spotCluster?.clearLayers();
     this.alertLayer.clearLayers();
 
     if (this.userMarker) {
@@ -290,8 +318,10 @@ export class DogMapComponent implements AfterViewInit, OnDestroy {
           offset: [0, -12],
         });
         marker.on('click', () => this.explore.selectSpot(spot.id));
-        this.spotLayer.addLayer(marker);
+        this.spotCluster?.addLayer(marker);
       }
+
+      this.spotCluster?.refreshClusters();
     }
 
     const centerKey = `${center.lat.toFixed(5)}:${center.lng.toFixed(5)}:${spots.length}:${alerts.length}:${gameOn}`;
