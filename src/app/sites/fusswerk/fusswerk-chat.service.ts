@@ -11,6 +11,7 @@ import {
   type FwChatMessage,
   type FwChatTemplateId,
 } from './fusswerk-chat.types';
+import { detectAutoReplyTemplates } from './fusswerk-chat-intent.util';
 
 export type {
   FwAppointmentPayload,
@@ -25,6 +26,7 @@ const FW_CHAT_KEY = 'fw-demo-support-chat-v1';
 const FW_CHAT_GUEST_KEY = 'fw-demo-support-chat-guest-v1';
 const FW_CHAT_GUEST_NAME_KEY = 'fw-demo-support-chat-guest-name-v1';
 const FW_CHAT_SYNC_CHANNEL = 'fw-demo-support-chat-sync';
+const FW_CHAT_AUTO_AUTHOR = 'Fusswerk Studio';
 
 @Injectable({ providedIn: 'root' })
 export class FusswerkChatService {
@@ -107,6 +109,7 @@ export class FusswerkChatService {
         this.mutate((list) => list.filter((e) => e.requesterId !== guestId));
       } else {
         this.appendMessage(existing.id, this.textMessage('guest', guestName, text));
+        this.maybeAutoReplyToGuest(existing.id, text);
         return null;
       }
     }
@@ -122,6 +125,7 @@ export class FusswerkChatService {
       messages: [this.textMessage('guest', guestName, text, now)],
     };
     this.mutate((list) => [conversation, ...list]);
+    this.maybeAutoReplyToGuest(conversation.id, text);
     return null;
   }
 
@@ -136,6 +140,7 @@ export class FusswerkChatService {
     const guestName = this.guestName().trim() || conversation.contactName;
     this.appendMessage(conversation.id, this.textMessage('guest', guestName, text));
     this.updateGuestName(guestName);
+    this.maybeAutoReplyToGuest(conversation.id, text);
     return null;
   }
 
@@ -155,15 +160,7 @@ export class FusswerkChatService {
     const user = this.auth.currentUser();
     if (!user) return 'Nicht angemeldet.';
     if (!this.conversationById(conversationId)) return 'Chat nicht gefunden.';
-    const card = this.buildTemplateCard(templateId);
-    this.appendMessage(conversationId, this.textMessage('staff', user.contactName, FW_CHAT_TEMPLATE_INTROS[templateId]));
-    this.appendMessage(conversationId, {
-      kind: 'info',
-      authorRole: 'staff',
-      authorName: user.contactName,
-      text: card.body,
-      infoTitle: card.title,
-    });
+    this.appendTemplateReply(conversationId, templateId, user.contactName);
     return null;
   }
 
@@ -343,6 +340,31 @@ export class FusswerkChatService {
       appointment,
     });
     return null;
+  }
+
+  private maybeAutoReplyToGuest(conversationId: string, guestText: string): void {
+    const conversation = this.conversationById(conversationId);
+    if (!conversation || !conversation.open || conversation.closedByStaff) return;
+
+    for (const templateId of detectAutoReplyTemplates(guestText)) {
+      this.appendTemplateReply(conversationId, templateId, FW_CHAT_AUTO_AUTHOR);
+    }
+  }
+
+  private appendTemplateReply(
+    conversationId: string,
+    templateId: FwChatTemplateId,
+    authorName: string,
+  ): void {
+    const card = this.buildTemplateCard(templateId);
+    this.appendMessage(conversationId, this.textMessage('staff', authorName, FW_CHAT_TEMPLATE_INTROS[templateId]));
+    this.appendMessage(conversationId, {
+      kind: 'info',
+      authorRole: 'staff',
+      authorName,
+      text: card.body,
+      infoTitle: card.title,
+    });
   }
 
   private buildTemplateCard(templateId: FwChatTemplateId): { title: string; body: string } {

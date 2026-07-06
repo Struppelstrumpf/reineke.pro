@@ -1,13 +1,15 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   effect,
   inject,
-  input,
-  output,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { fromEvent } from 'rxjs';
 import { FusswerkBookingService } from '../../fusswerk-booking.service';
+import { FusswerkBookingWizardUiService } from '../../fusswerk-booking-wizard-ui.service';
 import {
   FW_WIZARD_DONE_STEP,
   FW_WIZARD_STEPS,
@@ -40,9 +42,8 @@ import { FwWizardStepTimeComponent } from './steps/wizard-step-time.component';
 export class FwBookingWizardComponent {
   private readonly wizardState = inject(FwBookingWizardState);
   private readonly bookingApi = inject(FusswerkBookingService);
-
-  readonly open = input(false);
-  readonly closed = output<void>();
+  private readonly ui = inject(FusswerkBookingWizardUiService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly step = this.wizardState.step;
   readonly stepLabels = FW_WIZARD_STEPS;
@@ -51,25 +52,34 @@ export class FwBookingWizardComponent {
   readonly submitting = signal(false);
   readonly submitError = signal('');
   readonly usingDemoSlots = this.bookingApi.usingDemoSlots;
+  readonly open = this.ui.open;
+  private wasOpen = false;
 
   constructor() {
     effect(() => {
       if (typeof document === 'undefined') return;
       document.body.style.overflow = this.open() ? 'hidden' : '';
     });
+
+    effect(() => {
+      const isOpen = this.open();
+      if (this.wasOpen && !isOpen) {
+        this.wizardState.reset();
+        this.submitError.set('');
+        this.bookingApi.reset();
+      }
+      this.wasOpen = isOpen;
+    });
+
+    if (typeof window !== 'undefined') {
+      fromEvent(window, 'popstate')
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.ui.onPopState());
+    }
   }
 
   close(): void {
-    this.wizardState.reset();
-    this.submitError.set('');
-    this.bookingApi.reset();
-    this.closed.emit();
-  }
-
-  onBackdrop(event: MouseEvent): void {
-    if ((event.target as HTMLElement).classList.contains('fw-wiz')) {
-      this.close();
-    }
+    this.ui.hide();
   }
 
   onValid(valid: boolean): void {
@@ -89,6 +99,8 @@ export class FwBookingWizardComponent {
   }
 
   async next(): Promise<void> {
+    if (this.submitting()) return;
+
     const s = this.step();
     const summaryStep = FW_WIZARD_STEPS.length - 1;
     const timeStep = summaryStep - 1;
@@ -128,10 +140,8 @@ export class FwBookingWizardComponent {
       this.step.set(FW_WIZARD_DONE_STEP);
       return;
     }
-    if (s >= FW_WIZARD_DONE_STEP) {
-      this.close();
-      return;
-    }
+
+    if (s >= FW_WIZARD_DONE_STEP) return;
     if (!this.canAdvance()) return;
     this.step.update((n) => n + 1);
     this.canAdvance.set(s + 1 !== timeStep);

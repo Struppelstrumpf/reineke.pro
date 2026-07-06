@@ -1,8 +1,11 @@
 @if (open()) {
-  <div class="fw-wiz" role="dialog" aria-modal="true" aria-labelledby="fw-wiz-title" (click)="onBackdrop($event)">
+  <div class="fw-wiz" role="dialog" aria-modal="true" aria-labelledby="fw-wiz-title">
     <div
       class="fw-wiz__dialog"
+      (click)="$event.stopPropagation()"
+      (mousedown)="$event.stopPropagation()"
       [class.fw-wiz__dialog--tall]="step() === 0 || step() === 3 || step() === 4"
+      [class.fw-wiz__dialog--summary]="step() === 5"
       [class.fw-wiz__dialog--done]="step() === doneStep"
     >
       <header class="fw-wiz__head">
@@ -35,53 +38,25 @@
         }
         @switch (step()) {
           @case (0) {
-            @defer (on immediate) {
-              <pv-fw-wizard-service (valid)="onValid($event)" />
-            } @placeholder {
-              <p class="fw-wiz-loading">Wird geladen …</p>
-            }
+            <pv-fw-wizard-service (valid)="onValid($event)" />
           }
           @case (1) {
-            @defer (on immediate) {
-              <pv-fw-wizard-name (valid)="onValid($event)" />
-            } @placeholder {
-              <p class="fw-wiz-loading">Wird geladen …</p>
-            }
+            <pv-fw-wizard-name (valid)="onValid($event)" />
           }
           @case (2) {
-            @defer (on immediate) {
-              <pv-fw-wizard-contact (valid)="onValid($event)" />
-            } @placeholder {
-              <p class="fw-wiz-loading">Wird geladen …</p>
-            }
+            <pv-fw-wizard-contact (valid)="onValid($event)" />
           }
           @case (3) {
-            @defer (on immediate) {
-              <pv-fw-wizard-date (valid)="onValid($event)" />
-            } @placeholder {
-              <p class="fw-wiz-loading">Wird geladen …</p>
-            }
+            <pv-fw-wizard-date (valid)="onValid($event)" />
           }
           @case (4) {
-            @defer (on immediate) {
-              <pv-fw-wizard-time (valid)="onValid($event)" />
-            } @placeholder {
-              <p class="fw-wiz-loading">Wird geladen …</p>
-            }
+            <pv-fw-wizard-time (valid)="onValid($event)" />
           }
           @case (5) {
-            @defer (on immediate) {
-              <pv-fw-wizard-summary (valid)="onValid($event)" />
-            } @placeholder {
-              <p class="fw-wiz-loading">Wird geladen …</p>
-            }
+            <pv-fw-wizard-summary (valid)="onValid($event)" />
           }
           @default {
-            @defer (on immediate) {
-              <pv-fw-wizard-done />
-            } @placeholder {
-              <p class="fw-wiz-loading">Wird geladen …</p>
-            }
+            <pv-fw-wizard-done />
           }
         }
       </div>

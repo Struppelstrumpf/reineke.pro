@@ -5,7 +5,7 @@ import { FwBookingWizardState } from '../fw-booking-wizard.state';
 @Component({
   selector: 'pv-fw-wizard-summary',
   template: `
-    <div class="fw-wiz-step">
+    <div class="fw-wiz-step fw-wiz-step--summary">
       <h2 class="fw-wiz-step__title">Alles in Ordnung?</h2>
       <p class="fw-wiz-step__lead">Bitte prüfen Sie Ihre Angaben — danach senden wir die Anfrage ab.</p>
 
@@ -38,8 +38,9 @@ import { FwBookingWizardState } from '../fw-booking-wizard.state';
         }
         <div class="fw-wiz-recap__when">
           <dt>Termin</dt>
-          <dd>
-            <span class="fw-wiz-recap__when-date">{{ dateLabel() }}</span>
+          <dd class="fw-wiz-recap__when-inline">
+            <span>{{ dateLabel() }}</span>
+            <span class="fw-wiz-recap__when-sep" aria-hidden="true">·</span>
             <span class="fw-wiz-recap__when-time">{{ state.slot() }} Uhr</span>
           </dd>
         </div>

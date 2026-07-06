@@ -12,7 +12,7 @@ import { FusswerkContentService } from '../../fusswerk-content.service';
 import type { FwBookingSettings } from '../../fusswerk-content.types';
 import type { FwBookingSlot } from '../../fusswerk-booking.types';
 import { formatDurationShort } from '../../fusswerk-duration.util';
-import { clampGapBeforeBookingMinutes } from '../../fusswerk-scheduling';
+import { clampGapBeforeBookingMinutes, computeSlots } from '../../fusswerk-scheduling';
 import {
   hasSameCustomerDuplicateOnDay,
   sameCustomerBookingsOnDay,
@@ -114,9 +114,15 @@ export class FwBookingCalendarComponent {
       const date = this.selectedDate();
       this.content.bookingSettings();
       this.content.openingHours();
-      this.bookings.revision();
       const serviceId = this.modalMode() === 'create' ? this.createServiceId() : undefined;
       void this.loadSlotsFor(date, serviceId);
+    });
+
+    effect(() => {
+      this.bookings.revision();
+      const date = this.selectedDate();
+      const serviceId = this.modalMode() === 'create' ? this.createServiceId() : undefined;
+      this.applySlotsLocally(date, serviceId);
     });
   }
 
@@ -403,6 +409,10 @@ export class FwBookingCalendarComponent {
     }
     this.closeModal();
     await this.loadSlotsFor(this.selectedDate());
+  }
+
+  private applySlotsLocally(date: string, serviceId?: string): void {
+    this.slots.set(computeSlots(date, this.content.schedulePayload(), this.bookings.all(), serviceId));
   }
 
   private async loadSlotsFor(date: string, serviceId?: string): Promise<void> {

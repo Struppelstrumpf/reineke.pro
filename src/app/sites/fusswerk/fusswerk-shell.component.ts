@@ -2,15 +2,17 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
+import { FwBookingWizardComponent } from './components/booking-wizard/fw-booking-wizard.component';
 import { FwSupportChatWidgetComponent } from './components/fw-support-chat-widget.component';
 import { FusswerkContentService } from './fusswerk-content.service';
 
 @Component({
   selector: 'pv-fusswerk-shell',
-  imports: [RouterOutlet, FwSupportChatWidgetComponent],
+  imports: [RouterOutlet, FwSupportChatWidgetComponent, FwBookingWizardComponent],
   template: `
     <div class="fw-site" [style]="content.themeStyle()">
       <router-outlet />
+      <pv-fw-booking-wizard />
       @if (showChat()) {
         <pv-fw-support-chat-widget />
       }

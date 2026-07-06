@@ -65,10 +65,14 @@ export class FwStudioComponent {
   readonly isMobile = signal(false);
 
   constructor() {
-    interval(5000)
+    interval(15000)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        if (this.auth.isStaff() && document.visibilityState === 'visible') {
+        if (
+          this.auth.isStaff() &&
+          document.visibilityState === 'visible' &&
+          this.tab() === 'bookings'
+        ) {
           void this.bookings.refresh({ fromSync: true });
         }
       });

@@ -65,28 +65,52 @@ export class FusswerkBookingAdminService {
   }
 
   private async loadBookings(fromSync: boolean): Promise<void> {
-    this.loading.set(true);
-    this.error.set('');
+    if (!fromSync) {
+      this.loading.set(true);
+    }
+    if (!fromSync) {
+      this.error.set('');
+    }
     try {
       const res = await fetch('/api/fusswerk/bookings');
       const data = (await res.json()) as { ok?: boolean; bookings?: FwBookingRecord[]; error?: string };
       if (!res.ok || !data.ok) {
         const msg = data.error ?? 'Buchungen konnten nicht geladen werden.';
-        this.error.set(
-          msg === 'Nicht gefunden'
-            ? 'Termin-API nicht erreichbar — bitte „npm run start:api“ neu starten.'
-            : msg,
-        );
+        if (!fromSync) {
+          this.error.set(
+            msg === 'Nicht gefunden'
+              ? 'Termin-API nicht erreichbar — bitte „npm run start:api“ neu starten.'
+              : msg,
+          );
+        }
         return;
       }
-      this.bookings.set(data.bookings ?? []);
+      const next = data.bookings ?? [];
+      if (this.sameBookings(this.bookings(), next)) {
+        return;
+      }
+      this.bookings.set(next);
       this.revision.update((n) => n + 1);
       if (!fromSync) notifyFwBookingsChanged();
     } catch {
-      this.error.set('Backend nicht erreichbar — bitte API starten.');
+      if (!fromSync) {
+        this.error.set('Backend nicht erreichbar — bitte API starten.');
+      }
     } finally {
-      this.loading.set(false);
+      if (!fromSync) {
+        this.loading.set(false);
+      }
     }
+  }
+
+  private sameBookings(a: FwBookingRecord[], b: FwBookingRecord[]): boolean {
+    if (a.length !== b.length) return false;
+    const fingerprint = (list: FwBookingRecord[]) =>
+      list
+        .map((item) => `${item.id}|${item.status}|${item.date}|${item.slot}|${item.updatedAt ?? ''}`)
+        .sort()
+        .join('\n');
+    return fingerprint(a) === fingerprint(b);
   }
 
   async loadSlots(date: string, serviceId?: string): Promise<FwBookingSlot[]> {

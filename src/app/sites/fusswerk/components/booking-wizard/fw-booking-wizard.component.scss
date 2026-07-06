@@ -20,6 +20,7 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   width: min(27rem, 100%);
+  min-height: min(22rem, calc(100dvh - 8rem));
   height: min(29rem, calc(100dvh - 1rem));
   max-height: calc(100dvh - 1rem);
   border-radius: calc(var(--fw-radius) + 4px);
@@ -32,6 +33,15 @@
 
 .fw-wiz__dialog--tall {
   height: min(34.5rem, calc(100dvh - 0.75rem));
+}
+
+.fw-wiz__dialog--summary {
+  height: auto;
+  max-height: calc(100dvh - 1rem);
+}
+
+.fw-wiz__dialog--summary .fw-wiz__body {
+  overflow: visible;
 }
 
 @media (max-width: 480px) {
@@ -252,6 +262,11 @@
     max-height: calc(100dvh - 0.5rem);
   }
 
+  .fw-wiz__dialog--summary {
+    height: auto;
+    max-height: calc(100dvh - 0.5rem);
+  }
+
   .fw-wiz__head {
     padding-top: 0.55rem;
     padding-bottom: 0.45rem;
@@ -269,6 +284,13 @@
   .fw-wiz__dialog--done {
     width: 100%;
     height: calc(100dvh - 0.5rem);
+    max-height: calc(100dvh - 0.5rem);
+    border-radius: 1rem;
+  }
+
+  .fw-wiz__dialog--summary {
+    width: 100%;
+    height: auto;
     max-height: calc(100dvh - 0.5rem);
     border-radius: 1rem;
   }
