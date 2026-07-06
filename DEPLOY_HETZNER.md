@@ -56,7 +56,31 @@ GitHub → Settings → Developer settings → Personal access tokens → Token 
 echo DEIN_GITHUB_TOKEN | docker login ghcr.io -u Struppelstrumpf --password-stdin
 ```
 
-### 4) Neue Images ziehen und Container starten (manuell, wie bisher)
+### 4) Neue Images ziehen und Container starten
+
+**Empfohlen (ein Befehl):**
+
+```bash
+bash scripts/deploy-hetzner.sh
+```
+
+Nur Frontend oder API:
+
+```bash
+bash scripts/deploy-hetzner.sh web
+bash scripts/deploy-hetzner.sh api
+bash scripts/deploy-hetzner.sh status
+```
+
+Von deinem PC (Windows, im Repo-Root nach `git push`):
+
+```powershell
+npm run deploy
+# oder nur Web:
+npm run deploy:web
+```
+
+**Manuell (wie bisher):**
 
 ```bash
 docker network create reineke-net 2>/dev/null || true

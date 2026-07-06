@@ -2,28 +2,44 @@
 # Images from GHCR after CI push to main:
 #   ghcr.io/struppelstrumpf/reineke.pro:latest
 #   ghcr.io/struppelstrumpf/reineke.pro-api:latest
+#
+# Server-Deploy ohne Compose: bash scripts/deploy-hetzner.sh
+
+networks:
+  reineke-net:
+    name: reineke-net
 
 services:
   web:
     build: .
     image: ghcr.io/struppelstrumpf/reineke.pro:latest
     pull_policy: always
+    container_name: reineke-pro
     ports:
       - "8080:80"
     depends_on:
       - api
+    networks:
+      - reineke-net
     restart: unless-stopped
 
   api:
     build: ./apps/ws-backend
     image: ghcr.io/struppelstrumpf/reineke.pro-api:latest
     pull_policy: always
+    container_name: reineke-api
     environment:
       WS_DATA_FILE: /data/ws-store.json
       TZ: Europe/Berlin
       NASEBAER_FRONTEND_ORIGIN: https://www.reineke.pro
     volumes:
       - reineke_data:/data
+    ports:
+      - "127.0.0.1:19290:19290"
+    networks:
+      reineke-net:
+        aliases:
+          - api
     restart: unless-stopped
 
 volumes:

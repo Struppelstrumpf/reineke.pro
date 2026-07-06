@@ -8,7 +8,11 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "build:ws-print": "npm run build --prefix apps/ws-label-print"
+    "build:ws-print": "npm run build --prefix apps/ws-label-print",
+    "deploy": "powershell -File scripts/deploy-remote.ps1",
+    "deploy:web": "powershell -File scripts/deploy-remote.ps1 -Target web",
+    "deploy:api": "powershell -File scripts/deploy-remote.ps1 -Target api",
+    "deploy:status": "powershell -File scripts/deploy-remote.ps1 -Target status"
   },
   "private": true,
   "dependencies": {

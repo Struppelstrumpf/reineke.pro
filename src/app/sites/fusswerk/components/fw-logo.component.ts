@@ -175,8 +175,12 @@ import { FW_BUSINESS } from '../fusswerk.data';
     }
 
     .fw-logo--header .fw-logo__word {
-      font-size: clamp(0.72rem, 3.4vw, 0.9rem);
+      font-size: clamp(1.44rem, 6.8vw, 1.8rem);
       letter-spacing: 0.12em;
+    }
+
+    .fw-logo--header .fw-logo__rule {
+      height: 3px;
     }
 
     .fw-logo--claim {
