@@ -339,8 +339,8 @@ export class FwBookingCalendarComponent {
       this.actionError.set('Bitte einen Namen angeben.');
       return;
     }
-    await this.runAction(() =>
-      this.bookings.createManual({
+    await this.runAction(async () => {
+      const result = await this.bookings.createManual({
         name: this.createName(),
         phone: this.createPhone(),
         email: this.createEmail(),
@@ -348,8 +348,9 @@ export class FwBookingCalendarComponent {
         slot: this.createSlot(),
         serviceId: this.createServiceId(),
         status: 'confirmed',
-      }),
-    );
+      });
+      return 'error' in result ? result.error : null;
+    });
   }
 
   statusLabel(status: string): string {

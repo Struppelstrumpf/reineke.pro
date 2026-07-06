@@ -512,6 +512,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
+  align-items: stretch;
 }
 
 .fw-offer__card {
@@ -519,6 +520,28 @@
   grid-template-columns: auto 1fr;
   gap: 1rem;
   padding: 1.25rem;
+  height: 100%;
+}
+
+.fw-offer__body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.fw-offer__content {
+  flex: 1 1 auto;
+}
+
+.fw-offer__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--fw-border);
+  font-size: 0.95rem;
 }
 
 .fw-offer__num {
@@ -547,7 +570,7 @@
 }
 
 .fw-offer__list {
-  margin: 0 0 0.85rem;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -570,21 +593,19 @@
   background: var(--fw-gold);
 }
 
-.fw-offer__foot {
-  display: flex;
-  justify-content: space-between;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--fw-border);
-  font-size: 0.95rem;
-}
-
 .fw-price-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
+  align-items: stretch;
+  max-width: 52rem;
+  margin-inline: auto;
 }
 
 .fw-price-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   padding: 1.5rem;
   text-align: center;
 }
@@ -594,9 +615,16 @@
   box-shadow: var(--fw-shadow);
 }
 
+.fw-price-card__badge-slot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 1.85rem;
+  margin-bottom: 0.5rem;
+}
+
 .fw-price-card__badge {
   display: inline-block;
-  margin-bottom: 0.5rem;
   padding: 0.28rem 0.6rem;
   border-radius: 999px;
   background: var(--fw-gold-soft);
@@ -607,14 +635,24 @@
   color: #7a5d32;
 }
 
-.fw-price-card h3 {
+.fw-price-card__intro {
+  min-height: 8.5rem;
+}
+
+.fw-price-card__intro h3 {
   margin: 0;
   font-family: var(--fw-serif);
   font-size: 2rem;
+  line-height: 1.15;
+  min-height: 2.3em;
+}
+
+.fw-price-card__pricing {
+  margin-bottom: 0.25rem;
 }
 
 .fw-price-card__amount {
-  margin: 0.35rem 0;
+  margin: 0;
   font-family: var(--fw-display);
   font-size: clamp(2.4rem, 5vw, 3rem);
   font-weight: 700;
@@ -627,8 +665,12 @@
   color: var(--fw-muted);
 }
 
+.fw-price-card__sub {
+  margin-bottom: 0.35rem;
+}
+
 .fw-price-card ul {
-  margin: 1rem 0 0;
+  margin: auto 0 0;
   padding: 0;
   list-style: none;
   text-align: left;

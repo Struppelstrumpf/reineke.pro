@@ -38,9 +38,13 @@ export class FwChatMessageComponent {
   }
 
   statusLabel(): string {
-    const s = this.message().appointment?.status;
+    const appt = this.message().appointment;
+    const s = appt?.status;
     if (s === 'confirmed') return 'Bestätigt';
     if (s === 'declined') return 'Abgelehnt';
+    if (s === 'pending' && appt?.bookingId && appt.proposedBy === 'staff') {
+      return 'Wartet auf Kundenbestätigung';
+    }
     return 'Offen';
   }
 }

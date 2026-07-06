@@ -166,7 +166,7 @@ export class FusswerkBookingAdminService {
     slot: string;
     serviceId: string;
     status?: 'pending' | 'confirmed';
-  }): Promise<string | null> {
+  }): Promise<{ bookingId: string } | { error: string }> {
     const schedule = this.content.schedulePayload();
     try {
       const res = await fetch('/api/fusswerk/bookings', {
@@ -184,12 +184,22 @@ export class FusswerkBookingAdminService {
           schedule,
         }),
       });
-      const data = (await res.json()) as { ok?: boolean; error?: string };
-      if (!res.ok || !data.ok) return data.error ?? 'Termin konnte nicht angelegt werden.';
+      const data = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        booking?: { id: string };
+      };
+      if (!res.ok || !data.ok) {
+        return { error: data.error ?? 'Termin konnte nicht angelegt werden.' };
+      }
+      const bookingId = data.booking?.id;
+      if (!bookingId) {
+        return { error: 'Termin konnte nicht angelegt werden.' };
+      }
       await this.refresh();
-      return null;
+      return { bookingId };
     } catch {
-      return 'Backend nicht erreichbar.';
+      return { error: 'Backend nicht erreichbar.' };
     }
   }
 

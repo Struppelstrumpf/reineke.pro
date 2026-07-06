@@ -52,6 +52,10 @@ export class FwHomeComponent {
 
   scrollTo(id: string): void {
     this.menuOpen.set(false);
+    if (id === 'top') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      return;
+    }
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 

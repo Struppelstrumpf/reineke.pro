@@ -134,19 +134,21 @@
 
           <div class="fw-offer__body">
 
-            <h3>{{ s.title }}</h3>
+            <div class="fw-offer__content">
+              <h3>{{ s.title }}</h3>
 
-            <p class="fw-offer__summary">{{ s.summary }}</p>
+              <p class="fw-offer__summary">{{ s.summary }}</p>
 
-            <ul class="fw-offer__list">
+              <ul class="fw-offer__list">
 
-              @for (item of s.includes; track item) {
+                @for (item of s.includes; track item) {
 
-                <li>{{ item }}</li>
+                  <li>{{ item }}</li>
 
-              }
+                }
 
-            </ul>
+              </ul>
+            </div>
 
             <footer class="fw-offer__foot">
 
@@ -184,19 +186,23 @@
 
         <article class="fw-price-card fw-card" [class.fw-price-card--featured]="tier.featured">
 
-          @if (tier.featured) {
+          <div class="fw-price-card__intro">
+            <div class="fw-price-card__badge-slot">
+              @if (tier.featured) {
+                <span class="fw-price-card__badge">Beliebt</span>
+              }
+            </div>
 
-            <span class="fw-price-card__badge">Beliebt</span>
+            <p class="fw-price-card__sub">{{ tier.subtitle }}</p>
 
-          }
+            <h3>{{ tier.name }}</h3>
+          </div>
 
-          <p class="fw-price-card__sub">{{ tier.subtitle }}</p>
+          <div class="fw-price-card__pricing">
+            <p class="fw-price-card__amount">{{ formatPrice(tier.price) }}</p>
 
-          <h3>{{ tier.name }}</h3>
-
-          <p class="fw-price-card__amount">{{ formatPrice(tier.price) }}</p>
-
-          <p class="fw-price-card__time">{{ tier.duration }}</p>
+            <p class="fw-price-card__time">{{ tier.duration }}</p>
+          </div>
 
           <ul>
 

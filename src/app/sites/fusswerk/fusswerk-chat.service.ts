@@ -208,6 +208,10 @@ export class FusswerkChatService {
     if (!this.canRespondToAppointment(message, viewerRole)) return 'Keine Berechtigung.';
 
     if (!accept) {
+      if (message.appointment.bookingId) {
+        const cancelErr = await this.bookings.cancel(message.appointment.bookingId);
+        if (cancelErr) return cancelErr;
+      }
       this.updateAppointmentStatus(conversationId, messageId, 'declined');
       const name = viewerRole === 'staff' ? this.auth.currentUser()?.contactName ?? 'Studio' : conversation.contactName;
       this.appendMessage(
@@ -218,19 +222,24 @@ export class FusswerkChatService {
     }
 
     const appt = message.appointment;
-    const err = await this.bookings.createManual({
-      name: conversation.contactName,
-      date: appt.date,
-      slot: appt.slot,
-      serviceId: appt.serviceId,
-      status: 'confirmed',
-    });
-    if (err) return err;
+    let bookingId = appt.bookingId;
 
-    const refreshed = this.bookings.all().find(
-      (b) => b.date === appt.date && b.slot === appt.slot && b.serviceId === appt.serviceId,
-    );
-    this.updateAppointmentStatus(conversationId, messageId, 'confirmed', refreshed?.id);
+    if (bookingId) {
+      const confirmErr = await this.bookings.confirm(bookingId);
+      if (confirmErr) return confirmErr;
+    } else {
+      const created = await this.bookings.createManual({
+        name: conversation.contactName,
+        date: appt.date,
+        slot: appt.slot,
+        serviceId: appt.serviceId,
+        status: 'confirmed',
+      });
+      if ('error' in created) return created.error;
+      bookingId = created.bookingId;
+    }
+
+    this.updateAppointmentStatus(conversationId, messageId, 'confirmed', bookingId);
     const confirmer =
       viewerRole === 'staff' ? this.auth.currentUser()?.contactName ?? 'Studio' : conversation.contactName;
     this.appendMessage(
@@ -326,10 +335,28 @@ export class FusswerkChatService {
     if (!payload.serviceId || !payload.date || !payload.slot) {
       return 'Bitte Leistung, Datum und Uhrzeit angeben.';
     }
+
+    const conversation = this.conversationById(conversationId);
+    if (!conversation) return 'Chat nicht gefunden.';
+
+    let bookingId: string | undefined;
+    if (role === 'staff') {
+      const created = await this.bookings.createManual({
+        name: conversation.contactName,
+        date: payload.date,
+        slot: payload.slot,
+        serviceId: payload.serviceId,
+        status: 'pending',
+      });
+      if ('error' in created) return created.error;
+      bookingId = created.bookingId;
+    }
+
     const appointment: FwAppointmentPayload = {
       ...payload,
       status: 'pending',
       proposedBy: role,
+      bookingId,
     };
     const summary = `Terminvorschlag: ${payload.serviceName} · ${this.formatPrice(payload.price)} · ${this.formatGermanDate(payload.date, payload.slot)}`;
     this.appendMessage(conversationId, {
