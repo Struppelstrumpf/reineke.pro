@@ -68,7 +68,7 @@
           <p class="fw-hero__badge">{{ copy().hero.openingLabel }} {{ biz().opened }}</p>
         }
 
-        <div class="fw-stage__rule" aria-hidden="true"></div>
+        <pv-fw-logo class="fw-stage__claim" [claimOnly]="true" [light]="true" />
 
         <h1 class="fw-stage__title">{{ copy().hero.titleLine1 }}<br />{{ copy().hero.titleLine2 }}</h1>
 
@@ -335,7 +335,7 @@
   <div class="fw-footer__inner">
 
     <a class="fw-footer__brand" href="#" (click)="$event.preventDefault(); scrollTo('top')">
-      <pv-fw-logo [minimal]="true" />
+      <pv-fw-logo />
     </a>
 
     <div class="fw-footer__meta">

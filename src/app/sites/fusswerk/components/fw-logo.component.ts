@@ -4,7 +4,36 @@ import { FW_BUSINESS } from '../fusswerk.data';
 @Component({
   selector: 'pv-fw-logo',
   template: `
-    @if (hero()) {
+    @if (claimOnly()) {
+      <span
+        class="fw-logo fw-logo--claim"
+        [class.fw-logo--light]="light()"
+        role="img"
+        [attr.aria-label]="biz.claim"
+      >
+        <span class="fw-logo__script">{{ biz.claim }}</span>
+        <span class="fw-logo__ornament" aria-hidden="true">
+          <span class="fw-logo__ornament-line"></span>
+          <svg class="fw-logo__ornament-leaf" viewBox="0 0 28 16" aria-hidden="true">
+            <path d="M14 2 C10 6 8 10 14 14 C20 10 18 6 14 2 Z" />
+            <path d="M6 8 C8 11 11 13 14 13 C11 9 9 6 6 8 Z" transform="rotate(-24 14 8)" />
+            <path d="M22 8 C20 11 17 13 14 13 C17 9 19 6 22 8 Z" transform="rotate(24 14 8)" />
+          </svg>
+          <span class="fw-logo__ornament-line"></span>
+        </span>
+      </span>
+    } @else if (header() || markOnly()) {
+      <span
+        class="fw-logo fw-logo--mark"
+        [class.fw-logo--header]="header()"
+        [class.fw-logo--light]="light()"
+        role="img"
+        [attr.aria-label]="biz.name"
+      >
+        <span class="fw-logo__word">FUSSWERK</span>
+        <span class="fw-logo__rule" aria-hidden="true"></span>
+      </span>
+    } @else if (hero()) {
       <span
         class="fw-logo fw-logo--hero"
         [class.fw-logo--light]="light()"
@@ -12,12 +41,11 @@ import { FW_BUSINESS } from '../fusswerk.data';
         [attr.aria-label]="biz.name + ' — ' + biz.claim"
       >
         <span class="fw-logo__mark">
-          <span class="fw-logo__rule" aria-hidden="true"></span>
           <span class="fw-logo__word">FUSSWERK</span>
           <span class="fw-logo__rule" aria-hidden="true"></span>
           <span class="fw-logo__studio">{{ biz.tagline }}</span>
         </span>
-        <span class="fw-logo__aside">
+        <span class="fw-logo__claim">
           <span class="fw-logo__script">{{ biz.claim }}</span>
           <span class="fw-logo__ornament" aria-hidden="true">
             <span class="fw-logo__ornament-line"></span>
@@ -32,20 +60,17 @@ import { FW_BUSINESS } from '../fusswerk.data';
       </span>
     } @else {
       <span
-        class="fw-logo fw-logo--lockup"
-        [class.fw-logo--minimal]="minimal()"
-        [class.fw-logo--header]="header()"
+        class="fw-logo fw-logo--stacked"
         [class.fw-logo--compact]="compact()"
         [class.fw-logo--light]="light()"
         role="img"
         [attr.aria-label]="biz.name + ' — ' + biz.claim"
       >
         <span class="fw-logo__mark">
-          <span class="fw-logo__rule" aria-hidden="true"></span>
           <span class="fw-logo__word">FUSSWERK</span>
           <span class="fw-logo__rule" aria-hidden="true"></span>
         </span>
-        <span class="fw-logo__aside">
+        <span class="fw-logo__claim">
           <span class="fw-logo__script">{{ biz.claim }}</span>
           <span class="fw-logo__ornament" aria-hidden="true">
             <span class="fw-logo__ornament-line"></span>
@@ -62,9 +87,6 @@ import { FW_BUSINESS } from '../fusswerk.data';
   `,
   styles: `
     .fw-logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.85rem;
       color: var(--fw-logo-color, var(--fw-accent-deep, var(--fw-ink)));
     }
 
@@ -72,22 +94,12 @@ import { FW_BUSINESS } from '../fusswerk.data';
       --fw-logo-color: #ffffff;
     }
 
-    .fw-logo__mark {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.2rem;
-      flex-shrink: 0;
-    }
-
     .fw-logo__word {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.15rem;
       font-weight: 600;
       letter-spacing: 0.18em;
       line-height: 1;
       text-transform: uppercase;
-      padding: 0 0.12em 0 0;
       white-space: nowrap;
     }
 
@@ -112,17 +124,15 @@ import { FW_BUSINESS } from '../fusswerk.data';
       white-space: nowrap;
     }
 
-    .fw-logo__aside {
+    .fw-logo__claim {
       display: inline-flex;
       flex-direction: column;
       align-items: center;
       gap: 0.28rem;
-      min-width: 0;
     }
 
     .fw-logo__script {
       font-family: 'Great Vibes', cursive;
-      font-size: 1.35rem;
       font-weight: 400;
       line-height: 1;
       white-space: nowrap;
@@ -152,57 +162,86 @@ import { FW_BUSINESS } from '../fusswerk.data';
       opacity: 0.92;
     }
 
-    .fw-logo--lockup.fw-logo--minimal .fw-logo__word {
+    .fw-logo--mark {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.2rem;
+    }
+
+    .fw-logo--mark .fw-logo__word {
       font-size: 0.95rem;
       letter-spacing: 0.14em;
     }
 
-    .fw-logo--lockup.fw-logo--minimal .fw-logo__script {
-      font-size: 1.05rem;
-    }
-
-    .fw-logo--lockup.fw-logo--minimal .fw-logo__ornament {
-      max-width: 6.5rem;
-    }
-
-    .fw-logo--header {
-      gap: clamp(0.45rem, 2vw, 0.75rem);
-    }
-
     .fw-logo--header .fw-logo__word {
-      font-size: clamp(0.68rem, 2.8vw, 0.82rem);
+      font-size: clamp(0.72rem, 3.4vw, 0.9rem);
       letter-spacing: 0.12em;
     }
 
-    .fw-logo--header .fw-logo__script {
-      font-size: clamp(0.82rem, 3.2vw, 1rem);
+    .fw-logo--claim {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.32rem;
     }
 
-    .fw-logo--header .fw-logo__ornament {
-      max-width: clamp(4.2rem, 18vw, 5.5rem);
+    .fw-logo--claim .fw-logo__script {
+      font-size: clamp(1.35rem, 4.5vw, 1.75rem);
     }
 
-    .fw-logo--header .fw-logo__ornament-leaf {
-      width: 0.85rem;
+    .fw-logo--claim .fw-logo__ornament {
+      max-width: 10rem;
     }
 
-    .fw-logo--compact {
+    .fw-logo--stacked {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
       gap: 0.55rem;
     }
 
-    .fw-logo--compact .fw-logo__word {
+    .fw-logo--stacked .fw-logo__mark {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.2rem;
+    }
+
+    .fw-logo--stacked .fw-logo__word {
+      font-size: 0.95rem;
+      letter-spacing: 0.14em;
+    }
+
+    .fw-logo--stacked .fw-logo__script {
+      font-size: 1.05rem;
+    }
+
+    .fw-logo--stacked .fw-logo__ornament {
+      max-width: 6.5rem;
+    }
+
+    .fw-logo--compact.fw-logo--stacked .fw-logo__word {
       font-size: 0.78rem;
     }
 
-    .fw-logo--compact .fw-logo__script {
+    .fw-logo--compact.fw-logo--stacked .fw-logo__script {
       font-size: 0.9rem;
     }
 
     .fw-logo--hero {
+      display: inline-flex;
       flex-direction: column;
       align-items: center;
       gap: 1rem;
       text-align: center;
+    }
+
+    .fw-logo--hero .fw-logo__mark {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.2rem;
     }
 
     .fw-logo--hero .fw-logo__word {
@@ -222,12 +261,6 @@ import { FW_BUSINESS } from '../fusswerk.data';
     .fw-logo--hero .fw-logo__ornament {
       max-width: 12rem;
     }
-
-    @media (max-width: 420px) {
-      .fw-logo--header .fw-logo__aside {
-        display: none;
-      }
-    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -237,5 +270,7 @@ export class FwLogoComponent {
   readonly header = input(false);
   readonly hero = input(false);
   readonly light = input(false);
+  readonly markOnly = input(false);
+  readonly claimOnly = input(false);
   readonly biz = FW_BUSINESS;
 }

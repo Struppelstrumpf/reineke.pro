@@ -315,11 +315,19 @@
   max-width: 36rem;
 }
 
-.fw-stage__rule {
-  width: 3.5rem;
-  height: 2px;
-  margin: 0.85rem 0 1.1rem;
-  background: linear-gradient(90deg, var(--fw-gold), transparent);
+.fw-stage__claim {
+  display: block;
+  margin: 0.75rem 0 0.15rem;
+}
+
+.fw-stage__title {
+  margin: 0.65rem 0 0.85rem;
+  font-family: var(--fw-serif);
+  font-size: var(--fw-hero-title-size, clamp(2.4rem, 6.5vh, 4rem));
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--fw-hero-title-color, #fff);
 }
 
 .fw-hero__badge {
@@ -335,16 +343,6 @@
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-}
-
-.fw-stage__title {
-  margin: 0 0 0.85rem;
-  font-family: var(--fw-serif);
-  font-size: var(--fw-hero-title-size, clamp(2.4rem, 6.5vh, 4rem));
-  font-weight: 500;
-  line-height: 1.02;
-  letter-spacing: -0.03em;
-  color: var(--fw-hero-title-color, #fff);
 }
 
 .fw-stage__lead {
