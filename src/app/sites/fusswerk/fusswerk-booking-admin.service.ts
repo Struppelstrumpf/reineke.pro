@@ -107,7 +107,10 @@ export class FusswerkBookingAdminService {
     if (a.length !== b.length) return false;
     const fingerprint = (list: FwBookingRecord[]) =>
       list
-        .map((item) => `${item.id}|${item.status}|${item.date}|${item.slot}|${item.updatedAt ?? ''}`)
+        .map(
+          (item) =>
+            `${item.id}|${item.status}|${item.date}|${item.slot}|${item.createdAt}|${item.confirmedAt ?? ''}`,
+        )
         .sort()
         .join('\n');
     return fingerprint(a) === fingerprint(b);
