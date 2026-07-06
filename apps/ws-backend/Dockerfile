@@ -3,7 +3,7 @@ FROM node:22-alpine
 
 WORKDIR /app
 COPY package.json ./
-COPY server.js ./
+COPY *.js ./
 
 ENV PORT=19290
 ENV WS_DATA_FILE=/data/ws-store.json
