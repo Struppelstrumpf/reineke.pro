@@ -57,7 +57,7 @@ function defaultCopy(): FwPageCopy {
       lead: 'Zeit für Ihre Füße — ruhig, hygienisch und persönlich in der Salinenstraße.',
       ctaPrimary: 'Termin vereinbaren',
       ctaSecondary: 'Preise ansehen',
-      point1: 'Klassische & medizinische Fußpflege',
+      point1: 'Klassische Fußpflege & Shellac',
       point2: 'Barrierefrei in der Fußgängerzone',
       openingLabel: 'Neueröffnung',
     },

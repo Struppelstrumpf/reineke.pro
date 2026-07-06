@@ -4,7 +4,7 @@ export type DeepPartial<T> = {
   [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
 };
 
-export const FW_CONTENT_KEY = 'fw-demo-content-v1';
+export const FW_CONTENT_KEY = 'fw-demo-content-v2';
 
 export type FwHourRow = {
   days: string;
