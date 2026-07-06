@@ -2,7 +2,7 @@
  * Reineke GbR — portfolio preview links (single deployment).
  * Paths are relative to site origin (e.g. https://example.com/pizzeria-demo).
  */
-export type PreviewSiteId = 'pizzeria' | 'weisser-schaefer' | 'nasebaer';
+export type PreviewSiteId = 'pizzeria' | 'weisser-schaefer' | 'nasebaer' | 'fusswerk';
 
 export const PREVIEW_STUDIO = {
   name: 'Reineke GbR',
@@ -37,3 +37,14 @@ export const PREVIEW_SITES: ReadonlyArray<{
     href: '/demo/nasebaer',
   },
 ];
+
+/** Nur per Democode erreichbar — nicht in der öffentlichen Vorlagen-Liste. */
+export const HIDDEN_PREVIEW_SITES: Readonly<
+  Partial<Record<PreviewSiteId, { label: string; hint: string; href: string }>>
+> = {
+  fusswerk: {
+    label: 'Fusswerk (Demo)',
+    hint: 'Fußpflegestudio · Bad Rothenfelde',
+    href: '/demo/fusswerk',
+  },
+};

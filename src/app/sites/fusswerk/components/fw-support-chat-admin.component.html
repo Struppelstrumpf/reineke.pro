@@ -1,0 +1,119 @@
+<section class="fw-chat-admin fw-card">
+  <header class="fw-chat-admin__head">
+    <h2>Chat</h2>
+  </header>
+
+  @if (conversations().length === 0) {
+    <p class="fw-chat-admin__empty">Aktuell keine offenen Chats.</p>
+  } @else {
+    <div class="fw-chat-admin__layout">
+      <aside class="fw-chat-admin__list" aria-label="Unterhaltungen">
+        @for (c of conversations(); track c.id) {
+          <button
+            type="button"
+            class="fw-chat-admin__item"
+            [class.is-active]="selected()?.id === c.id"
+            (click)="selectConversation(c.id)"
+          >
+            <strong>{{ c.contactName }}</strong>
+            <small>{{ c.messages.length }} Nachrichten</small>
+            @if (chat.isWaitingForStaff(c)) {
+              <span class="fw-chat-admin__badge">Neu</span>
+            }
+          </button>
+        }
+      </aside>
+
+      @if (selected(); as conv) {
+        <div class="fw-chat-admin__thread">
+          <div class="fw-chat-admin__toolbar">
+            <p class="fw-chat-admin__toolbar-label">Schnell senden</p>
+            <div class="fw-chat-admin__chips">
+              @for (t of staffTemplates; track t) {
+                <button type="button" class="fw-chat-admin__chip" (click)="sendTemplate(t)">
+                  {{ templateLabels[t] }}
+                </button>
+              }
+              <button
+                type="button"
+                class="fw-chat-admin__chip fw-chat-admin__chip--gold"
+                [class.is-active]="showApptForm()"
+                (click)="toggleApptForm()"
+              >
+                Termin vorschlagen
+              </button>
+            </div>
+          </div>
+
+          @if (showApptForm()) {
+            <div class="fw-chat-admin__appt">
+              <label>
+                <span>Leistung</span>
+                <select [ngModel]="apptServiceId()" (ngModelChange)="apptServiceId.set($event)">
+                  @for (s of services(); track s.id) {
+                    <option [value]="s.id">{{ s.title }} — ab {{ chat.formatPrice(s.fromPrice) }}</option>
+                  }
+                </select>
+              </label>
+              <div class="fw-chat-admin__appt-row">
+                <label><span>Datum</span><input type="date" [ngModel]="apptDate()" (ngModelChange)="apptDate.set($event)" /></label>
+                <label>
+                  <span>Uhrzeit</span>
+                  <select [ngModel]="apptSlot()" (ngModelChange)="apptSlot.set($event)" [disabled]="apptSlotsLoading()">
+                    @for (s of apptSlots(); track s.time) {
+                      <option [value]="s.time">{{ s.time }} Uhr</option>
+                    }
+                  </select>
+                </label>
+              </div>
+              <button type="button" class="fw-btn fw-btn--gold" [disabled]="apptBusy()" (click)="sendAppointment()">
+                Vorschlag senden
+              </button>
+            </div>
+          }
+
+          <div class="fw-chat-admin__messages-wrap">
+            <div
+              #messagesEl
+              class="fw-chat-admin__messages"
+              aria-label="Chatverlauf"
+              (scroll)="onMessagesScroll()"
+            >
+              @for (msg of conv.messages; track msg.id) {
+                <pv-fw-chat-message
+                  [message]="msg"
+                  viewerRole="staff"
+                  [isSelf]="msg.authorRole === 'staff'"
+                  (respond)="onRespond($event)"
+                />
+              }
+            </div>
+            @if (showNewMessagesHint()) {
+              <button type="button" class="fw-chat-admin__jump" (click)="jumpToLatestMessage()">
+                Neue Nachricht
+                <span aria-hidden="true">↓</span>
+              </button>
+            }
+          </div>
+
+          <div class="fw-chat-admin__reply">
+            <textarea
+              rows="2"
+              [ngModel]="reply()"
+              (ngModelChange)="reply.set($event)"
+              placeholder="Antwort schreiben…"
+            ></textarea>
+            <div class="fw-chat-admin__actions">
+              <button type="button" class="fw-btn fw-btn--gold" (click)="sendReply()">Senden</button>
+              <button type="button" class="fw-btn fw-btn--soft" (click)="closeChat(conv.id)">Abschließen</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (error()) {
+    <p class="fw-chat-admin__error">{{ error() }}</p>
+  }
+</section>

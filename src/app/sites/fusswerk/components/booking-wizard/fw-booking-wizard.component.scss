@@ -1,0 +1,295 @@
+/* Kein Layout-Fußabdruck — shared :host setzt sonst min-height: 100dvh */
+:host {
+  display: contents;
+}
+
+.fw-wiz {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right))
+    max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left));
+  background: rgba(14, 18, 22, 0.68);
+  backdrop-filter: blur(12px);
+  animation: fw-wiz-fade 240ms var(--fw-ease) both;
+}
+
+.fw-wiz__dialog {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(27rem, 100%);
+  height: min(29rem, calc(100dvh - 1rem));
+  max-height: calc(100dvh - 1rem);
+  border-radius: calc(var(--fw-radius) + 4px);
+  background: linear-gradient(180deg, #fffefb 0%, var(--fw-paper) 100%);
+  box-shadow:
+    0 32px 80px rgba(12, 16, 20, 0.38),
+    0 0 0 1px rgba(255, 255, 255, 0.65) inset;
+  overflow: hidden;
+}
+
+.fw-wiz__dialog--tall {
+  height: min(34.5rem, calc(100dvh - 0.75rem));
+}
+
+@media (max-width: 480px) {
+  .fw-wiz__dialog--tall {
+    height: min(38rem, calc(100dvh - 0.5rem));
+  }
+
+  .fw-wiz__body {
+    padding-inline: 0.75rem;
+  }
+}
+
+.fw-wiz__dialog--done {
+  height: min(36rem, calc(100dvh - 0.75rem));
+}
+
+.fw-wiz__dialog--done .fw-wiz__body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.fw-wiz__head {
+  position: relative;
+  flex-shrink: 0;
+  padding: clamp(0.7rem, 1.8vh, 1rem) clamp(0.85rem, 2.5vw, 1.25rem) clamp(0.55rem, 1.2vh, 0.75rem);
+  border-bottom: 1px solid color-mix(in srgb, var(--fw-gold) 12%, var(--fw-border));
+  background: linear-gradient(180deg, rgba(184, 149, 107, 0.06), transparent);
+}
+
+.fw-wiz__progress {
+  display: flex;
+  gap: 0.28rem;
+  justify-content: center;
+  margin: 0 1.75rem 0.45rem;
+}
+
+.fw-wiz__dot {
+  flex: 1;
+  max-width: 2.2rem;
+  height: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fw-gold) 18%, var(--fw-border));
+  transition:
+    background var(--fw-ease),
+    transform var(--fw-ease),
+    opacity var(--fw-ease);
+}
+
+.fw-wiz__dot.is-active {
+  background: linear-gradient(90deg, #c9a87a, var(--fw-gold));
+  transform: scaleY(1.5);
+  box-shadow: 0 0 12px rgba(184, 149, 107, 0.45);
+}
+
+.fw-wiz__dot.is-done {
+  background: color-mix(in srgb, var(--fw-gold) 70%, #fff);
+}
+
+.fw-wiz__step-label {
+  margin: 0;
+  text-align: center;
+  font-family: var(--fw-display);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fw-soft);
+}
+
+.fw-wiz__step-label span {
+  color: var(--fw-gold);
+}
+
+.fw-wiz__close {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--fw-border);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--fw-muted);
+  cursor: pointer;
+  transition: background var(--fw-ease), color var(--fw-ease);
+}
+
+.fw-wiz__close:hover {
+  background: var(--fw-gold-soft);
+  color: var(--fw-ink);
+  border-color: color-mix(in srgb, var(--fw-gold) 35%, var(--fw-border));
+}
+
+.fw-wiz__body {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: clamp(0.65rem, 1.6vh, 1rem) clamp(0.85rem, 2.5vw, 1.2rem);
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--fw-gold) 40%, transparent) transparent;
+}
+
+.fw-wiz__body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.fw-wiz__body::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fw-gold) 45%, var(--fw-border));
+}
+
+.fw-wiz-error-banner {
+  margin: 0 0 0.55rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  background: rgba(180, 60, 60, 0.1);
+  border: 1px solid rgba(180, 60, 60, 0.22);
+  color: #8f2f2f;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.fw-wiz-demo-banner {
+  margin: 0 0 0.55rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(184, 149, 107, 0.12);
+  border: 1px solid color-mix(in srgb, var(--fw-gold) 28%, var(--fw-border));
+  color: #7a5d32;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.fw-wiz-loading {
+  margin: 1.5rem 0;
+  text-align: center;
+  color: var(--fw-muted);
+  font-size: 0.9rem;
+}
+
+.fw-wiz__foot {
+  display: flex;
+  gap: 0.5rem;
+  padding: clamp(0.6rem, 1.2vh, 0.8rem) clamp(0.85rem, 2.5vw, 1.15rem)
+    max(0.65rem, env(safe-area-inset-bottom));
+  border-top: 1px solid color-mix(in srgb, var(--fw-gold) 10%, var(--fw-border));
+  background: rgba(255, 253, 249, 0.96);
+}
+
+.fw-wiz__foot--solo {
+  justify-content: center;
+}
+
+.fw-wiz__foot--solo .fw-wiz__next {
+  flex: none;
+  min-width: 11rem;
+}
+
+.fw-wiz__back {
+  flex: 1;
+  min-height: 2.75rem;
+  border: 1px solid var(--fw-border);
+  border-radius: 999px;
+  background: #fff;
+  font-family: var(--fw-display);
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--fw-muted);
+  cursor: pointer;
+  transition:
+    border-color var(--fw-ease),
+    color var(--fw-ease),
+    background var(--fw-ease);
+}
+
+.fw-wiz__back:hover {
+  border-color: color-mix(in srgb, var(--fw-gold) 40%, var(--fw-border));
+  color: var(--fw-ink);
+  background: var(--fw-gold-soft);
+}
+
+.fw-wiz__next {
+  flex: 1.35;
+  min-height: 2.75rem;
+  padding-inline: 0.9rem;
+  font-size: 0.86rem;
+}
+
+@keyframes fw-wiz-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (min-width: 600px) {
+  .fw-wiz__dialog {
+    width: min(28rem, 100%);
+  }
+
+  .fw-wiz__dialog--tall {
+    height: min(35rem, calc(100dvh - 1.5rem));
+  }
+}
+
+@media (max-height: 640px) {
+  .fw-wiz__dialog,
+  .fw-wiz__dialog--tall {
+    height: calc(100dvh - 0.5rem);
+    max-height: calc(100dvh - 0.5rem);
+  }
+
+  .fw-wiz__head {
+    padding-top: 0.55rem;
+    padding-bottom: 0.45rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .fw-wiz {
+    padding: 0.35rem;
+    padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
+  }
+
+  .fw-wiz__dialog,
+  .fw-wiz__dialog--tall,
+  .fw-wiz__dialog--done {
+    width: 100%;
+    height: calc(100dvh - 0.5rem);
+    max-height: calc(100dvh - 0.5rem);
+    border-radius: 1rem;
+  }
+
+  .fw-wiz__foot {
+    flex-direction: column-reverse;
+  }
+
+  .fw-wiz__back,
+  .fw-wiz__next {
+    flex: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 320px) {
+  .fw-wiz__progress {
+    margin-inline: 1.25rem;
+  }
+
+  .fw-wiz__step-label {
+    font-size: 0.55rem;
+  }
+}

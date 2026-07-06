@@ -1,8 +1,16 @@
 <div class="app-root">
-  <div class="app-stage" [class.app-stage--dimmed]="booking.dimmed()">
-    <pv-fiverr-sidebar />
+  <div
+    class="app-stage"
+    [class.app-stage--dimmed]="booking.dimmed()"
+    [class.app-stage--no-sidebar]="hidePortfolioChrome()"
+  >
+    @if (!hidePortfolioChrome()) {
+      <pv-fiverr-sidebar />
+    }
     <router-outlet />
-    <pv-welcome-overlay />
+    @if (!hidePortfolioChrome()) {
+      <pv-welcome-overlay />
+    }
   </div>
   <pv-booking-modal />
   <pv-demo-code-modal />

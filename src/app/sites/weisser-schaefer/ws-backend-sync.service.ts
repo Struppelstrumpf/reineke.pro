@@ -42,6 +42,11 @@ const SYNC_KEYS: readonly string[] = [
   'nasebaer-demo-state',
   'pfotenatlas-demo-state',
   'nasenbaer-demo-state',
+  'fw-demo-users',
+  'fw-demo-content-v1',
+  'fw-demo-support-chat-v1',
+  'fw-demo-support-chat-audio-v1',
+  'fw-bookings',
   'dog-demo-state',
 ];
 

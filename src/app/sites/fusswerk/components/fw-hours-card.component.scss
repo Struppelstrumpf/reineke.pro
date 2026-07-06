@@ -1,0 +1,161 @@
+.fw-hours-card {
+  position: relative;
+  width: min(19rem, 100%);
+  padding: clamp(1rem, 2.2vh, 1.25rem);
+  border-radius: calc(var(--fw-radius) + 2px);
+  background: linear-gradient(155deg, rgba(255, 253, 249, 0.97), rgba(248, 242, 234, 0.94));
+  color: var(--fw-ink);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.55),
+    0 24px 56px rgba(12, 16, 20, 0.35);
+  backdrop-filter: blur(14px);
+}
+
+.fw-hours-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(145deg, rgba(201, 168, 122, 0.55), rgba(106, 143, 168, 0.35));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.fw-hours-card__live {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.55rem;
+}
+
+.fw-hours-card__pulse {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: #94a3a8;
+  flex-shrink: 0;
+}
+
+.fw-hours-card__pulse.is-open {
+  background: #5a9a6e;
+  box-shadow: 0 0 0 5px rgba(90, 154, 110, 0.28);
+  animation: fw-pulse 2s ease-in-out infinite;
+}
+
+.fw-hours-card__pulse.is-soon {
+  background: #c9a04a;
+  box-shadow: 0 0 0 4px rgba(201, 160, 74, 0.25);
+}
+
+.fw-hours-card__pulse.is-closed {
+  background: #9aa3a8;
+}
+
+.fw-hours-card__badge {
+  margin: 0;
+  font-family: var(--fw-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8a6d45;
+}
+
+.fw-hours-card__title {
+  margin: 0 0 0.35rem;
+  font-family: var(--fw-serif);
+  font-size: clamp(1.25rem, 2.8vh, 1.55rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.fw-hours-card__detail {
+  margin: 0 0 0.75rem;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--fw-muted);
+}
+
+.fw-hours-card__week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.28rem;
+  margin-bottom: 0.65rem;
+}
+
+.fw-hours-card__day {
+  display: grid;
+  place-items: center;
+  min-height: 1.85rem;
+  border-radius: 8px;
+  font-family: var(--fw-display);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--fw-muted);
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--fw-border);
+}
+
+.fw-hours-card__day.is-today {
+  color: #fff;
+  background: linear-gradient(135deg, #c9a87a, #9a7648);
+  border-color: transparent;
+}
+
+.fw-hours-card__day.is-closed:not(.is-today) {
+  opacity: 0.55;
+}
+
+.fw-hours-card__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--fw-blue-deep);
+  cursor: pointer;
+}
+
+.fw-hours-card__chev {
+  display: inline-block;
+  transition: transform var(--fw-ease);
+}
+
+.fw-hours-card__chev.is-open {
+  transform: rotate(180deg);
+}
+
+@keyframes fw-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(90, 154, 110, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(90, 154, 110, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fw-hours-card__pulse.is-open {
+    animation: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .fw-hours-card {
+    width: 100%;
+    max-width: 22rem;
+  }
+}

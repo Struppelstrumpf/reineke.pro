@@ -1,0 +1,379 @@
+<header class="fw-header" [class.fw-header--menu]="menuOpen()">
+  <div class="fw-header__bar">
+    <a class="fw-header__brand" href="#" (click)="$event.preventDefault(); scrollTo('top')">
+      <pv-fw-logo [minimal]="true" [header]="true" />
+    </a>
+
+    <nav class="fw-header__nav" aria-label="Hauptnavigation">
+      <button type="button" (click)="scrollTo('angebot')">Angebot</button>
+      <button type="button" (click)="scrollTo('preise')">Preise</button>
+      <button type="button" (click)="scrollTo('studio')">Studio</button>
+      <button type="button" (click)="scrollTo('kontakt')">Kontakt</button>
+    </nav>
+
+    <div class="fw-header__end">
+      <a
+        class="fw-header__rating"
+        [href]="biz().googleReviews"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span aria-hidden="true">★</span> {{ biz().googleRatingValue }}
+      </a>
+      <pv-fw-social class="fw-header__social" />
+      <button type="button" class="fw-btn fw-btn--gold fw-header__btn" (click)="openBooking()">
+        Termin
+      </button>
+      <a class="fw-btn fw-btn--soft fw-header__btn" [href]="biz().phoneTel">Anrufen</a>
+      <button
+        type="button"
+        class="fw-header__burger"
+        [attr.aria-expanded]="menuOpen()"
+        aria-label="Menü"
+        (click)="toggleMenu()"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  @if (menuOpen()) {
+    <nav class="fw-header__mobile" aria-label="Mobile Navigation">
+      <a class="fw-header__mobile-link" [href]="biz().phoneTel">{{ biz().phone }}</a>
+      <a class="fw-header__mobile-link" [href]="biz().emailMailto">{{ biz().email }}</a>
+      <button type="button" (click)="scrollTo('angebot')">Angebot</button>
+      <button type="button" (click)="scrollTo('preise')">Preise</button>
+      <button type="button" (click)="scrollTo('studio')">Studio</button>
+      <button type="button" class="fw-btn fw-btn--gold" (click)="openBooking()">Termin vereinbaren</button>
+      <button type="button" (click)="scrollTo('kontakt')">Kontakt</button>
+    </nav>
+  }
+</header>
+
+<main id="top">
+
+  <section class="fw-stage" aria-label="Willkommen">
+
+    <img class="fw-stage__bg" [src]="images.hero" alt="" aria-hidden="true" width="1920" height="1280" />
+
+    <div class="fw-stage__shade" aria-hidden="true"></div>
+
+
+
+    <div class="fw-stage__layout">
+
+      <div class="fw-stage__pitch">
+
+        @if (biz().showOpeningNotice) {
+          <p class="fw-hero__badge">{{ copy().hero.openingLabel }} {{ biz().opened }}</p>
+        }
+
+        <div class="fw-stage__rule" aria-hidden="true"></div>
+
+        <h1 class="fw-stage__title">{{ copy().hero.titleLine1 }}<br />{{ copy().hero.titleLine2 }}</h1>
+
+        <p class="fw-stage__lead">
+          {{ copy().hero.lead }}
+        </p>
+
+        <div class="fw-stage__actions">
+          <button type="button" class="fw-btn fw-btn--gold" (click)="openBooking()">
+            {{ copy().hero.ctaPrimary }}
+          </button>
+          <button type="button" class="fw-btn fw-btn--ghost" (click)="scrollTo('preise')">
+            {{ copy().hero.ctaSecondary }}
+          </button>
+        </div>
+
+        <ul class="fw-stage__points">
+          <li>{{ copy().hero.point1 }}</li>
+          <li>{{ copy().hero.point2 }}</li>
+        </ul>
+
+      </div>
+
+
+
+      <pv-fw-hours-card />
+
+    </div>
+
+
+
+    <button type="button" class="fw-stage__more" (click)="scrollTo('angebot')">
+
+      Mehr erfahren <span aria-hidden="true">↓</span>
+
+    </button>
+
+  </section>
+
+
+
+  <section id="angebot" class="fw-section">
+
+    <div class="fw-section__intro">
+
+      <p class="fw-eyebrow">{{ copy().angebot.eyebrow }}</p>
+
+      <h2 class="fw-section-title">{{ copy().angebot.title }}</h2>
+
+      <p class="fw-lead">{{ copy().angebot.lead }}</p>
+
+    </div>
+
+
+
+    <div class="fw-offer">
+
+      @for (s of services(); track s.id) {
+
+        <article class="fw-offer__card fw-card">
+
+          <span class="fw-offer__num">{{ s.num }}</span>
+
+          <div class="fw-offer__body">
+
+            <h3>{{ s.title }}</h3>
+
+            <p class="fw-offer__summary">{{ s.summary }}</p>
+
+            <ul class="fw-offer__list">
+
+              @for (item of s.includes; track item) {
+
+                <li>{{ item }}</li>
+
+              }
+
+            </ul>
+
+            <footer class="fw-offer__foot">
+
+              <span>{{ s.duration }}</span>
+
+              <strong>ab {{ formatPrice(s.fromPrice) }}</strong>
+
+            </footer>
+
+          </div>
+
+        </article>
+
+      }
+
+    </div>
+
+  </section>
+
+
+
+  <section id="preise" class="fw-section fw-section--prices">
+
+    <div class="fw-section__intro fw-section__intro--center">
+
+      <p class="fw-eyebrow">{{ copy().preise.eyebrow }}</p>
+
+      <h2 class="fw-section-title">{{ copy().preise.title }}</h2>
+
+    </div>
+
+    <div class="fw-price-grid">
+
+      @for (tier of prices(); track tier.id) {
+
+        <article class="fw-price-card fw-card" [class.fw-price-card--featured]="tier.featured">
+
+          @if (tier.featured) {
+
+            <span class="fw-price-card__badge">Beliebt</span>
+
+          }
+
+          <p class="fw-price-card__sub">{{ tier.subtitle }}</p>
+
+          <h3>{{ tier.name }}</h3>
+
+          <p class="fw-price-card__amount">{{ formatPrice(tier.price) }}</p>
+
+          <p class="fw-price-card__time">{{ tier.duration }}</p>
+
+          <ul>
+
+            @for (item of tier.highlights; track item) {
+
+              <li>{{ item }}</li>
+
+            }
+
+          </ul>
+
+        </article>
+
+      }
+
+    </div>
+
+  </section>
+
+
+
+  <section class="fw-section fw-gallery">
+
+    <figure class="fw-gallery__item fw-card">
+
+      <img [src]="images.care" alt="Fußbad und entspannte Pflege" width="800" height="600" loading="lazy" />
+
+    </figure>
+
+    <figure class="fw-gallery__item fw-card">
+
+      <img [src]="images.detail" alt="Sanfte Fußpflege im Handtuch" width="800" height="600" loading="lazy" />
+
+    </figure>
+
+  </section>
+
+
+
+  <section id="studio" class="fw-section fw-studio">
+
+    <figure class="fw-studio__media fw-card">
+
+      <img src="/fusswerk/studio-hero.png" alt="Fusswerk Studio in der Salinenstraße" width="900" height="680" loading="lazy" />
+
+    </figure>
+
+    <div class="fw-studio__copy">
+
+      <p class="fw-eyebrow">{{ copy().studioSection.eyebrow }}</p>
+
+      <h2 class="fw-section-title">{{ copy().studioSection.title }}</h2>
+
+      <p>{{ copy().studioSection.body }}</p>
+
+      <ul class="fw-trust">
+
+        @for (item of trust(); track item) {
+
+          <li>{{ item }}</li>
+
+        }
+
+      </ul>
+
+    </div>
+
+  </section>
+
+
+
+  <section id="kontakt" class="fw-section fw-contact">
+
+    <div class="fw-contact__shell fw-card">
+
+      <div class="fw-contact__main">
+
+        <p class="fw-eyebrow">{{ copy().kontakt.eyebrow }}</p>
+
+        <h2 class="fw-section-title">{{ copy().kontakt.title }}</h2>
+
+        <a class="fw-btn fw-btn--phone" [href]="biz().phoneTel">{{ biz().phone }} anrufen</a>
+
+        <dl class="fw-contact__meta">
+
+          <div>
+
+            <dt>Adresse</dt>
+
+            <dd>{{ biz().street }}<br />{{ biz().zip }} {{ biz().city }}</dd>
+
+          </div>
+
+          <div>
+
+            <dt>E-Mail</dt>
+
+            <dd><a class="fw-contact__email" [href]="biz().emailMailto">{{ biz().email }}</a></dd>
+
+          </div>
+
+        </dl>
+
+        <div class="fw-contact__social">
+
+          <pv-fw-social />
+
+          <a class="fw-contact__rating" [href]="biz().googleReviews" target="_blank" rel="noopener noreferrer">
+
+            <span aria-hidden="true">★</span> Google Bewertungen
+
+          </a>
+
+        </div>
+
+      </div>
+
+      <aside class="fw-contact__aside">
+
+        <h3>Öffnungszeiten</h3>
+
+        <pv-fw-hours-list [rows]="hours()" />
+
+      </aside>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+
+<footer class="fw-footer">
+
+  <div class="fw-footer__inner">
+
+    <a class="fw-footer__brand" href="#" (click)="$event.preventDefault(); scrollTo('top')">
+      <pv-fw-logo [minimal]="true" />
+    </a>
+
+    <div class="fw-footer__meta">
+
+      <a class="fw-footer__rating" [href]="biz().googleReviews" target="_blank" rel="noopener noreferrer">
+        {{ biz().googleRating }}
+      </a>
+      <pv-fw-social />
+    </div>
+    <nav class="fw-footer__legal" aria-label="Rechtliches">
+      <a routerLink="/demo/fusswerk/impressum">Impressum</a>
+      <a routerLink="/demo/fusswerk/datenschutz">Datenschutz</a>
+      @if (!isStudioEmbed()) {
+        <a routerLink="/demo/fusswerk/studio">Studio</a>
+      }
+    </nav>
+
+    <div class="fw-footer__payments" aria-label="Zahlungsarten">
+      <p class="fw-footer__payments-label">Zahlungsarten</p>
+      <ul class="fw-footer__payments-list">
+        @for (method of paymentMethods; track method.id) {
+          <li>
+            <span class="fw-footer__pay" [attr.data-variant]="method.variant ?? method.id">
+              {{ method.label }}
+            </span>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <p class="fw-footer__copy">© {{ biz().name }} · {{ biz().city }}</p>
+
+  </div>
+
+</footer>
+
+
+
+<pv-fw-booking-wizard [open]="bookingOpen()" (closed)="bookingOpen.set(false)" />
+
+

@@ -20,6 +20,7 @@ const fs = require('fs');
 const fsp = require('fs/promises');
 const path = require('path');
 const crypto = require('crypto');
+const { handleFusswerkBooking } = require('./fusswerk-booking');
 
 const PORT = Number(process.env.PORT) || 19290;
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
@@ -1793,6 +1794,23 @@ const server = http.createServer(async (req, res) => {
     sendJson(res, 405, { ok: false, error: 'Methode nicht erlaubt' });
     return;
   }
+
+  const fusswerkHandled = await handleFusswerkBooking({
+    req,
+    res,
+    method,
+    pathname,
+    url,
+    store,
+    persistStore,
+    readBody,
+    sendJson,
+    sendRedirect,
+    randomToken,
+    nowIso,
+    clientIp,
+  });
+  if (fusswerkHandled) return;
 
   sendJson(res, 404, { ok: false, error: 'Nicht gefunden' });
 });

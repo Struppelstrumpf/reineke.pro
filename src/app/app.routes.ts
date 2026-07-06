@@ -51,6 +51,39 @@ export const routes: Routes = [
   { path: 'demo/dog', redirectTo: 'demo/nasebaer', pathMatch: 'full' },
 
   {
+    path: 'demo/fusswerk',
+    loadComponent: () =>
+      import('./sites/fusswerk/fusswerk-shell.component').then((m) => m.FusswerkShellComponent),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./sites/fusswerk/pages/home/home.component').then((m) => m.FwHomeComponent),
+      },
+      {
+        path: 'termin-bestaetigen',
+        loadComponent: () =>
+          import('./sites/fusswerk/pages/confirm/confirm.component').then((m) => m.FwConfirmComponent),
+      },
+      {
+        path: 'studio',
+        loadComponent: () =>
+          import('./sites/fusswerk/pages/studio/studio.component').then((m) => m.FwStudioComponent),
+      },
+      {
+        path: 'impressum',
+        loadComponent: () =>
+          import('./sites/fusswerk/pages/impressum/impressum.component').then((m) => m.FwImpressumComponent),
+      },
+      {
+        path: 'datenschutz',
+        loadComponent: () =>
+          import('./sites/fusswerk/pages/impressum/datenschutz.component').then((m) => m.FwDatenschutzComponent),
+      },
+    ],
+  },
+
+  {
 
     path: 'demo/weisser-schaefer',
 

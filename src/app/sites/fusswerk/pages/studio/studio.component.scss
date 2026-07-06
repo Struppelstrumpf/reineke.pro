@@ -1,0 +1,329 @@
+:host {
+  display: block;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  max-width: 100vw;
+}
+
+.fw-studio-login {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.fw-studio-login__card {
+  width: min(26rem, 100%);
+  padding: 1.25rem;
+}
+
+.fw-studio-login__lead {
+  margin: 0 0 1rem;
+  color: var(--fw-muted);
+  font-size: 0.88rem;
+}
+
+.fw-studio-login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.fw-studio-login__form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  color: var(--fw-muted);
+}
+
+.fw-studio-login__form input {
+  border: 1px solid var(--fw-border);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.65rem;
+  font: inherit;
+}
+
+.fw-studio-login__error {
+  margin: 0;
+  color: #b33;
+  font-size: 0.82rem;
+}
+
+.fw-studio-login__back {
+  display: inline-block;
+  margin-top: 0.85rem;
+  color: var(--fw-blue-deep);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.fw-studio-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  max-width: min(1680px, 100%);
+  margin: 0 auto;
+  padding: 0 clamp(0.5rem, 1.5vw, 0.85rem);
+}
+
+.fw-studio__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  padding: 0.4rem 0 0.35rem;
+  min-height: 0;
+}
+
+.fw-studio__bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.fw-studio-panel {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0.35rem;
+}
+
+.fw-studio-panel > * {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.fw-studio-panel--wide {
+  max-width: 100%;
+}
+
+.fw-account__lead {
+  margin: 0 0 0.75rem;
+  color: var(--fw-muted);
+  font-size: 0.85rem;
+}
+
+.fw-account__form {
+  display: grid;
+  gap: 0.6rem;
+  max-width: 22rem;
+}
+
+.fw-account__form label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  color: var(--fw-muted);
+}
+
+.fw-account__form input {
+  border: 1px solid var(--fw-border);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.65rem;
+  font: inherit;
+}
+
+.fw-studio__pill {
+  border: 0;
+  border-radius: 999px;
+  min-width: 1.65rem;
+  height: 1.65rem;
+  padding: 0 0.45rem;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.fw-studio__pill--bookings {
+  background: rgba(106, 143, 168, 0.18);
+  color: var(--fw-blue-deep);
+}
+
+.fw-studio__pill--chat {
+  background: var(--fw-gold-soft);
+  color: #7a5d32;
+}
+
+.fw-studio__tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.2rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--fw-border);
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.fw-studio__tabs button {
+  border: 0;
+  background: transparent;
+  border-radius: 999px;
+  padding: 0.32rem 0.65rem;
+  font: inherit;
+  font-size: clamp(0.72rem, 1.8vw, 0.82rem);
+  font-weight: 600;
+  color: var(--fw-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.fw-studio__tabs button.is-active {
+  background: #fff;
+  color: var(--fw-ink);
+  box-shadow: var(--fw-shadow-soft);
+}
+
+.fw-studio__tab-badge {
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: #c9a87a;
+  color: #fff;
+  font-size: 0.62rem;
+  display: inline-grid;
+  place-items: center;
+}
+
+.fw-btn--xs {
+  min-height: 1.85rem !important;
+  padding: 0.22rem 0.55rem !important;
+  font-size: 0.72rem !important;
+  border-radius: 999px !important;
+}
+
+.fw-admin-card {
+  padding: 0.85rem;
+  border-radius: var(--fw-radius-sm);
+  border: 1px solid var(--fw-border);
+  background: var(--fw-paper);
+  box-shadow: var(--fw-shadow-soft);
+  overflow: auto;
+}
+
+.fw-admin-card h2 {
+  margin: 0 0 0.65rem;
+  font-family: var(--fw-serif);
+  font-size: 1.1rem;
+}
+
+.fw-admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.fw-admin-form input,
+.fw-admin-form select {
+  border: 1px solid var(--fw-border);
+  border-radius: 0.75rem;
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+}
+
+.fw-users {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.fw-user-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--fw-border);
+  border-radius: 0.75rem;
+  background: #fff;
+  font-size: 0.82rem;
+}
+
+.fw-user-row__actions {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.fw-studio-toast {
+  position: fixed;
+  bottom: 0.65rem;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: var(--fw-ink);
+  color: #fff;
+  font-size: 0.8rem;
+  z-index: 90;
+}
+
+.fw-studio-shell--mobile .fw-studio__bar {
+  padding-top: 0.3rem;
+}
+
+.fw-studio-shell--mobile .fw-studio__tabs {
+  flex: 1;
+}
+
+.fw-studio-shell--mobile .fw-studio__tabs button {
+  flex: 1;
+  justify-content: center;
+  padding: 0.45rem 0.5rem;
+}
+
+@media (max-width: 800px) {
+  .fw-user-row {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .fw-studio-shell {
+    padding-inline: 0.35rem;
+  }
+
+  .fw-studio__bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+  }
+
+  .fw-studio__bar-actions {
+    justify-content: flex-end;
+  }
+
+  .fw-studio-toast {
+    bottom: max(0.65rem, env(safe-area-inset-bottom));
+    max-width: calc(100vw - 1.25rem);
+    text-align: center;
+  }
+
+  .fw-studio-login__card {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .fw-studio__tabs button {
+    font-size: 0.68rem;
+    padding: 0.38rem 0.42rem;
+  }
+}

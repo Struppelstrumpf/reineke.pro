@@ -22,6 +22,10 @@
   min-height: 100dvh;
 }
 
+.app-stage--no-sidebar {
+  padding-left: 0 !important;
+}
+
 .app-stage--dimmed {
   opacity: 0.1;
   pointer-events: none;

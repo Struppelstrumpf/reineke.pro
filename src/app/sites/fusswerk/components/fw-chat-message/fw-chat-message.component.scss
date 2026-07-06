@@ -1,0 +1,157 @@
+.fw-chat-msg {
+  align-self: flex-start;
+  max-width: 92%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fw-chat-msg.is-self {
+  align-self: flex-end;
+}
+
+.fw-chat-msg__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0 0.15rem;
+}
+
+.fw-chat-msg__head strong {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--fw-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.fw-chat-msg__head time {
+  font-size: 0.62rem;
+  color: var(--fw-soft, var(--fw-muted));
+}
+
+.fw-chat-msg__text {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: 1rem 1rem 1rem 0.35rem;
+  border: 1px solid var(--fw-border);
+  background: #fff;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.fw-chat-msg.is-self .fw-chat-msg__text {
+  border-radius: 1rem 1rem 0.35rem 1rem;
+  border-color: color-mix(in srgb, var(--fw-gold) 35%, var(--fw-border));
+  background: var(--fw-gold-soft);
+}
+
+.fw-chat-msg__card {
+  border-radius: 1rem;
+  border: 1px solid var(--fw-border);
+  background: #fff;
+  overflow: hidden;
+}
+
+.fw-chat-msg__card--info {
+  padding: 0.65rem 0.8rem;
+  border-color: color-mix(in srgb, var(--fw-blue) 30%, var(--fw-border));
+  background: linear-gradient(145deg, #fff, var(--fw-blue-soft));
+}
+
+.fw-chat-msg__card--info h4 {
+  margin: 0 0 0.35rem;
+  font-family: var(--fw-serif);
+  font-size: 0.95rem;
+}
+
+.fw-chat-msg__card--info p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.fw-chat-msg__card--appt {
+  padding: 0.7rem 0.8rem;
+  border-color: color-mix(in srgb, var(--fw-gold) 40%, var(--fw-border));
+  background: linear-gradient(155deg, #fffdf9, var(--fw-gold-soft));
+}
+
+.fw-chat-msg__card--appt[data-status='confirmed'] {
+  border-color: color-mix(in srgb, #4c8c6a 40%, var(--fw-border));
+  background: linear-gradient(155deg, #fff, rgba(76, 140, 106, 0.12));
+}
+
+.fw-chat-msg__card--appt[data-status='declined'] {
+  opacity: 0.72;
+}
+
+.fw-chat-msg__appt-label {
+  margin: 0 0 0.2rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fw-gold);
+}
+
+.fw-chat-msg__card--appt h4 {
+  margin: 0 0 0.45rem;
+  font-family: var(--fw-serif);
+  font-size: 1rem;
+}
+
+.fw-chat-msg__card--appt ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.fw-chat-msg__card--appt li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.fw-chat-msg__card--appt li span {
+  color: var(--fw-muted);
+}
+
+.fw-chat-msg__appt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+}
+
+.fw-chat-msg__appt-actions .fw-btn {
+  min-height: 2.2rem !important;
+  padding: 0.35rem 0.85rem !important;
+  font-size: 0.78rem !important;
+  border-radius: 999px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  font-family: var(--fw-display);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fw-chat-msg__appt-actions .fw-btn--gold {
+  color: #fff;
+  background: linear-gradient(135deg, #c9a87a, #9a7648);
+}
+
+.fw-chat-msg__appt-actions .fw-btn--soft {
+  color: var(--fw-blue-deep);
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(106, 143, 168, 0.28);
+}

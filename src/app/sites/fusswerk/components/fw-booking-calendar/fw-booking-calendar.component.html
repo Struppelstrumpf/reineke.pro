@@ -1,0 +1,342 @@
+<section class="fw-cal">
+  <header class="fw-cal__head">
+    <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" (click)="bookings.refresh()" aria-label="Aktualisieren">↻</button>
+    <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" (click)="openSettings()">
+      <span aria-hidden="true">⚙</span>
+      <span class="fw-cal__settings-label">Einstellungen</span>
+    </button>
+  </header>
+
+  @if (bookings.loadError()) {
+    <p class="fw-cal__error">{{ bookings.loadError() }}</p>
+  }
+
+  <div class="fw-cal__layout">
+    <div class="fw-cal__month fw-card">
+      <div class="fw-cal__month-nav">
+        <button type="button" class="fw-cal__nav-btn" (click)="prevMonth()" aria-label="Vorheriger Monat">‹</button>
+        <strong>{{ monthLabel() }}</strong>
+        <button type="button" class="fw-cal__nav-btn" (click)="nextMonth()" aria-label="Nächster Monat">›</button>
+      </div>
+      <div class="fw-cal__weekdays">
+        @for (w of weekdayLabels; track w) {
+          <span>{{ w }}</span>
+        }
+      </div>
+      <div class="fw-cal__grid">
+        @for (cell of calendarDays(); track cell.key) {
+          <button
+            type="button"
+            class="fw-cal__day"
+            [class.is-out]="!cell.inMonth"
+            [class.is-past]="cell.isPast"
+            [class.is-selected]="cell.date === selectedDate()"
+            [class.has-bookings]="bookingCount(cell.date) > 0"
+            [class.has-pending]="pendingCount(cell.date) > 0"
+            (click)="selectDate(cell.date)"
+          >
+            <span>{{ cell.day }}</span>
+            @if (bookingCount(cell.date) > 0) {
+              <em>{{ bookingCount(cell.date) }}</em>
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="fw-cal__slots fw-card">
+      <h3>Zeiten am {{ formatDate(selectedDate()) }}</h3>
+      @if (isPastDate(selectedDate())) {
+        <p class="fw-cal__hint fw-cal__hint--past">Vergangener Tag — Termine einsehbar, keine Neuanlage.</p>
+      }
+      @if (slotsLoading()) {
+        <p class="fw-cal__hint">Lade Zeiten…</p>
+      } @else if (slots().length === 0) {
+        <p class="fw-cal__hint">An diesem Tag ist geschlossen.</p>
+      } @else {
+        <div class="fw-cal__slot-grid">
+          @for (slot of slots(); track slot.time) {
+            <button
+              type="button"
+              class="fw-cal__slot"
+              [class]="slotClass(slot)"
+              [class.has-duplicate]="hasSlotDuplicate(slot)"
+              [disabled]="slotDisabled(slot)"
+              (click)="openSlot(slot)"
+            >
+              @if (hasSlotDuplicate(slot)) {
+                <span class="fw-cal__slot-warn" aria-hidden="true">!</span>
+              }
+              <span>{{ slot.time }}</span>
+              @if (slot.booking) {
+                <small>{{ slot.booking.name }}</small>
+              } @else if (slot.available) {
+                <small>Frei</small>
+              } @else if (slot.staffBookable) {
+                <small>Studio</small>
+              }
+            </button>
+          }
+        </div>
+      }
+      <p class="fw-cal__legend">
+        <span class="dot is-free"></span> Frei
+        <span class="dot is-pending"></span> Anfrage
+        <span class="dot is-booked"></span> Bestätigt
+        <span class="dot is-dup"></span> Mehrfachbuchung
+        <span class="dot is-staff-only"></span> Nur Studio
+      </p>
+    </div>
+  </div>
+</section>
+
+@if (modalMode()) {
+  <div class="fw-cal-modal" (click)="closeModal()">
+    <article class="fw-cal-modal__card fw-card" (click)="$event.stopPropagation()">
+      @if (modalMode() === 'view' && activeBooking(); as b) {
+        <header class="fw-cal-modal__head">
+          <h3>
+            {{ b.name }}
+            @if (hasDuplicateWarning(b)) {
+              <span class="fw-cal-modal__dup-badge" aria-hidden="true">!</span>
+            }
+          </h3>
+          <span class="fw-cal-modal__status" [attr.data-status]="b.status">{{ statusLabel(b.status) }}</span>
+        </header>
+        @if (hasDuplicateWarning(b)) {
+          <button type="button" class="fw-cal-modal__dup-hint" (click)="openDuplicateResolve(b)">
+            <span class="fw-cal-modal__dup-badge" aria-hidden="true">!</span>
+            Mehrere Termine dieses Kunden am selben Tag — bitte prüfen
+          </button>
+        }
+        <dl class="fw-cal-modal__meta">
+          <div><dt>Termin</dt><dd>{{ formatDate(b.date) }}, {{ b.slot }} Uhr</dd></div>
+          <div><dt>Leistung</dt><dd>{{ bookings.serviceLabel(b.serviceId, serviceLabels()) }}</dd></div>
+          @if (b.email) { <div><dt>E-Mail</dt><dd>{{ b.email }}</dd></div> }
+          @if (b.phone) { <div><dt>Telefon</dt><dd>{{ b.phone }}</dd></div> }
+        </dl>
+        @if (b.notes?.length) {
+          <div class="fw-cal-modal__notes">
+            <h4>Notizen</h4>
+            <ul>
+              @for (n of b.notes; track n.at) {
+                <li>{{ n.text }}</li>
+              }
+            </ul>
+          </div>
+        }
+        @if (b.status !== 'cancelled') {
+          <div class="fw-cal-modal__actions">
+            @if (b.status === 'pending') {
+              <button type="button" class="fw-btn fw-btn--gold" [disabled]="actionBusy()" (click)="confirmBooking()">Zusagen</button>
+            }
+            <button type="button" class="fw-btn fw-btn--soft" [disabled]="actionBusy()" (click)="openReschedule()">Verschieben</button>
+            <button type="button" class="fw-btn fw-btn--soft" [disabled]="actionBusy()" (click)="cancelBooking()">Absagen</button>
+          </div>
+        }
+      }
+
+      @if (modalMode() === 'create') {
+        <header class="fw-cal-modal__head"><h3>Termin eintragen</h3></header>
+        <p class="fw-cal-modal__lead">{{ formatDate(selectedDate()) }}, {{ createSlot() }} Uhr</p>
+        <div class="fw-cal-form">
+          <label><span>Name *</span><input [ngModel]="createName()" (ngModelChange)="createName.set($event)" name="cn" /></label>
+          <label><span>Telefon</span><input [ngModel]="createPhone()" (ngModelChange)="createPhone.set($event)" name="cp" /></label>
+          <label><span>E-Mail</span><input type="email" [ngModel]="createEmail()" (ngModelChange)="createEmail.set($event)" name="ce" /></label>
+          <label><span>Leistung</span>
+            <select [ngModel]="createServiceId()" (ngModelChange)="onCreateServiceChange($event)" name="cs">
+              @for (s of serviceOptions(); track s.id) {
+                <option [value]="s.id">{{ s.title }} ({{ serviceDurationLabel(s) }})</option>
+              }
+            </select>
+          </label>
+        </div>
+        <div class="fw-cal-modal__actions">
+          <button type="button" class="fw-btn fw-btn--gold" [disabled]="actionBusy()" (click)="submitCreate()">Speichern</button>
+          <button type="button" class="fw-btn fw-btn--soft" (click)="closeModal()">Abbrechen</button>
+        </div>
+      }
+
+      @if (modalMode() === 'reschedule') {
+        <header class="fw-cal-modal__head"><h3>Termin verschieben</h3></header>
+        <div class="fw-cal-form">
+          <label><span>Neues Datum</span><input type="date" [ngModel]="rescheduleDate()" (ngModelChange)="rescheduleDate.set($event)" name="rd" /></label>
+          <label><span>Uhrzeit</span><input [ngModel]="rescheduleSlot()" (ngModelChange)="rescheduleSlot.set($event)" name="rt" placeholder="09:00" /></label>
+          <fieldset class="fw-cal-radio">
+            <legend>Benachrichtigung</legend>
+            <label><input type="radio" name="rm" [ngModel]="rescheduleMode()" (ngModelChange)="rescheduleMode.set($event)" value="direct" /> Direkt verschieben &amp; Kunde informieren</label>
+            <label><input type="radio" name="rm" [ngModel]="rescheduleMode()" (ngModelChange)="rescheduleMode.set($event)" value="request" /> Beim Kunden anfragen</label>
+          </fieldset>
+        </div>
+        <div class="fw-cal-modal__actions">
+          <button type="button" class="fw-btn fw-btn--gold" [disabled]="actionBusy()" (click)="submitReschedule()">Verschieben</button>
+          <button type="button" class="fw-btn fw-btn--soft" (click)="modalMode.set('view')">Zurück</button>
+        </div>
+      }
+
+      @if (modalMode() === 'duplicates') {
+        <header class="fw-cal-modal__head">
+          <h3>Mehrfachbuchung am {{ formatDate(selectedDate()) }}</h3>
+        </header>
+        <p class="fw-cal-modal__lead">
+          Dieser Kunde hat mehrere Termine am selben Tag. Welchen möchten Sie behalten?
+        </p>
+        <ul class="fw-cal-dup-list">
+          @for (item of duplicateGroup(); track item.id) {
+            <li>
+              <label class="fw-cal-dup-item">
+                <input
+                  type="radio"
+                  name="keepBooking"
+                  [value]="item.id"
+                  [ngModel]="keepBookingId()"
+                  (ngModelChange)="keepBookingId.set($event)"
+                />
+                <span>
+                  <strong>{{ item.slot }} Uhr</strong>
+                  — {{ bookings.serviceLabel(item.serviceId, serviceLabels()) }}
+                  <small>{{ statusLabel(item.status) }}</small>
+                </span>
+              </label>
+            </li>
+          }
+        </ul>
+        <div class="fw-cal-modal__actions">
+          <button type="button" class="fw-btn fw-btn--gold" [disabled]="actionBusy()" (click)="keepOnlySelectedDuplicate()">
+            Nur ausgewählten behalten
+          </button>
+          <button type="button" class="fw-btn fw-btn--soft" [disabled]="actionBusy()" (click)="keepAllDuplicates()">
+            Alle behalten
+          </button>
+          <button type="button" class="fw-btn fw-btn--soft" [disabled]="actionBusy()" (click)="deleteAllDuplicates()">
+            Alle löschen
+          </button>
+        </div>
+      }
+
+      @if (modalMode() === 'settings') {
+        <header class="fw-cal-modal__head"><h3>Termin-Einstellungen</h3></header>
+        <p class="fw-cal-modal__lead">
+          Öffnungszeiten kommen aus <strong>Inhalte → Kontakt</strong>. Leistungsdauern aus <strong>Angebot → Leistungen</strong>.
+        </p>
+        <div class="fw-cal-form">
+          <label class="fw-cal-check">
+            <input
+              type="checkbox"
+              [ngModel]="settingsDraft().useServiceDurations"
+              (ngModelChange)="updateSettingsDraft({ useServiceDurations: $event })"
+              name="useSvc"
+            />
+            <span>Dauer je Leistung aus dem Angebot (sonst einheitliche Dauer)</span>
+          </label>
+          @if (!settingsDraft().useServiceDurations) {
+            <label>
+              <span>Einheitliche Termindauer (Minuten)</span>
+              <input
+                type="number"
+                min="15"
+                max="240"
+                step="5"
+                [ngModel]="settingsDraft().defaultDurationMinutes"
+                (ngModelChange)="updateSettingsDraft({ defaultDurationMinutes: +$event })"
+                name="defaultDur"
+              />
+            </label>
+          }
+          <label>
+            <span>Puffer nach Behandlung (Minuten)</span>
+            <input
+              type="number"
+              min="0"
+              max="60"
+              step="5"
+              [ngModel]="settingsDraft().bufferMinutes"
+              (ngModelChange)="updateSettingsDraft({ bufferMinutes: +$event })"
+              name="buffer"
+            />
+          </label>
+          <label>
+            <span>Zeitraster (Minuten)</span>
+            <input
+              type="number"
+              min="5"
+              max="60"
+              step="5"
+              [ngModel]="settingsDraft().slotStepMinutes"
+              (ngModelChange)="updateSettingsDraft({ slotStepMinutes: +$event })"
+              name="step"
+            />
+          </label>
+          <label>
+            <span>Keine Termine in den letzten Zeitrastern vor Schluss</span>
+            <input
+              type="number"
+              min="0"
+              max="24"
+              step="1"
+              [ngModel]="settingsDraft().closingBufferSlots"
+              (ngModelChange)="updateSettingsDraft({ closingBufferSlots: Math.max(0, +$event) })"
+              name="closeBuf"
+            />
+          </label>
+          <div class="fw-cal-setting-row">
+            <div>
+              <span class="fw-cal-setting-row__label">Abstand vor bestehendem Termin</span>
+              <p class="fw-cal-setting-row__hint">
+                Kunden können nur buchen, wenn der Start mindestens so viele Minuten vor dem nächsten Termin liegt.
+              </p>
+            </div>
+            <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" (click)="openGapPicker()">
+              {{ settingsDraft().gapBeforeBookingMinutes }} Min.
+            </button>
+          </div>
+          <p class="fw-cal-modal__lead">
+            Ausgegraute Zeiten sind für Kunden gesperrt — im Studio können Sie dort trotzdem Termine eintragen.
+          </p>
+          <p class="fw-cal-modal__lead">
+            @if (settingsDraft().closingBufferSlots > 0) {
+              Die letzten
+              {{ settingsDraft().closingBufferSlots * settingsDraft().slotStepMinutes }} Minuten vor Ladenschluss
+              sind für Kunden ausgegraut und nicht buchbar.
+            } @else {
+              Kunden können bis zum letzten Zeitraster vor Ladenschluss buchen.
+            }
+          </p>
+        </div>
+        @if (gapPickerOpen()) {
+          <div class="fw-cal-submodal" (click)="closeGapPicker()">
+            <div class="fw-cal-submodal__card" (click)="$event.stopPropagation()">
+              <h4>Abstand vor Termin</h4>
+              <p>Wie viele Minuten vor einem bestehenden Termin nehmen Sie online keine Buchungen mehr an?</p>
+              <label>
+                <span>Minuten (5–120)</span>
+                <input
+                  type="number"
+                  min="5"
+                  max="120"
+                  step="5"
+                  [ngModel]="gapPickerDraft()"
+                  (ngModelChange)="gapPickerDraft.set(+$event)"
+                  name="gapMin"
+                />
+              </label>
+              <div class="fw-cal-modal__actions">
+                <button type="button" class="fw-btn fw-btn--gold" (click)="applyGapPicker()">Übernehmen</button>
+                <button type="button" class="fw-btn fw-btn--soft" (click)="closeGapPicker()">Abbrechen</button>
+              </div>
+            </div>
+          </div>
+        }
+        <div class="fw-cal-modal__actions">
+          <button type="button" class="fw-btn fw-btn--gold" (click)="saveSettings()">Speichern</button>
+          <button type="button" class="fw-btn fw-btn--soft" (click)="closeModal()">Abbrechen</button>
+        </div>
+      }
+
+      @if (actionError()) {
+        <p class="fw-cal__error">{{ actionError() }}</p>
+      }
+      <button type="button" class="fw-cal-modal__close" (click)="closeModal()" aria-label="Schließen">×</button>
+    </article>
+  </div>
+}

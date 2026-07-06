@@ -10,6 +10,7 @@ import { RouterLink } from '@angular/router';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 import {
+  HIDDEN_PREVIEW_SITES,
   PREVIEW_SITES,
   PREVIEW_STUDIO,
   type PreviewSiteId,
@@ -47,9 +48,18 @@ export class FiverrSidebarComponent {
   readonly studio = PREVIEW_STUDIO;
   readonly packages = STUDIO_PACKAGES;
   readonly expandedPackage = signal<StudioPackageId | null>(null);
+  readonly themeId = computed(() => this.siteId());
   readonly currentSite = computed(() => {
     const id = this.siteId();
-    return PREVIEW_SITES.find((s) => s.id === id) ?? PREVIEW_SITES[0];
+    const visible = PREVIEW_SITES.find((s) => s.id === id);
+    if (visible) {
+      return visible;
+    }
+    const hidden = HIDDEN_PREVIEW_SITES[id];
+    if (hidden) {
+      return { id, ...hidden };
+    }
+    return PREVIEW_SITES[0];
   });
   readonly otherSites = computed(() =>
     PREVIEW_SITES.filter((s) => s.id !== this.siteId()),
@@ -89,6 +99,9 @@ export class FiverrSidebarComponent {
       url.includes('/demo/dog')
     ) {
       return 'nasebaer';
+    }
+    if (url.includes('fusswerk')) {
+      return 'fusswerk';
     }
     return 'pizzeria';
   }

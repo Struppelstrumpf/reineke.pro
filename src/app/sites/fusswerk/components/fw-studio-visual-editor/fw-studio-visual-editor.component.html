@@ -1,0 +1,353 @@
+<div class="fw-visual">
+  <aside class="fw-visual__nav" aria-label="Bereiche">
+    <p class="fw-visual__nav-title">Bereiche bearbeiten</p>
+    <div class="fw-visual__tiles">
+      @for (sec of sections; track sec.id) {
+        <article
+          class="fw-visual__tile"
+          [class.is-active]="highlightSection() === sec.id"
+          role="button"
+          tabindex="0"
+          (click)="previewSection(sec.id, $event)"
+          (keydown.enter)="previewSection(sec.id, $event)"
+          (keydown.space)="previewSection(sec.id, $event)"
+        >
+          <span class="fw-visual__tile-label">{{ sec.label }}</span>
+          <button
+            type="button"
+            class="fw-visual__tile-edit"
+            (click)="openEditor(sec.id, $event)"
+          >
+            Bearbeiten
+          </button>
+        </article>
+      }
+    </div>
+    <button type="button" class="fw-visual__refresh fw-btn fw-btn--soft" (click)="refreshPreview()">
+      Vorschau neu laden
+    </button>
+  </aside>
+
+  <div class="fw-visual__preview">
+    <div class="fw-visual__preview-bar">
+      <span>Live-Vorschau</span>
+      <a class="fw-visual__open" href="/demo/fusswerk" target="_blank" rel="noopener">In neuem Tab öffnen</a>
+    </div>
+    <iframe #previewFrame class="fw-visual__frame" [src]="previewUrl" title="Website-Vorschau"></iframe>
+  </div>
+</div>
+
+@if (editorOpen()) {
+  <div class="fw-edit-modal" role="dialog" aria-modal="true" (click)="closeEditor()">
+    <article
+      class="fw-edit-modal__card fw-card"
+      [class.fw-edit-modal__card--wide]="editorSection() === 'angebot'"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="fw-edit-modal__head">
+        <div>
+          <h2>{{ sectionLabel() }}</h2>
+          <p>Änderungen werden sofort gespeichert.</p>
+        </div>
+        <button type="button" class="fw-edit-modal__close" (click)="closeEditor()" aria-label="Schließen">×</button>
+      </header>
+
+      <div class="fw-edit-modal__body">
+        @switch (editorSection()) {
+          @case ('hero') {
+            <div class="fw-edit-group">
+              <h3>Texte</h3>
+              <label class="fw-edit-field">
+                <span>Überschrift Zeile 1</span>
+                <input [ngModel]="content.copy().hero.titleLine1" (ngModelChange)="content.updateCopy({ hero: { titleLine1: $event } })" name="h1" />
+              </label>
+              <label class="fw-edit-field">
+                <span>Überschrift Zeile 2</span>
+                <input [ngModel]="content.copy().hero.titleLine2" (ngModelChange)="content.updateCopy({ hero: { titleLine2: $event } })" name="h2" />
+              </label>
+              <label class="fw-edit-field">
+                <span>Einleitung</span>
+                <textarea rows="3" [ngModel]="content.copy().hero.lead" (ngModelChange)="content.updateCopy({ hero: { lead: $event } })" name="hl"></textarea>
+              </label>
+              <label class="fw-edit-field">
+                <span>Button „Termin“</span>
+                <input [ngModel]="content.copy().hero.ctaPrimary" (ngModelChange)="content.updateCopy({ hero: { ctaPrimary: $event } })" name="hcp" />
+              </label>
+              <label class="fw-edit-field">
+                <span>Button „Preise“</span>
+                <input [ngModel]="content.copy().hero.ctaSecondary" (ngModelChange)="content.updateCopy({ hero: { ctaSecondary: $event } })" name="hcs" />
+              </label>
+              <label class="fw-edit-field">
+                <span>Hinweis 1</span>
+                <input [ngModel]="content.copy().hero.point1" (ngModelChange)="content.updateCopy({ hero: { point1: $event } })" name="hp1" />
+              </label>
+              <label class="fw-edit-field">
+                <span>Hinweis 2</span>
+                <input [ngModel]="content.copy().hero.point2" (ngModelChange)="content.updateCopy({ hero: { point2: $event } })" name="hp2" />
+              </label>
+              <label class="fw-edit-check">
+                <input type="checkbox" [ngModel]="content.business().showOpeningNotice" (ngModelChange)="content.updateBusiness({ showOpeningNotice: $event })" name="ho" />
+                Neueröffnung anzeigen
+              </label>
+              @if (content.business().showOpeningNotice) {
+                <label class="fw-edit-field">
+                  <span>{{ content.copy().hero.openingLabel }}</span>
+                  <div class="fw-edit-field__row">
+                    <input [ngModel]="content.copy().hero.openingLabel" (ngModelChange)="content.updateCopy({ hero: { openingLabel: $event } })" name="hol" />
+                    <input [ngModel]="content.business().opened" (ngModelChange)="content.updateBusiness({ opened: $event })" name="hod" placeholder="01.07.2026" />
+                  </div>
+                </label>
+              }
+            </div>
+            <div class="fw-edit-group">
+              <h3>Hero-Design</h3>
+              <label class="fw-edit-field">
+                <span>Überschrift Schrift</span>
+                <select [ngModel]="content.theme().fonts.serif" (ngModelChange)="content.updateTheme({ fonts: { serif: $event } })" name="hsf">
+                  @for (f of fontOptions; track f.value) {
+                    <option [value]="f.value">{{ f.label }}</option>
+                  }
+                </select>
+              </label>
+              <label class="fw-edit-field">
+                <span>Überschrift Größe</span>
+                <select [ngModel]="content.theme().sizes.heroTitle" (ngModelChange)="content.updateTheme({ sizes: { heroTitle: $event } })" name="hss">
+                  @for (s of heroSizeOptions; track s.value) {
+                    <option [value]="s.value">{{ s.label }}</option>
+                  }
+                </select>
+              </label>
+              <label class="fw-edit-field fw-edit-field--color">
+                <span>Überschrift Farbe</span>
+                <input type="color" [ngModel]="content.theme().hero.titleColor" (ngModelChange)="content.updateTheme({ hero: { titleColor: $event } })" name="htc" />
+              </label>
+              <label class="fw-edit-field">
+                <span>Textfarbe Einleitung</span>
+                <input [ngModel]="content.theme().hero.leadColor" (ngModelChange)="content.updateTheme({ hero: { leadColor: $event } })" name="hlc" placeholder="rgba(255,255,255,0.84)" />
+              </label>
+            </div>
+          }
+
+          @case ('angebot') {
+            <div class="fw-edit-group">
+              <h3>Abschnitt auf der Website</h3>
+              <label class="fw-edit-field"><span>Kleine Überschrift</span><input [ngModel]="content.copy().angebot.eyebrow" (ngModelChange)="content.updateCopy({ angebot: { eyebrow: $event } })" name="ae" /></label>
+              <label class="fw-edit-field"><span>Titel</span><input [ngModel]="content.copy().angebot.title" (ngModelChange)="content.updateCopy({ angebot: { title: $event } })" name="at" /></label>
+              <label class="fw-edit-field"><span>Einleitung</span><textarea rows="2" [ngModel]="content.copy().angebot.lead" (ngModelChange)="content.updateCopy({ angebot: { lead: $event } })" name="al"></textarea></label>
+            </div>
+            <div class="fw-edit-group fw-edit-group--services">
+              <div class="fw-edit-services-head">
+                <h3>Leistungen</h3>
+                <span class="fw-edit-services-count">{{ content.services().length }}</span>
+              </div>
+              <p class="fw-edit-services-hint">Zum Bearbeiten aufklappen. Die Reihenfolge entspricht der Anzeige auf der Website.</p>
+              <div class="fw-edit-services">
+                @for (s of content.services(); track s.id; let i = $index) {
+                  <article class="fw-edit-svc" [class.is-open]="expandedService() === i">
+                    <button
+                      type="button"
+                      class="fw-edit-svc__summary"
+                      (click)="toggleService(i)"
+                      [attr.aria-expanded]="expandedService() === i"
+                    >
+                      <span class="fw-edit-svc__num">{{ s.num }}</span>
+                      <span class="fw-edit-svc__brief">
+                        <strong>{{ s.title || 'Ohne Titel' }}</strong>
+                        <span>{{ s.duration }} · ab {{ s.fromPrice }} €</span>
+                      </span>
+                      <span class="fw-edit-svc__chev" aria-hidden="true"></span>
+                    </button>
+                    @if (expandedService() === i) {
+                      <div class="fw-edit-svc__body">
+                        <label class="fw-edit-field fw-edit-field--inset">
+                          <span>Leistungsname</span>
+                          <input
+                            [ngModel]="s.title"
+                            (ngModelChange)="updateService(i, { title: $event })"
+                            [name]="'st' + i"
+                            placeholder="z. B. Klassische Fußpflege"
+                          />
+                        </label>
+                        <label class="fw-edit-field fw-edit-field--inset">
+                          <span>Kurztext für die Website</span>
+                          <textarea
+                            rows="3"
+                            [ngModel]="s.summary"
+                            (ngModelChange)="updateService(i, { summary: $event })"
+                            [name]="'ss' + i"
+                            placeholder="Was ist enthalten? Wofür ist die Leistung gedacht?"
+                          ></textarea>
+                        </label>
+                        <div class="fw-edit-svc__row">
+                          <label class="fw-edit-field fw-edit-field--inset">
+                            <span>Behandlungsdauer</span>
+                            <pv-fw-duration-picker
+                              [minutes]="s.durationMinutes"
+                              (minutesChange)="updateServiceDuration(i, $event)"
+                            />
+                          </label>
+                          <label class="fw-edit-field fw-edit-field--inset">
+                            <span>Preis ab (€)</span>
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              [ngModel]="s.fromPrice"
+                              (ngModelChange)="updateService(i, { fromPrice: +$event })"
+                              [name]="'sp' + i"
+                            />
+                          </label>
+                        </div>
+                        <footer class="fw-edit-svc__foot">
+                          <div class="fw-edit-svc__order" aria-label="Reihenfolge">
+                            <button type="button" class="fw-edit-svc__arrow" (click)="moveService(i, -1)" [disabled]="i === 0" aria-label="Nach oben">↑</button>
+                            <button type="button" class="fw-edit-svc__arrow" (click)="moveService(i, 1)" [disabled]="i === content.services().length - 1" aria-label="Nach unten">↓</button>
+                            <span>Reihenfolge</span>
+                          </div>
+                          <button
+                            type="button"
+                            class="fw-edit-svc__delete"
+                            (click)="removeService(i)"
+                            [disabled]="content.services().length <= 1"
+                          >
+                            Leistung löschen
+                          </button>
+                        </footer>
+                      </div>
+                    }
+                  </article>
+                }
+              </div>
+              <button type="button" class="fw-edit-svc-add fw-btn fw-btn--soft" (click)="addService()">+ Leistung hinzufügen</button>
+            </div>
+          }
+
+          @case ('preise') {
+            <div class="fw-edit-group">
+              <h3>Abschnitt</h3>
+              <label class="fw-edit-field"><span>Kleine Überschrift</span><input [ngModel]="content.copy().preise.eyebrow" (ngModelChange)="content.updateCopy({ preise: { eyebrow: $event } })" name="pe" /></label>
+              <label class="fw-edit-field"><span>Titel</span><input [ngModel]="content.copy().preise.title" (ngModelChange)="content.updateCopy({ preise: { title: $event } })" name="pt" /></label>
+            </div>
+            <div class="fw-edit-group">
+              <h3>Preiskarten</h3>
+              @for (p of content.priceTiers(); track p.id; let i = $index) {
+                <details class="fw-edit-card" [open]="i === 0">
+                  <summary>{{ p.name }}</summary>
+                  <label class="fw-edit-field"><span>Name</span><input [ngModel]="p.name" (ngModelChange)="updatePrice(i, { name: $event })" [name]="'pn' + i" /></label>
+                  <label class="fw-edit-field"><span>Untertitel</span><input [ngModel]="p.subtitle" (ngModelChange)="updatePrice(i, { subtitle: $event })" [name]="'ps' + i" /></label>
+                  <label class="fw-edit-field"><span>Preis (€)</span><input type="number" [ngModel]="p.price" (ngModelChange)="updatePrice(i, { price: +$event })" [name]="'pp' + i" /></label>
+                  <label class="fw-edit-field"><span>Dauer</span><input [ngModel]="p.duration" (ngModelChange)="updatePrice(i, { duration: $event })" [name]="'pd' + i" /></label>
+                </details>
+              }
+            </div>
+          }
+
+          @case ('studio') {
+            <div class="fw-edit-group">
+              <h3>Studio-Texte</h3>
+              <label class="fw-edit-field"><span>Kleine Überschrift</span><input [ngModel]="content.copy().studioSection.eyebrow" (ngModelChange)="content.updateCopy({ studioSection: { eyebrow: $event } })" name="se" /></label>
+              <label class="fw-edit-field"><span>Titel</span><input [ngModel]="content.copy().studioSection.title" (ngModelChange)="content.updateCopy({ studioSection: { title: $event } })" name="stt" /></label>
+              <label class="fw-edit-field"><span>Fließtext</span><textarea rows="4" [ngModel]="content.copy().studioSection.body" (ngModelChange)="content.updateCopy({ studioSection: { body: $event } })" name="sb"></textarea></label>
+            </div>
+            <div class="fw-edit-group">
+              <h3>Vertrauenspunkte</h3>
+              @for (item of content.trust(); track $index; let i = $index) {
+                <label class="fw-edit-field"><span>Punkt {{ i + 1 }}</span><input [ngModel]="item" (ngModelChange)="updateTrust(i, $event)" [name]="'tr' + i" /></label>
+              }
+            </div>
+          }
+
+          @case ('kontakt') {
+            <div class="fw-edit-group">
+              <h3>Kontakt-Texte</h3>
+              <label class="fw-edit-field"><span>Kleine Überschrift</span><input [ngModel]="content.copy().kontakt.eyebrow" (ngModelChange)="content.updateCopy({ kontakt: { eyebrow: $event } })" name="ke" /></label>
+              <label class="fw-edit-field"><span>Titel</span><input [ngModel]="content.copy().kontakt.title" (ngModelChange)="content.updateCopy({ kontakt: { title: $event } })" name="kt" /></label>
+            </div>
+            <div class="fw-edit-group">
+              <h3>Öffnungszeiten</h3>
+              <pv-fw-hours-picker
+                [schedule]="content.openingHours()"
+                (scheduleChange)="saveOpeningHours($event)"
+              />
+            </div>
+          }
+
+          @case ('stammdaten') {
+            <div class="fw-edit-group">
+              <h3>Kontakt & Adresse</h3>
+              <label class="fw-edit-field"><span>Telefon</span><input [ngModel]="content.business().phone" (ngModelChange)="content.updateBusiness({ phone: $event })" name="ph" /></label>
+              <label class="fw-edit-field"><span>E-Mail</span><input [ngModel]="content.business().email" (ngModelChange)="content.updateBusiness({ email: $event })" name="em" /></label>
+              <label class="fw-edit-field"><span>Straße</span><input [ngModel]="content.business().street" (ngModelChange)="content.updateBusiness({ street: $event })" name="str" /></label>
+              <div class="fw-edit-field__row">
+                <input [ngModel]="content.business().zip" (ngModelChange)="content.updateBusiness({ zip: $event })" name="zip" placeholder="PLZ" />
+                <input [ngModel]="content.business().city" (ngModelChange)="content.updateBusiness({ city: $event })" name="city" placeholder="Ort" />
+              </div>
+            </div>
+            <div class="fw-edit-group">
+              <h3>Social & Google</h3>
+              <label class="fw-edit-field"><span>Instagram URL</span><input [ngModel]="content.business().instagram" (ngModelChange)="content.updateBusiness({ instagram: $event })" name="ig" /></label>
+              <label class="fw-edit-field"><span>Facebook URL</span><input [ngModel]="content.business().facebook" (ngModelChange)="content.updateBusiness({ facebook: $event })" name="fb" /></label>
+              <label class="fw-edit-field"><span>Google Bewertungen Link</span><input [ngModel]="content.business().googleReviews" (ngModelChange)="content.updateBusiness({ googleReviews: $event })" name="gr" /></label>
+              <div class="fw-edit-field__row">
+                <label class="fw-edit-field"><span>Sterne</span><input type="number" step="0.1" min="0" max="5" [ngModel]="content.business().googleRating" (ngModelChange)="content.updateBusiness({ googleRating: +$event })" name="grt" /></label>
+                <label class="fw-edit-field"><span>Anzahl</span><input type="number" min="0" [ngModel]="content.business().googleReviewCount" (ngModelChange)="content.updateBusiness({ googleReviewCount: +$event })" name="grc" /></label>
+              </div>
+            </div>
+          }
+
+          @case ('design') {
+            <div class="fw-edit-group">
+              <h3>Schriftarten</h3>
+              <label class="fw-edit-field"><span>Fließtext</span>
+                <select [ngModel]="content.theme().fonts.body" (ngModelChange)="content.updateTheme({ fonts: { body: $event } })" name="fb">
+                  @for (f of fontOptions; track f.value) { <option [value]="f.value">{{ f.label }}</option> }
+                </select>
+              </label>
+              <label class="fw-edit-field"><span>Überschriften (klein)</span>
+                <select [ngModel]="content.theme().fonts.display" (ngModelChange)="content.updateTheme({ fonts: { display: $event } })" name="fd">
+                  @for (f of fontOptions; track f.value) { <option [value]="f.value">{{ f.label }}</option> }
+                </select>
+              </label>
+              <label class="fw-edit-field"><span>Titel (groß)</span>
+                <select [ngModel]="content.theme().fonts.serif" (ngModelChange)="content.updateTheme({ fonts: { serif: $event } })" name="fs">
+                  @for (f of fontOptions; track f.value) { <option [value]="f.value">{{ f.label }}</option> }
+                </select>
+              </label>
+            </div>
+            <div class="fw-edit-group">
+              <h3>Schriftgrößen</h3>
+              <label class="fw-edit-field"><span>Abschnitt-Titel</span>
+                <select [ngModel]="content.theme().sizes.sectionTitle" (ngModelChange)="content.updateTheme({ sizes: { sectionTitle: $event } })" name="szs">
+                  @for (s of heroSizeOptions; track s.value) { <option [value]="s.value">{{ s.label }}</option> }
+                </select>
+              </label>
+              <label class="fw-edit-field"><span>Fließtext</span>
+                <select [ngModel]="content.theme().sizes.body" (ngModelChange)="content.updateTheme({ sizes: { body: $event } })" name="szb">
+                  @for (s of sizeOptions; track s.value) { <option [value]="s.value">{{ s.label }}</option> }
+                </select>
+              </label>
+              <label class="fw-edit-field"><span>Kleine Überschrift</span>
+                <select [ngModel]="content.theme().sizes.eyebrow" (ngModelChange)="content.updateTheme({ sizes: { eyebrow: $event } })" name="sze">
+                  @for (s of sizeOptions; track s.value) { <option [value]="s.value">{{ s.label }}</option> }
+                </select>
+              </label>
+            </div>
+            <div class="fw-edit-group">
+              <h3>Farben</h3>
+              <label class="fw-edit-field fw-edit-field--color"><span>Text</span><input type="color" [ngModel]="content.theme().colors.ink" (ngModelChange)="content.updateTheme({ colors: { ink: $event } })" name="ci" /></label>
+              <label class="fw-edit-field fw-edit-field--color"><span>Gedämpft</span><input type="color" [ngModel]="content.theme().colors.muted" (ngModelChange)="content.updateTheme({ colors: { muted: $event } })" name="cm" /></label>
+              <label class="fw-edit-field fw-edit-field--color"><span>Gold</span><input type="color" [ngModel]="content.theme().colors.gold" (ngModelChange)="content.updateTheme({ colors: { gold: $event } })" name="cg" /></label>
+              <label class="fw-edit-field fw-edit-field--color"><span>Blau</span><input type="color" [ngModel]="content.theme().colors.blue" (ngModelChange)="content.updateTheme({ colors: { blue: $event } })" name="cb" /></label>
+              <label class="fw-edit-field fw-edit-field--color"><span>Hintergrund</span><input type="color" [ngModel]="content.theme().colors.bg" (ngModelChange)="content.updateTheme({ colors: { bg: $event } })" name="cbg" /></label>
+              <label class="fw-edit-field fw-edit-field--color"><span>Karten</span><input type="color" [ngModel]="content.theme().colors.paper" (ngModelChange)="content.updateTheme({ colors: { paper: $event } })" name="cp" /></label>
+            </div>
+          }
+        }
+      </div>
+
+      <footer class="fw-edit-modal__foot">
+        <button type="button" class="fw-btn fw-btn--gold" (click)="closeEditor()">Speichern &amp; schließen</button>
+      </footer>
+    </article>
+  </div>
+}

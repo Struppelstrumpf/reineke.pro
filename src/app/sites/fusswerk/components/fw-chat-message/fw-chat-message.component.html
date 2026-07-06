@@ -1,0 +1,43 @@
+<article
+  class="fw-chat-msg"
+  [class.is-self]="isSelf()"
+  [class.is-staff]="message().authorRole === 'staff'"
+  [class.is-info]="message().kind === 'info'"
+  [class.is-appointment]="message().kind === 'appointment'"
+>
+  <header class="fw-chat-msg__head">
+    <strong>{{ message().authorName }}</strong>
+    <time>{{ message().createdAt | date: 'HH:mm' }}</time>
+  </header>
+
+  @if (message().kind === 'info') {
+    <div class="fw-chat-msg__card fw-chat-msg__card--info">
+      @if (message().infoTitle) {
+        <h4>{{ message().infoTitle }}</h4>
+      }
+      <p>{{ message().text }}</p>
+    </div>
+  } @else if (message().kind === 'appointment' && message().appointment) {
+    <div class="fw-chat-msg__card fw-chat-msg__card--appt" [attr.data-status]="message().appointment!.status">
+      <p class="fw-chat-msg__appt-label">Terminvorschlag</p>
+      <h4>{{ message().appointment!.serviceName }}</h4>
+      <ul>
+        <li><span>Preis</span><strong>{{ formatPrice(message().appointment!.price) }}</strong></li>
+        <li><span>Datum</span><strong>{{ formatDate(message().appointment!.date, message().appointment!.slot) }}</strong></li>
+        <li><span>Status</span><strong>{{ statusLabel() }}</strong></li>
+      </ul>
+      @if (canRespond()) {
+        <div class="fw-chat-msg__appt-actions">
+          <button type="button" class="fw-btn fw-btn--gold" (click)="respond.emit({ messageId: message().id, accept: true })">
+            Bestätigen
+          </button>
+          <button type="button" class="fw-btn fw-btn--soft" (click)="respond.emit({ messageId: message().id, accept: false })">
+            Ablehnen
+          </button>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="fw-chat-msg__text">{{ message().text }}</p>
+  }
+</article>

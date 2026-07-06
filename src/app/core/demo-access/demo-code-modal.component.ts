@@ -48,7 +48,7 @@ export class DemoCodeModalComponent {
     }
     this.demoTheme.setTheme(this.selectedTheme());
     this.close();
-    void this.router.navigateByUrl(demoRoute(entry.slug));
+    void this.router.navigateByUrl(demoRoute(entry));
   }
 
   @HostListener('document:keydown.escape')

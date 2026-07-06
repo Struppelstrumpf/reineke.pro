@@ -1,0 +1,44 @@
+<section class="legal">
+  <article class="fw-card legal__card">
+    <p class="fw-eyebrow">Rechtliches</p>
+    <h1>Impressum</h1>
+    <p class="legal__lead">
+      Die Darstellung „Fusswerk“ ist ein <strong>fiktives Design-Showcase</strong> für ein Fußpflegestudio.
+      Verantwortlich für diese Demo-Website ist:
+    </p>
+
+    <div class="legal__grid">
+      <section>
+        <h2>Angaben gemäß § 5 TMG</h2>
+        <p>
+          Reineke GbR<br />
+          geführt von Matthias &amp; Jane Reineke<br />
+          Elisabethstraße 31<br />
+          49201 Dissen<br />
+          Deutschland
+        </p>
+      </section>
+      <section>
+        <h2>Kontakt</h2>
+        <p>
+          E-Mail:
+          <a [href]="'mailto:' + studio.email">{{ studio.email }}</a><br />
+          Telefon: <a [href]="studio.phoneTel">{{ studio.phone }}</a>
+        </p>
+      </section>
+      <section>
+        <h2>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
+        <p>Matthias &amp; Jane Reineke, Elisabethstraße 31, 49201 Dissen</p>
+      </section>
+      <section>
+        <h2>Haftungshinweis</h2>
+        <p>
+          Alle Studio-Daten, Termine und Kontaktangaben auf der Fusswerk-Demo sind Beispieldaten
+          ohne Gewähr. Für verbindliche Auskünfte wenden Sie sich an den oben genannten Betreiber.
+        </p>
+      </section>
+    </div>
+
+    <a class="fw-btn fw-btn--soft legal__back" routerLink="/demo/fusswerk">Zurück zur Website</a>
+  </article>
+</section>

@@ -1,0 +1,152 @@
+@if (!auth.isStaff()) {
+  <section class="fw-studio-login">
+    <article class="fw-studio-login__card fw-card">
+      <p class="fw-eyebrow">Studio</p>
+      <h1>Anmeldung</h1>
+      <p class="fw-studio-login__lead">Verwaltung für Termine, Inhalte und Chat.</p>
+      <form class="fw-studio-login__form" (submit)="$event.preventDefault(); login()">
+        <label>
+          <span>E-Mail</span>
+          <input type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" autocomplete="username" />
+        </label>
+        <label>
+          <span>Passwort</span>
+          <input type="password" [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" autocomplete="current-password" />
+        </label>
+        @if (loginError()) {
+          <p class="fw-studio-login__error">{{ loginError() }}</p>
+        }
+        <button type="submit" class="fw-btn fw-btn--gold">Anmelden</button>
+      </form>
+      <a class="fw-studio-login__back" routerLink="/demo/fusswerk">← Zur Website</a>
+    </article>
+  </section>
+} @else {
+  <div class="fw-studio-shell" [class.fw-studio-shell--mobile]="isMobile()">
+    <header class="fw-studio__bar">
+      <nav class="fw-studio__tabs" aria-label="Verwaltung">
+        <button type="button" [class.is-active]="tab() === 'bookings'" (click)="setTab('bookings')">
+          Termine
+          @if (pendingBookings() > 0) {
+            <span class="fw-studio__tab-badge">{{ pendingBookings() }}</span>
+          }
+        </button>
+        <button type="button" [class.is-active]="tab() === 'chat'" (click)="setTab('chat')">
+          Chat
+          @if (waitingChats() > 0) {
+            <span class="fw-studio__tab-badge">{{ waitingChats() }}</span>
+          }
+        </button>
+        @if (!isMobile()) {
+          <button type="button" [class.is-active]="tab() === 'website'" (click)="setTab('website')">Inhalte</button>
+        }
+        @if (!isMobile()) {
+          <button type="button" [class.is-active]="tab() === 'users'" (click)="setTab('users')">Benutzer</button>
+        }
+      </nav>
+
+      <div class="fw-studio__bar-actions">
+        @if (pendingBookings() > 0 && isMobile()) {
+          <button type="button" class="fw-studio__pill fw-studio__pill--bookings" (click)="setTab('bookings')">
+            {{ pendingBookings() }}
+          </button>
+        }
+        @if (waitingChats() > 0 && isMobile()) {
+          <button type="button" class="fw-studio__pill fw-studio__pill--chat" (click)="setTab('chat')">
+            {{ waitingChats() }}
+          </button>
+        }
+        @if (!isMobile()) {
+          <a class="fw-btn fw-btn--soft fw-btn--xs" routerLink="/demo/fusswerk">Website</a>
+          <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" [class.is-active]="tab() === 'account'" (click)="setTab('account')">Konto</button>
+        }
+        <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" (click)="logout()">Abmelden</button>
+      </div>
+    </header>
+
+    <div
+      class="fw-studio-panel"
+      [class.fw-studio-panel--wide]="tab() === 'website'"
+      [class.fw-studio-panel--mobile]="isMobile()"
+    >
+      @if (tab() === 'bookings') {
+        <pv-fw-booking-calendar />
+      }
+
+      @if (tab() === 'website') {
+        <pv-fw-studio-visual-editor />
+      }
+
+      @if (tab() === 'chat') {
+        <pv-fw-support-chat-admin />
+      }
+
+      @if (tab() === 'account') {
+        <section class="fw-admin-card fw-account">
+          <h2>Mein Konto</h2>
+          <p class="fw-account__lead">Passwort sicher ändern — gespeichert als verschlüsselter Hash (PBKDF2).</p>
+          <form class="fw-account__form" (submit)="$event.preventDefault(); changePassword()">
+            <label>
+              <span>Aktuelles Passwort</span>
+              <input type="password" [ngModel]="currentPassword()" (ngModelChange)="currentPassword.set($event)" name="cpw" autocomplete="current-password" />
+            </label>
+            <label>
+              <span>Neues Passwort</span>
+              <input type="password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" name="npw" autocomplete="new-password" />
+            </label>
+            <label>
+              <span>Neues Passwort wiederholen</span>
+              <input type="password" [ngModel]="newPasswordRepeat()" (ngModelChange)="newPasswordRepeat.set($event)" name="npw2" autocomplete="new-password" />
+            </label>
+            @if (accountError()) {
+              <p class="fw-studio-login__error">{{ accountError() }}</p>
+            }
+            <button type="submit" class="fw-btn fw-btn--gold">Passwort speichern</button>
+          </form>
+        </section>
+      }
+
+      @if (tab() === 'users') {
+        <section class="fw-admin-card">
+          <h2>Benutzerkonten</h2>
+          <div class="fw-users">
+            @for (user of auth.allUsers(); track user.id) {
+              <article class="fw-user-row">
+                <div>
+                  <strong>{{ user.contactName }}</strong>
+                  <span>{{ user.email }} · {{ roleLabel(user.role) }}</span>
+                </div>
+                <div class="fw-user-row__actions">
+                  @if (user.role !== 'admin') {
+                    <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" (click)="toggleUserLock(user.id, user.status !== 'locked')">
+                      {{ user.status === 'locked' ? 'Entsperren' : 'Sperren' }}
+                    </button>
+                    <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" (click)="deleteUser(user.id)">Löschen</button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+
+          @if (auth.isAdmin()) {
+            <h3>Neuen Benutzer anlegen</h3>
+            <div class="fw-admin-form">
+              <input placeholder="Name" [ngModel]="newStaffName()" (ngModelChange)="newStaffName.set($event)" name="sn" />
+              <input placeholder="E-Mail" [ngModel]="newStaffEmail()" (ngModelChange)="newStaffEmail.set($event)" name="se" />
+              <input placeholder="Passwort" type="password" [ngModel]="newStaffPassword()" (ngModelChange)="newStaffPassword.set($event)" name="spw" />
+              <select [ngModel]="newStaffRole()" (ngModelChange)="newStaffRole.set($event)" name="sr">
+                <option value="employee">Mitarbeiter</option>
+                <option value="admin">Administrator</option>
+              </select>
+              <button type="button" class="fw-btn fw-btn--gold fw-btn--xs" (click)="createStaff()">Anlegen</button>
+            </div>
+          }
+        </section>
+      }
+    </div>
+  </div>
+}
+
+@if (toast()) {
+  <p class="fw-studio-toast" role="status">{{ toast() }}</p>
+}

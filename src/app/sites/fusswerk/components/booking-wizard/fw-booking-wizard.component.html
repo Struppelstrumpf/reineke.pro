@@ -1,0 +1,112 @@
+@if (open()) {
+  <div class="fw-wiz" role="dialog" aria-modal="true" aria-labelledby="fw-wiz-title" (click)="onBackdrop($event)">
+    <div
+      class="fw-wiz__dialog"
+      [class.fw-wiz__dialog--tall]="step() === 0 || step() === 3 || step() === 4"
+      [class.fw-wiz__dialog--done]="step() === doneStep"
+    >
+      <header class="fw-wiz__head">
+        <div class="fw-wiz__progress" aria-hidden="true">
+          @for (label of stepLabels; track label; let i = $index) {
+            <span
+              class="fw-wiz__dot"
+              [class.is-done]="step() > i"
+              [class.is-active]="step() === i"
+            ></span>
+          }
+        </div>
+        <p class="fw-wiz__step-label">
+          Schritt {{ step() < doneStep ? step() + 1 : doneStep }} von {{ doneStep }}
+          @if (step() < doneStep) {
+            <span>· {{ stepLabels[step()] }}</span>
+          }
+        </p>
+        <button type="button" class="fw-wiz__close" aria-label="Schließen" (click)="close()">×</button>
+      </header>
+
+      <div class="fw-wiz__body" id="fw-wiz-title">
+        @if (submitError() && step() >= 3 && step() <= 5) {
+          <p class="fw-wiz-error-banner" role="alert">{{ submitError() }}</p>
+        }
+        @if (usingDemoSlots() && step() === 4) {
+          <p class="fw-wiz-demo-banner" role="status">
+            Vorschau-Modus: Zeiten lokal berechnet. Für echte Buchungen bitte die API starten.
+          </p>
+        }
+        @switch (step()) {
+          @case (0) {
+            @defer (on immediate) {
+              <pv-fw-wizard-service (valid)="onValid($event)" />
+            } @placeholder {
+              <p class="fw-wiz-loading">Wird geladen …</p>
+            }
+          }
+          @case (1) {
+            @defer (on immediate) {
+              <pv-fw-wizard-name (valid)="onValid($event)" />
+            } @placeholder {
+              <p class="fw-wiz-loading">Wird geladen …</p>
+            }
+          }
+          @case (2) {
+            @defer (on immediate) {
+              <pv-fw-wizard-contact (valid)="onValid($event)" />
+            } @placeholder {
+              <p class="fw-wiz-loading">Wird geladen …</p>
+            }
+          }
+          @case (3) {
+            @defer (on immediate) {
+              <pv-fw-wizard-date (valid)="onValid($event)" />
+            } @placeholder {
+              <p class="fw-wiz-loading">Wird geladen …</p>
+            }
+          }
+          @case (4) {
+            @defer (on immediate) {
+              <pv-fw-wizard-time (valid)="onValid($event)" />
+            } @placeholder {
+              <p class="fw-wiz-loading">Wird geladen …</p>
+            }
+          }
+          @case (5) {
+            @defer (on immediate) {
+              <pv-fw-wizard-summary (valid)="onValid($event)" />
+            } @placeholder {
+              <p class="fw-wiz-loading">Wird geladen …</p>
+            }
+          }
+          @default {
+            @defer (on immediate) {
+              <pv-fw-wizard-done />
+            } @placeholder {
+              <p class="fw-wiz-loading">Wird geladen …</p>
+            }
+          }
+        }
+      </div>
+
+      @if (step() < doneStep) {
+        <footer class="fw-wiz__foot">
+          <button type="button" class="fw-wiz__back" (click)="back()">
+            {{ step() === 0 ? 'Abbrechen' : 'Zurück' }}
+          </button>
+          <button
+            type="button"
+            class="fw-btn fw-btn--gold fw-wiz__next"
+            [disabled]="!canAdvance() || submitting()"
+            (click)="next()"
+          >
+            {{ submitting() ? 'Wird gesendet …' : nextLabel() }}
+          </button>
+        </footer>
+      } @else {
+        <footer class="fw-wiz__foot fw-wiz__foot--solo">
+          <button type="button" class="fw-btn fw-btn--gold fw-wiz__next" (click)="close()">
+            Schließen
+          </button>
+        </footer>
+      }
+    </div>
+  </div>
+}

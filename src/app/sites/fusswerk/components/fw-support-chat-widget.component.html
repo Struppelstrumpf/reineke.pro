@@ -1,0 +1,202 @@
+<div
+  #chatWidgetRoot
+  class="fw-chat-widget"
+  [class.is-open]="open()"
+  [class.is-dragging]="isDragging()"
+  [style.--fw-chat-offset-x.px]="widgetOffset().x"
+  [style.--fw-chat-offset-y.px]="widgetOffset().y"
+>
+  @if (open()) {
+    <section
+      #chatPanel
+      class="fw-chat-widget__panel"
+      [attr.data-placement]="panelPlacement()"
+      [style.left.px]="panelStyle().left"
+      [style.top.px]="panelStyle().top"
+      [style.max-height.px]="panelStyle().maxHeight"
+      [style.height.px]="panelStyle().height"
+      aria-label="Support Chat"
+    >
+      <header class="fw-chat-widget__head" (pointerdown)="startPanelDrag($event)">
+        <div class="fw-chat-widget__head-text">
+          <p class="fw-chat-widget__kicker">Fusswerk · Live</p>
+          <h2>Wie können wir helfen?</h2>
+        </div>
+        <button
+          type="button"
+          class="fw-chat-widget__close"
+          (pointerdown)="$event.stopPropagation()"
+          (click)="toggleOpen()"
+          aria-label="Chat schließen"
+        >
+          ×
+        </button>
+      </header>
+
+      @if (!conversation()) {
+        <div class="fw-chat-widget__intro">
+          <p>Schreiben Sie uns — wir antworten schnell und persönlich.</p>
+          <label class="fw-chat-widget__field">
+            <span>Ihr Name</span>
+            <input
+              type="text"
+              [ngModel]="guestName()"
+              (ngModelChange)="syncGuestName($event)"
+              placeholder="z. B. Maria Schmidt"
+            />
+          </label>
+          <label class="fw-chat-widget__field">
+            <span>Erste Nachricht</span>
+            <textarea
+              rows="2"
+              [ngModel]="firstMessage()"
+              (ngModelChange)="firstMessage.set($event)"
+              placeholder="Was können wir für Sie tun?"
+            ></textarea>
+          </label>
+          <button type="button" class="fw-btn fw-btn--gold fw-chat-widget__btn" (click)="startGuestChat()">
+            Chat starten
+          </button>
+        </div>
+      }
+
+      @if (conversation(); as conv) {
+        <div class="fw-chat-widget__body">
+          <div class="fw-chat-widget__messages-wrap">
+            <div
+              #messagesEl
+              class="fw-chat-widget__messages"
+              aria-label="Chatverlauf"
+              (scroll)="onMessagesScroll()"
+            >
+              @for (msg of conv.messages; track msg.id) {
+                <pv-fw-chat-message
+                  [message]="msg"
+                  viewerRole="guest"
+                  [isSelf]="msg.authorRole === 'guest'"
+                  (respond)="onRespond($event)"
+                />
+              }
+            </div>
+            @if (showNewMessagesHint()) {
+              <button type="button" class="fw-chat-widget__jump" (click)="jumpToLatestMessage()">
+                Neue Nachricht
+                <span aria-hidden="true">↓</span>
+              </button>
+            }
+          </div>
+
+          @if (conversationEnded()) {
+            <div class="fw-chat-widget__ended">
+              <p>Dieser Chat wurde beendet.</p>
+              <button type="button" class="fw-btn fw-btn--gold fw-chat-widget__btn" (click)="startNewChat()">
+                Neuer Chat
+              </button>
+            </div>
+          } @else {
+          <div class="fw-chat-widget__dock">
+            <div class="fw-chat-widget__quick">
+              @for (q of guestQuickMessages; track q.label) {
+                <button type="button" class="fw-chat-widget__chip" (click)="sendQuickMessage(q.text)">
+                  {{ q.label }}
+                </button>
+              }
+              <button
+                type="button"
+                class="fw-chat-widget__chip"
+                [class.is-active]="showApptForm()"
+                (click)="toggleApptForm()"
+              >
+                Termin anfragen
+              </button>
+            </div>
+
+            @if (showApptForm()) {
+              <div class="fw-chat-widget__appt">
+                <p class="fw-chat-widget__appt-title">Terminwunsch senden</p>
+                <label class="fw-chat-widget__field">
+                  <span>Leistung</span>
+                  <select [ngModel]="apptServiceId()" (ngModelChange)="apptServiceId.set($event)">
+                    @for (s of services(); track s.id) {
+                      <option [value]="s.id">{{ s.title }} — ab {{ chat.formatPrice(s.fromPrice) }}</option>
+                    }
+                  </select>
+                </label>
+                <div class="fw-chat-widget__appt-row">
+                  <label class="fw-chat-widget__field">
+                    <span>Datum</span>
+                    <input type="date" [ngModel]="apptDate()" (ngModelChange)="apptDate.set($event)" />
+                  </label>
+                  <label class="fw-chat-widget__field">
+                    <span>Uhrzeit</span>
+                    <select
+                      [ngModel]="apptSlot()"
+                      (ngModelChange)="apptSlot.set($event)"
+                      [disabled]="apptSlotsLoading()"
+                    >
+                      @for (s of apptSlots(); track s.time) {
+                        <option [value]="s.time">{{ s.time }} Uhr</option>
+                      }
+                    </select>
+                  </label>
+                </div>
+                <p class="fw-chat-widget__appt-hint">Ausgewählt: {{ selectedServicePrice() }}</p>
+                <button
+                  type="button"
+                  class="fw-btn fw-btn--gold fw-chat-widget__btn"
+                  [disabled]="apptBusy()"
+                  (click)="sendAppointment()"
+                >
+                  {{ apptBusy() ? 'Wird gesendet…' : 'Anfrage absenden' }}
+                </button>
+              </div>
+            }
+
+            <div class="fw-chat-widget__composer">
+              <textarea
+                rows="2"
+                [ngModel]="messageDraft()"
+                (ngModelChange)="messageDraft.set($event)"
+                placeholder="Nachricht schreiben…"
+                (keydown.enter)="$event.preventDefault(); sendMessage()"
+              ></textarea>
+              <button type="button" class="fw-btn fw-btn--gold" (click)="sendMessage()" aria-label="Senden">
+                →
+              </button>
+            </div>
+
+            @if (error()) {
+              <p class="fw-chat-widget__error">{{ error() }}</p>
+            }
+          </div>
+          }
+        </div>
+      }
+
+      @if (!conversation() && error()) {
+        <p class="fw-chat-widget__error">{{ error() }}</p>
+      }
+    </section>
+  }
+
+  <button
+    #chatBubble
+    type="button"
+    class="fw-chat-widget__toggle"
+    [class.has-unread]="hasUnreadReply() && !open()"
+    (pointerdown)="startBubbleDrag($event)"
+    (click)="toggleOpen()"
+    aria-label="Support Chat öffnen"
+  >
+    <span class="fw-chat-widget__mascot" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H9l-4.5 3.5V7a1.5 1.5 0 0 1 1.5-1.5Z" />
+      </svg>
+    </span>
+    <span class="fw-chat-widget__label">{{ open() ? 'Schließen' : 'Chat' }}</span>
+  </button>
+
+  @if (hasUnreadReply() && !open()) {
+    <p class="fw-chat-widget__incoming-hint">Neue Nachricht</p>
+  }
+</div>

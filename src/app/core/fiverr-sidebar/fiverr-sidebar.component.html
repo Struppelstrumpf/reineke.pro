@@ -2,9 +2,10 @@
   class="fiverr"
   [class.fiverr--collapsed]="!open()"
   [class.fiverr--spotlight]="spotlight()"
-  [class.fiverr--pizzeria]="currentSite().id === 'pizzeria'"
-  [class.fiverr--weisser-schaefer]="currentSite().id === 'weisser-schaefer'"
-  [class.fiverr--nasebaer]="currentSite().id === 'nasebaer'"
+  [class.fiverr--pizzeria]="themeId() === 'pizzeria'"
+  [class.fiverr--weisser-schaefer]="themeId() === 'weisser-schaefer'"
+  [class.fiverr--nasebaer]="themeId() === 'nasebaer'"
+  [class.fiverr--fusswerk]="themeId() === 'fusswerk'"
   aria-label="Reineke GbR Studio-Vorschau"
 >
   @if (open()) {
