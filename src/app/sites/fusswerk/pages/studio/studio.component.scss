@@ -275,8 +275,18 @@
   z-index: 90;
 }
 
+.fw-studio-shell--mobile {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 .fw-studio-shell--mobile .fw-studio__bar {
   padding-top: 0.3rem;
+}
+
+.fw-studio-shell--mobile .fw-studio-panel {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .fw-studio-shell--mobile .fw-studio__tabs {

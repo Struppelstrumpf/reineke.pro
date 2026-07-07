@@ -3,7 +3,15 @@
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  min-width: 0;
+  max-width: 100%;
   overflow: hidden;
+}
+
+:host {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .fw-cal__head {
@@ -727,8 +735,10 @@
 
 @media (max-width: 900px) {
   .fw-cal__layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
+    width: 100%;
+    max-width: 100%;
   }
 
   .fw-cal__month {
@@ -737,20 +747,39 @@
 
   .fw-cal__slots {
     overflow: auto;
+    overflow-x: hidden;
   }
 
   .fw-cal__slot-grid {
-    grid-template-columns: repeat(auto-fill, minmax(5.2rem, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .fw-cal__day {
     border-radius: 0.55rem;
+    min-width: 0;
   }
 }
 
 :host-context(.fw-studio-panel--mobile) .fw-cal__layout {
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+:host-context(.fw-studio-panel--mobile) .fw-cal {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+:host-context(.fw-studio-panel--mobile) .fw-cal__month,
+:host-context(.fw-studio-panel--mobile) .fw-cal__slots {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 :host-context(.fw-studio-panel--mobile) .fw-cal__month {
@@ -762,19 +791,71 @@
   margin-bottom: 0.45rem;
 }
 
-:host-context(.fw-studio-panel--mobile) .fw-cal__weekdays span,
-:host-context(.fw-studio-panel--mobile) .fw-cal__day em {
-  font-size: 0.58rem;
+:host-context(.fw-studio-panel--mobile) .fw-cal__weekdays,
+:host-context(.fw-studio-panel--mobile) .fw-cal__grid {
+  width: 100%;
+  gap: clamp(0.1rem, 0.75vw, 0.2rem);
 }
 
-:host-context(.fw-studio-panel--mobile) .fw-cal__grid,
-:host-context(.fw-studio-panel--mobile) .fw-cal__weekdays {
-  gap: 0.2rem;
+:host-context(.fw-studio-panel--mobile) .fw-cal__weekdays span {
+  font-size: clamp(0.52rem, 2.4vw, 0.62rem);
+}
+
+:host-context(.fw-studio-panel--mobile) .fw-cal__day {
+  aspect-ratio: auto;
+  min-width: 0;
+  min-height: 2.1rem;
+  padding: 0.12rem 0.04rem 0.18rem;
+  border-radius: 0.45rem;
+}
+
+:host-context(.fw-studio-panel--mobile) .fw-cal__day-num {
+  font-size: clamp(0.62rem, 2.6vw, 0.78rem);
+}
+
+:host-context(.fw-studio-panel--mobile) .fw-cal__day-badge {
+  font-size: clamp(0.48rem, 2vw, 0.55rem);
+  padding: 0 0.12rem;
+  min-width: 0.65rem;
+}
+
+:host-context(.fw-studio-panel--mobile) .fw-cal__day-markers {
+  gap: 0.06rem;
+  min-height: 0.55rem;
+}
+
+:host-context(.fw-studio-panel--mobile) .fw-cal__month-legend {
+  gap: 0.45rem 0.65rem;
+  font-size: 0.62rem;
+  margin-top: 0.45rem;
+}
+
+:host-context(.fw-studio-panel--mobile) .fw-cal__slot-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.32rem;
 }
 
 :host-context(.fw-studio-panel--mobile) .fw-cal__slot {
-  padding: 0.4rem 0.3rem;
-  font-size: 0.78rem;
+  min-width: 0;
+  padding: 0.35rem 0.2rem;
+  font-size: 0.74rem;
+}
+
+:host-context(.fw-studio-panel--mobile) .fw-cal__slot small {
+  font-size: 0.58rem;
+}
+
+:host-context(.fw-studio-panel--mobile) .fw-cal__legend {
+  gap: 0.35rem 0.5rem;
+  font-size: 0.62rem;
+}
+
+:host-context(.fw-studio-panel--mobile) .fw-cal__head {
+  max-width: 100%;
+}
+
+:host-context(.fw-studio-panel--mobile) .fw-cal__block-active {
+  max-width: 100%;
 }
 
 @media (max-width: 520px) {

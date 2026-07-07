@@ -2,9 +2,9 @@
   <div
     class="app-stage"
     [class.app-stage--dimmed]="booking.dimmed()"
-    [class.app-stage--no-sidebar]="hidePortfolioChrome()"
+    [class.app-stage--no-sidebar]="hideFiverrSidebar()"
   >
-    @if (!hidePortfolioChrome()) {
+    @if (!hideFiverrSidebar()) {
       <pv-fiverr-sidebar />
     }
     <router-outlet />

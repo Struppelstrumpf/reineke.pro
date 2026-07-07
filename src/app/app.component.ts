@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
@@ -26,8 +26,11 @@ export class AppComponent {
   readonly title = 'Reineke GbR — Portfolio';
   readonly booking = inject(BookingModalService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
   // Initialisiert das gespeicherte Farblayout beim App-Start.
   readonly demoTheme = inject(DemoThemeService);
+
+  readonly isMobileViewport = signal(false);
 
   private readonly routeUrl = toSignal(
     this.router.events.pipe(
@@ -40,4 +43,21 @@ export class AppComponent {
 
   /** Live-Vorschau im Fusswerk-Studio — ohne Portfolio-Leiste links. */
   readonly hidePortfolioChrome = computed(() => this.routeUrl().includes('embed=studio'));
+
+  /** Fusswerk-Studio mobil: kein Portfolio-„Studio“-Handle links (mehr Platz für Kalender). */
+  readonly hideFiverrSidebar = computed(() => {
+    const url = this.routeUrl();
+    if (url.includes('embed=studio')) return true;
+    return this.isMobileViewport() && url.includes('/fusswerk/studio');
+  });
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      const mq = window.matchMedia('(max-width: 768px)');
+      const sync = () => this.isMobileViewport.set(mq.matches);
+      sync();
+      mq.addEventListener('change', sync);
+      this.destroyRef.onDestroy(() => mq.removeEventListener('change', sync));
+    }
+  }
 }
