@@ -36,6 +36,7 @@ const DEFAULT_SETTINGS = {
   slotStepMinutes: 15,
   closingBufferSlots: 0,
   gapBeforeBookingMinutes: 45,
+  blockDefaultMinutes: 30,
 };
 
 function clampGapBeforeBookingMinutes(value) {
@@ -210,6 +211,16 @@ function getServiceDurationMinutes(serviceId, schedule) {
   return parseDurationMinutes(svc?.duration, settings.defaultDurationMinutes);
 }
 
+function getBookingDurationMinutes(booking, schedule) {
+  if (booking.serviceId === 'block' && typeof booking.durationMinutes === 'number' && booking.durationMinutes > 0) {
+    return booking.durationMinutes;
+  }
+  if (typeof booking.durationMinutes === 'number' && booking.durationMinutes > 0) {
+    return booking.durationMinutes;
+  }
+  return getServiceDurationMinutes(booking.serviceId, schedule);
+}
+
 function slotDurationForGrid(schedule) {
   const { settings, services } = normalizeSchedule(schedule);
   if (!settings.useServiceDurations) return settings.defaultDurationMinutes;
@@ -239,15 +250,36 @@ function rangesOverlap(aStart, aEnd, bStart, bEnd) {
   return aStart < bEnd && bStart < aEnd;
 }
 
-function bookingIntervals(slot, serviceId, schedule) {
+function bookingIntervals(slot, serviceId, schedule, durationMinutes) {
   const start = timeToMinutes(slot);
-  const duration = getServiceDurationMinutes(serviceId, schedule);
+  const duration =
+    typeof durationMinutes === 'number' && durationMinutes > 0
+      ? durationMinutes
+      : getServiceDurationMinutes(serviceId, schedule);
   const buffer = normalizeSchedule(schedule).settings.bufferMinutes;
   return {
     start,
     treatmentEnd: start + duration,
     blockedUntil: start + duration + buffer,
   };
+}
+
+function bookingIntervalsFromBooking(booking, schedule) {
+  return bookingIntervals(
+    booking.slot,
+    booking.serviceId,
+    schedule,
+    getBookingDurationMinutes(booking, schedule),
+  );
+}
+
+function bookingAtSlotStart(time, bookings, schedule) {
+  const start = timeToMinutes(time);
+  return bookings.find((booking) => {
+    const bStart = timeToMinutes(booking.slot);
+    const duration = getBookingDurationMinutes(booking, schedule);
+    return start >= bStart && start < bStart + duration;
+  });
 }
 
 function appointmentsClash(candidate, existing, gapBeforeMinutes, audience) {
@@ -267,11 +299,23 @@ function appointmentsClash(candidate, existing, gapBeforeMinutes, audience) {
   return true;
 }
 
-function isSlotAvailable(date, time, serviceId, schedule, bookings, now = new Date(), audience = 'customer') {
+function isSlotAvailable(
+  date,
+  time,
+  serviceId,
+  schedule,
+  bookings,
+  now = new Date(),
+  audience = 'customer',
+  candidateDurationMinutes,
+) {
   const day = new Date(`${date}T12:00:00`).getDay();
   const ranges = getDayRangesMinutes(schedule, day);
   if (!ranges.length) return false;
-  const duration = getServiceDurationMinutes(serviceId, schedule);
+  const duration =
+    typeof candidateDurationMinutes === 'number' && candidateDurationMinutes > 0
+      ? candidateDurationMinutes
+      : getServiceDurationMinutes(serviceId, schedule);
   const start = timeToMinutes(time);
   if (!fitsSlotStartInRanges(start, ranges)) return false;
   const { settings } = normalizeSchedule(schedule);
@@ -282,7 +326,7 @@ function isSlotAvailable(date, time, serviceId, schedule, bookings, now = new Da
     return false;
   }
   const today = now.toISOString().slice(0, 10);
-  if (date === today) {
+  if (date === today && audience === 'customer') {
     const nowMins = now.getHours() * 60 + now.getMinutes();
     if (start <= nowMins) return false;
   }
@@ -293,8 +337,9 @@ function isSlotAvailable(date, time, serviceId, schedule, bookings, now = new Da
   };
   const gapBefore = clampGapBeforeBookingMinutes(settings.gapBeforeBookingMinutes ?? 45);
   for (const booking of bookings) {
+    if (booking.date !== date) continue;
     if (booking.status !== 'pending' && booking.status !== 'confirmed') continue;
-    const existing = bookingIntervals(booking.slot, booking.serviceId, schedule);
+    const existing = bookingIntervalsFromBooking(booking, schedule);
     if (appointmentsClash(candidate, existing, gapBefore, audience)) return false;
   }
   return true;
@@ -305,35 +350,53 @@ function computeSlots(date, schedule, bookings, serviceId, now = new Date()) {
   const active = (bookings || []).filter(
     (b) => b.date === date && (b.status === 'pending' || b.status === 'confirmed'),
   );
-  const bookingAt = new Map(active.map((b) => [b.slot, b]));
   return starts.map((time) => {
-    const direct = bookingAt.get(time);
+    const covering = bookingAtSlotStart(time, active, schedule);
     const customerOk = isSlotAvailable(date, time, serviceId, schedule, active, now, 'customer');
     const staffOk = isSlotAvailable(date, time, serviceId, schedule, active, now, 'staff');
+    const showBooking = covering && timeToMinutes(time) === timeToMinutes(covering.slot) ? covering : null;
     return {
       time,
-      available: customerOk && !direct,
-      staffBookable: staffOk && !direct,
-      booking: direct
+      available: customerOk && !covering,
+      staffBookable: staffOk && !covering,
+      booking: showBooking
         ? {
-            id: direct.id,
-            status: direct.status,
-            name: direct.name,
-            serviceId: direct.serviceId,
+            id: showBooking.id,
+            status: showBooking.status,
+            name: showBooking.name,
+            serviceId: showBooking.serviceId,
           }
         : null,
     };
   });
 }
 
-function bookingClash(bookings, date, slot, serviceId, schedule, excludeId, audience = 'customer') {
+function bookingClash(
+  bookings,
+  date,
+  slot,
+  serviceId,
+  schedule,
+  excludeId,
+  audience = 'customer',
+  candidateDurationMinutes,
+) {
   const active = (bookings || []).filter(
     (b) =>
       b.id !== excludeId &&
       b.date === date &&
       (b.status === 'pending' || b.status === 'confirmed'),
   );
-  return !isSlotAvailable(date, slot, serviceId, schedule, active, new Date(), audience);
+  return !isSlotAvailable(
+    date,
+    slot,
+    serviceId,
+    schedule,
+    active,
+    new Date(),
+    audience,
+    candidateDurationMinutes,
+  );
 }
 
 function isValidSlot(date, slot, serviceId, schedule) {
@@ -353,4 +416,5 @@ module.exports = {
   isSlotAvailable,
   isValidSlot,
   getServiceDurationMinutes,
+  getBookingDurationMinutes,
 };

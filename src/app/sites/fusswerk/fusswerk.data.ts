@@ -46,6 +46,7 @@ export const FW_BOOKING_SETTINGS_DEFAULT = {
   slotStepMinutes: 15,
   closingBufferSlots: 0,
   gapBeforeBookingMinutes: 45,
+  blockDefaultMinutes: 30,
 } as const;
 
 export const FW_HOURS = [

@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnDestroy,
   computed,
   effect,
   inject,
@@ -12,13 +13,22 @@ import { FusswerkContentService } from '../../fusswerk-content.service';
 import type { FwBookingSettings } from '../../fusswerk-content.types';
 import type { FwBookingSlot } from '../../fusswerk-booking.types';
 import { formatDurationShort } from '../../fusswerk-duration.util';
-import { clampGapBeforeBookingMinutes, computeSlots } from '../../fusswerk-scheduling';
+import {
+  clampGapBeforeBookingMinutes,
+  computeSlots,
+  getBookingDurationMinutes,
+  minutesToTime,
+  timeToMinutes,
+} from '../../fusswerk-scheduling';
 import {
   hasSameCustomerDuplicateOnDay,
   sameCustomerBookingsOnDay,
 } from '../../fusswerk-booking-customer.util';
 
-type ModalMode = 'view' | 'create' | 'reschedule' | 'settings' | 'duplicates' | null;
+type ModalMode = 'view' | 'create' | 'reschedule' | 'settings' | 'duplicates' | 'block' | null;
+
+const BLOCK_DURATION_OPTIONS = [20, 30, 45, 60] as const;
+const BLOCK_MODAL_TIMEOUT_SEC = 30;
 
 @Component({
   selector: 'pv-fw-booking-calendar',
@@ -27,8 +37,9 @@ type ModalMode = 'view' | 'create' | 'reschedule' | 'settings' | 'duplicates' | 
   styleUrls: ['../../fusswerk-shared.scss', './fw-booking-calendar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FwBookingCalendarComponent {
+export class FwBookingCalendarComponent implements OnDestroy {
   protected readonly Math = Math;
+  readonly blockDurationOptions = BLOCK_DURATION_OPTIONS;
 
   readonly bookings = inject(FusswerkBookingAdminService);
   readonly content = inject(FusswerkContentService);
@@ -39,6 +50,7 @@ export class FwBookingCalendarComponent {
   readonly slotsLoading = signal(false);
   readonly actionError = signal('');
   readonly actionBusy = signal(false);
+  readonly nowTick = signal(Date.now());
 
   readonly modalMode = signal<ModalMode>(null);
   readonly activeBooking = signal<FwBookingRecord | null>(null);
@@ -58,12 +70,38 @@ export class FwBookingCalendarComponent {
   readonly gapPickerOpen = signal(false);
   readonly gapPickerDraft = signal(this.content.bookingSettings().gapBeforeBookingMinutes ?? 45);
 
+  readonly blockPickMinutes = signal(30);
+  readonly blockModalSeconds = signal(BLOCK_MODAL_TIMEOUT_SEC);
+
   readonly serviceOptions = computed(() => this.content.services());
   readonly weekdayLabels = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
-  readonly serviceLabels = computed(() =>
-    Object.fromEntries(this.content.services().map((s) => [s.id, s.title])),
-  );
+  readonly serviceLabels = computed(() => ({
+    block: 'Sperre',
+    ...Object.fromEntries(this.content.services().map((s) => [s.id, s.title])),
+  }));
+
+  readonly liveBlock = computed(() => {
+    this.nowTick();
+    this.bookings.revision();
+    const schedule = this.content.schedulePayload();
+    const now = new Date();
+    const today = this.dateKey(now);
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+
+    for (const booking of this.bookings.all()) {
+      if (booking.serviceId !== 'block' || booking.date !== today || booking.status !== 'confirmed') {
+        continue;
+      }
+      const start = timeToMinutes(booking.slot);
+      const end = start + getBookingDurationMinutes(booking, schedule);
+      if (nowMins >= start && nowMins < end) {
+        const remainingSec = (end - nowMins) * 60 - now.getSeconds();
+        return { booking, remainingSec: Math.max(0, remainingSec) };
+      }
+    }
+    return null;
+  });
 
   readonly monthLabel = computed(() => {
     const [y, m] = this.viewMonth().split('-').map(Number);
@@ -110,6 +148,10 @@ export class FwBookingCalendarComponent {
   });
 
   constructor() {
+    if (typeof window !== 'undefined') {
+      this.clockId = window.setInterval(() => this.nowTick.set(Date.now()), 1000);
+    }
+
     effect(() => {
       const date = this.selectedDate();
       this.content.bookingSettings();
@@ -124,6 +166,14 @@ export class FwBookingCalendarComponent {
       const serviceId = this.modalMode() === 'create' ? this.createServiceId() : undefined;
       this.applySlotsLocally(date, serviceId);
     });
+  }
+
+  private clockId: ReturnType<typeof setInterval> | null = null;
+  private blockModalTimerId: ReturnType<typeof setInterval> | null = null;
+
+  ngOnDestroy(): void {
+    if (this.clockId !== null) clearInterval(this.clockId);
+    this.clearBlockModalTimer();
   }
 
   bookingsOn(date: string): FwBookingRecord[] {
@@ -173,6 +223,7 @@ export class FwBookingCalendarComponent {
 
   slotClass(slot: FwBookingSlot): string {
     if (slot.booking) {
+      if (slot.booking.serviceId === 'block') return 'is-booked is-block';
       return slot.booking.status === 'pending' ? 'is-pending' : 'is-booked';
     }
     if (this.isPastDate(this.selectedDate())) {
@@ -187,6 +238,86 @@ export class FwBookingCalendarComponent {
     if (slot.booking) return false;
     if (this.isPastDate(this.selectedDate())) return true;
     return !slot.available && !slot.staffBookable;
+  }
+
+  openBlockModal(): void {
+    this.actionError.set('');
+    this.blockPickMinutes.set(this.content.bookingSettings().blockDefaultMinutes ?? 30);
+    this.blockModalSeconds.set(BLOCK_MODAL_TIMEOUT_SEC);
+    this.modalMode.set('block');
+    this.clearBlockModalTimer();
+    this.blockModalTimerId = setInterval(() => {
+      this.blockModalSeconds.update((sec) => {
+        if (sec <= 1) {
+          void this.confirmBlock(this.blockPickMinutes());
+          return 0;
+        }
+        return sec - 1;
+      });
+    }, 1000);
+  }
+
+  pickBlockMinutes(minutes: number): void {
+    this.blockPickMinutes.set(minutes);
+    void this.confirmBlock(minutes);
+  }
+
+  async confirmBlock(minutes: number): Promise<void> {
+    if (this.actionBusy()) return;
+    this.clearBlockModalTimer();
+    const now = new Date();
+    const date = this.dateKey(now);
+    const step = this.content.bookingSettings().slotStepMinutes;
+    const slot = minutesToTime(Math.floor((now.getHours() * 60 + now.getMinutes()) / step) * step);
+
+    this.actionBusy.set(true);
+    this.actionError.set('');
+    const result = await this.bookings.createManual({
+      name: 'Sperre',
+      date,
+      slot,
+      serviceId: 'block',
+      status: 'confirmed',
+      source: 'block',
+      durationMinutes: minutes,
+    });
+    this.actionBusy.set(false);
+
+    if ('error' in result) {
+      this.actionError.set(result.error);
+      return;
+    }
+
+    this.selectedDate.set(date);
+    if (!date.startsWith(this.viewMonth())) {
+      this.viewMonth.set(date.slice(0, 7));
+    }
+    this.closeModal();
+    await this.loadSlotsFor(date);
+  }
+
+  async endActiveBlock(): Promise<void> {
+    const block = this.liveBlock();
+    if (!block) return;
+    await this.runAction(() => this.bookings.cancel(block.booking.id));
+  }
+
+  formatBlockRemaining(totalSec: number): string {
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  isBlockBooking(booking: FwBookingRecord): boolean {
+    return booking.serviceId === 'block' || booking.source === 'block';
+  }
+
+  bookingServiceLabel(booking: FwBookingRecord): string {
+    if (this.isBlockBooking(booking)) {
+      const mins = booking.durationMinutes ?? this.content.bookingSettings().blockDefaultMinutes;
+      return `Sperre · ${formatDurationShort(mins)}`;
+    }
+    return this.bookings.serviceLabel(booking.serviceId, this.serviceLabels());
   }
 
   openSettings(): void {
@@ -256,6 +387,7 @@ export class FwBookingCalendarComponent {
   }
 
   closeModal(): void {
+    this.clearBlockModalTimer();
     this.modalMode.set(null);
     this.activeBooking.set(null);
     this.duplicateGroup.set([]);
@@ -359,6 +491,10 @@ export class FwBookingCalendarComponent {
     return 'Anfrage';
   }
 
+  blockStatusLabel(booking: FwBookingRecord): string {
+    return this.isBlockBooking(booking) ? 'Sperre aktiv' : this.statusLabel(booking.status);
+  }
+
   formatDate(date: string): string {
     return new Date(`${date}T12:00:00`).toLocaleDateString('de-DE', {
       weekday: 'long',
@@ -369,6 +505,13 @@ export class FwBookingCalendarComponent {
 
   isPastDate(date: string): boolean {
     return date < this.dateKey(new Date());
+  }
+
+  private clearBlockModalTimer(): void {
+    if (this.blockModalTimerId !== null) {
+      clearInterval(this.blockModalTimerId);
+      this.blockModalTimerId = null;
+    }
   }
 
   private dateKey(d: Date): string {

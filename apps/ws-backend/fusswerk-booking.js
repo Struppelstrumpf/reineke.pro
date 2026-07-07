@@ -18,9 +18,8 @@ const FW_ORIGIN = (process.env.FUSSWERK_FRONTEND_ORIGIN || 'http://localhost:420
 
 const FW_SERVICES = {
   classic: { label: 'Klassische Fußpflege', minutes: 45 },
-  medical: { label: 'Medizinische Fußpflege', minutes: 55 },
-  wellness: { label: 'Fußbad & Massage', minutes: 30 },
-  senior: { label: 'Seniorenpflege', minutes: 50 },
+  shellac: { label: 'Fußpflege mit Shellac / UV-Lack / Gel', minutes: 60 },
+  block: { label: 'Sperre', minutes: 30 },
 };
 
 function sanitizeText(raw, max = 200) {
@@ -215,11 +214,15 @@ function createBookingRecord(body, randomToken, nowIso, schedule = FW_DEFAULT_SC
   const slot = sanitizeText(body.slot, 5);
   const serviceId = sanitizeText(body.serviceId || 'classic', 20);
   const status = body.status === 'confirmed' ? 'confirmed' : 'pending';
-  const source = body.source === 'manual' ? 'manual' : 'web';
+  const source =
+    body.source === 'block' ? 'block' : body.source === 'manual' ? 'manual' : 'web';
+  const durationRaw = Number(body.durationMinutes);
+  const durationMinutes =
+    Number.isFinite(durationRaw) && durationRaw > 0 ? Math.round(durationRaw) : undefined;
   const clientKey = sanitizeText(body.clientKey, 64);
 
   if (!name || name.length < 2) return { error: 'Bitte Namen angeben' };
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+  if (source !== 'block' && email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
     return { error: 'Bitte gültige E-Mail angeben' };
   }
   if (!parseDateOnly(date)) {
@@ -241,6 +244,7 @@ function createBookingRecord(body, randomToken, nowIso, schedule = FW_DEFAULT_SC
       serviceId,
       status,
       source,
+      durationMinutes,
       clientKey: clientKey || undefined,
       clientIp: clientIp && clientIp !== 'unknown' ? clientIp : undefined,
       notes: [],
@@ -317,13 +321,37 @@ async function handleFusswerkBooking({ req, res, method, pathname, url, store, p
       const booking = created.booking;
       const service = FW_SERVICES[booking.serviceId] || FW_SERVICES.classic;
       const bookings = readBookings(store);
-      const audience = booking.source === 'manual' ? 'staff' : 'customer';
+      const audience =
+        booking.source === 'block' || booking.source === 'manual' ? 'staff' : 'customer';
+      const candidateDuration = booking.durationMinutes;
 
-      if (!isSlotAvailable(booking.date, booking.slot, booking.serviceId, schedule, bookings, new Date(), audience)) {
+      if (
+        !isSlotAvailable(
+          booking.date,
+          booking.slot,
+          booking.serviceId,
+          schedule,
+          bookings,
+          new Date(),
+          audience,
+          candidateDuration,
+        )
+      ) {
         sendJson(res, 409, { ok: false, error: 'Dieser Termin ist leider nicht mehr verfügbar' });
         return true;
       }
-      if (bookingClash(bookings, booking.date, booking.slot, booking.serviceId, schedule, undefined, audience)) {
+      if (
+        bookingClash(
+          bookings,
+          booking.date,
+          booking.slot,
+          booking.serviceId,
+          schedule,
+          undefined,
+          audience,
+          candidateDuration,
+        )
+      ) {
         sendJson(res, 409, { ok: false, error: 'Dieser Termin ist leider vergeben' });
         return true;
       }
@@ -331,25 +359,29 @@ async function handleFusswerkBooking({ req, res, method, pathname, url, store, p
       bookings.push(booking);
       writeBookings(store, bookings);
 
-      const confirmUrl = `${FW_ORIGIN}/demo/fusswerk/termin-bestaetigen?token=${encodeURIComponent(booking.token)}`;
-      const customerEmail = buildCustomerEmail(booking, service);
-      const ownerEmail = buildOwnerEmail(booking, service, confirmUrl);
+      if (booking.source !== 'block') {
+        const confirmUrl = `${FW_ORIGIN}/demo/fusswerk/termin-bestaetigen?token=${encodeURIComponent(booking.token)}`;
+        const customerEmail = buildCustomerEmail(booking, service);
+        const ownerEmail = buildOwnerEmail(booking, service, confirmUrl);
 
-      appendEmailLog(store, {
-        id: booking.id,
-        sentAt: nowIso(),
-        customer: customerEmail,
-        owner: ownerEmail,
-      });
+        appendEmailLog(store, {
+          id: booking.id,
+          sentAt: nowIso(),
+          customer: customerEmail,
+          owner: ownerEmail,
+        });
+      }
 
       await persistStore();
 
       sendJson(res, 201, {
         ok: true,
         booking: { id: booking.id, status: booking.status, date: booking.date, slot: booking.slot, service: service.label },
-        emails: { customer: customerEmail, owner: ownerEmail },
-        demo: true,
-        message: 'In der Live-Version werden diese E-Mails automatisch versendet. Hier sehen Sie die Vorschau.',
+        demo: booking.source === 'block',
+        message:
+          booking.source === 'block'
+            ? 'Sperrzeit eingetragen.'
+            : 'In der Live-Version werden diese E-Mails automatisch versendet. Hier sehen Sie die Vorschau.',
       });
     } catch {
       sendJson(res, 400, { ok: false, error: 'Anfrage fehlgeschlagen' });

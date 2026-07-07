@@ -290,6 +290,35 @@ export function getLiveOpenStatus(
   }
 
   const nextToday = ranges.find((r) => mins < r.open);
+  const first = ranges[0];
+  const last = ranges[ranges.length - 1];
+
+  if (mins < first.open) {
+    const soon = first.open - 45;
+    if (mins < soon) {
+      const close = last.close;
+      return {
+        badge: 'Noch geschlossen',
+        detail: `Heute geöffnet ab ${minutesToTime(first.open)} Uhr · bis ${minutesToTime(close)} Uhr`,
+        tone: 'closed',
+      };
+    }
+    return {
+      badge: 'Gleich geöffnet',
+      detail: `Wir öffnen in Kürze — ab ${minutesToTime(first.open)} Uhr.`,
+      tone: 'soon',
+    };
+  }
+
+  if (mins >= last.close) {
+    const next = findNextOpening(schedule, now);
+    return {
+      badge: 'Heute geschlossen',
+      detail: next ? `${next.label} ab ${next.time} Uhr wieder geöffnet.` : 'Heute keine weiteren Termine.',
+      tone: 'closed',
+    };
+  }
+
   if (nextToday) {
     const gapMins = nextToday.open - mins;
     if (gapMins <= 45) {
@@ -303,24 +332,6 @@ export function getLiveOpenStatus(
       badge: 'Mittagspause',
       detail: `Wieder ab ${minutesToTime(nextToday.open)} Uhr für Sie da.`,
       tone: 'closed',
-    };
-  }
-
-  const first = ranges[0];
-  if (mins < first.open) {
-    const soon = first.open - 45;
-    if (mins < soon) {
-      const close = ranges[ranges.length - 1].close;
-      return {
-        badge: 'Noch geschlossen',
-        detail: `Heute geöffnet ab ${minutesToTime(first.open)} Uhr · bis ${minutesToTime(close)} Uhr`,
-        tone: 'closed',
-      };
-    }
-    return {
-      badge: 'Gleich geöffnet',
-      detail: `Wir öffnen in Kürze — ab ${minutesToTime(first.open)} Uhr.`,
-      tone: 'soon',
     };
   }
 

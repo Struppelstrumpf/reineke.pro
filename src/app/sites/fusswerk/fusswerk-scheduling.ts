@@ -52,6 +52,19 @@ export function getServiceDurationMinutes(
   return parseDurationMinutesFromSchedule(svc?.duration, svc?.durationMinutes, settings.defaultDurationMinutes);
 }
 
+export function getBookingDurationMinutes(
+  booking: Pick<FwBookingRecord, 'serviceId' | 'durationMinutes'>,
+  schedule: FwSchedulePayload,
+): number {
+  if (booking.serviceId === 'block' && typeof booking.durationMinutes === 'number' && booking.durationMinutes > 0) {
+    return booking.durationMinutes;
+  }
+  if (typeof booking.durationMinutes === 'number' && booking.durationMinutes > 0) {
+    return booking.durationMinutes;
+  }
+  return getServiceDurationMinutes(booking.serviceId, schedule);
+}
+
 export function slotDurationForGrid(schedule: FwSchedulePayload): number {
   if (!schedule.settings.useServiceDurations) {
     return schedule.settings.defaultDurationMinutes;
@@ -79,7 +92,7 @@ export function slotStartsForDate(dateStr: string, schedule: FwSchedulePayload, 
   return [...new Set(slots)].sort();
 }
 
-type ActiveBooking = Pick<FwBookingRecord, 'id' | 'slot' | 'serviceId' | 'status' | 'name' | 'date'>;
+type ActiveBooking = Pick<FwBookingRecord, 'id' | 'slot' | 'serviceId' | 'status' | 'name' | 'date' | 'durationMinutes'>;
 
 function rangesOverlap(aStart: number, aEnd: number, bStart: number, bEnd: number): boolean {
   return aStart < bEnd && bStart < aEnd;
@@ -89,15 +102,44 @@ function bookingIntervals(
   slot: string,
   serviceId: string,
   schedule: FwSchedulePayload,
+  durationMinutes?: number,
 ): { start: number; treatmentEnd: number; blockedUntil: number } {
   const start = timeToMinutes(slot);
-  const duration = getServiceDurationMinutes(serviceId, schedule);
+  const duration =
+    typeof durationMinutes === 'number' && durationMinutes > 0
+      ? durationMinutes
+      : getServiceDurationMinutes(serviceId, schedule);
   const buffer = schedule.settings.bufferMinutes;
   return {
     start,
     treatmentEnd: start + duration,
     blockedUntil: start + duration + buffer,
   };
+}
+
+function bookingIntervalsFromBooking(
+  booking: ActiveBooking,
+  schedule: FwSchedulePayload,
+): { start: number; treatmentEnd: number; blockedUntil: number } {
+  return bookingIntervals(
+    booking.slot,
+    booking.serviceId,
+    schedule,
+    getBookingDurationMinutes(booking, schedule),
+  );
+}
+
+function bookingAtSlotStart(
+  time: string,
+  bookings: ActiveBooking[],
+  schedule: FwSchedulePayload,
+): ActiveBooking | undefined {
+  const start = timeToMinutes(time);
+  return bookings.find((booking) => {
+    const bStart = timeToMinutes(booking.slot);
+    const duration = getBookingDurationMinutes(booking, schedule);
+    return start >= bStart && start < bStart + duration;
+  });
 }
 
 /** Behandlungen dürfen sich nicht überschneiden; Puffer nur zwischen Terminen. */
@@ -156,7 +198,7 @@ export function isSlotAvailable(
   }
 
   const today = now.toISOString().slice(0, 10);
-  if (date === today) {
+  if (date === today && audience === 'customer') {
     const nowMins = now.getHours() * 60 + now.getMinutes();
     if (start <= nowMins) return false;
   }
@@ -170,8 +212,9 @@ export function isSlotAvailable(
   const gapBefore = clampGapBeforeBookingMinutes(schedule.settings.gapBeforeBookingMinutes ?? 45);
 
   for (const booking of bookings) {
+    if (booking.date !== date) continue;
     if (booking.status !== 'pending' && booking.status !== 'confirmed') continue;
-    const existing = bookingIntervals(booking.slot, booking.serviceId, schedule);
+    const existing = bookingIntervalsFromBooking(booking, schedule);
     if (appointmentsClash(candidate, existing, gapBefore, audience)) {
       return false;
     }
@@ -191,22 +234,22 @@ export function computeSlots(
   const active = bookings.filter(
     (b) => b.date === date && (b.status === 'pending' || b.status === 'confirmed'),
   );
-  const bookingAt = new Map(active.map((b) => [b.slot, b]));
 
   return starts.map((time) => {
-    const direct = bookingAt.get(time);
+    const covering = bookingAtSlotStart(time, active, schedule);
     const customerOk = isSlotAvailable(date, time, serviceId, schedule, active, now, 'customer');
     const staffOk = isSlotAvailable(date, time, serviceId, schedule, active, now, 'staff');
+    const showBooking = covering && timeToMinutes(time) === timeToMinutes(covering.slot) ? covering : null;
     return {
       time,
-      available: customerOk && !direct,
-      staffBookable: staffOk && !direct,
-      booking: direct
+      available: customerOk && !covering,
+      staffBookable: staffOk && !covering,
+      booking: showBooking
         ? {
-            id: direct.id,
-            status: direct.status,
-            name: direct.name,
-            serviceId: direct.serviceId,
+            id: showBooking.id,
+            status: showBooking.status,
+            name: showBooking.name,
+            serviceId: showBooking.serviceId,
           }
         : null,
     };

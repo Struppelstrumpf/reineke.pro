@@ -166,6 +166,8 @@ export class FusswerkBookingAdminService {
     slot: string;
     serviceId: string;
     status?: 'pending' | 'confirmed';
+    source?: 'manual' | 'block';
+    durationMinutes?: number;
   }): Promise<{ bookingId: string } | { error: string }> {
     const schedule = this.content.schedulePayload();
     try {
@@ -180,7 +182,8 @@ export class FusswerkBookingAdminService {
           slot: input.slot,
           serviceId: input.serviceId,
           status: input.status ?? 'confirmed',
-          source: 'manual',
+          source: input.source ?? 'manual',
+          durationMinutes: input.durationMinutes,
           schedule,
         }),
       });

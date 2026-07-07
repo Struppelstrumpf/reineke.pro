@@ -38,6 +38,8 @@ export type FwBookingSettings = {
   closingBufferSlots: number;
   /** Mindestabstand vor einem bestehenden Termin — Kunden dürfen nicht näher buchen (Minuten). */
   gapBeforeBookingMinutes: number;
+  /** Standarddauer für Schnellsperre, wenn im Popup nichts gewählt wird (Sekunden: 30). */
+  blockDefaultMinutes: number;
 };
 
 export type FwBusinessContent = {

@@ -49,7 +49,9 @@ export type FwBookingRecord = {
   slot: string;
   serviceId: string;
   status: 'pending' | 'confirmed' | 'cancelled';
-  source?: 'web' | 'manual';
+  source?: 'web' | 'manual' | 'block';
+  /** Für Sperrzeiten (serviceId block) — blockiert mehrere Zeitraster. */
+  durationMinutes?: number;
   /** Browser-Schlüssel (localStorage) — Zuordnung mehrerer Web-Termine. */
   clientKey?: string;
   /** Server-IP bei Online-Buchung. */

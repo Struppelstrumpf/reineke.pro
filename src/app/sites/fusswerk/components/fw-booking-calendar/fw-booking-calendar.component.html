@@ -7,6 +7,20 @@
     </button>
   </header>
 
+  <div class="fw-cal__block">
+    @if (liveBlock(); as block) {
+      <div class="fw-cal__block-active" role="status" aria-live="polite">
+        <span class="fw-cal__block-label">Sperre aktiv</span>
+        <span class="fw-cal__block-timer">{{ formatBlockRemaining(block.remainingSec) }}</span>
+        <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" [disabled]="actionBusy()" (click)="endActiveBlock()">
+          Beenden
+        </button>
+      </div>
+    } @else {
+      <button type="button" class="fw-btn fw-btn--block" (click)="openBlockModal()">Sperren</button>
+    }
+  </div>
+
   @if (bookings.loadError()) {
     <p class="fw-cal__error">{{ bookings.loadError() }}</p>
   }
@@ -101,9 +115,9 @@
               <span class="fw-cal-modal__dup-badge" aria-hidden="true">!</span>
             }
           </h3>
-          <span class="fw-cal-modal__status" [attr.data-status]="b.status">{{ statusLabel(b.status) }}</span>
+          <span class="fw-cal-modal__status" [attr.data-status]="b.status">{{ blockStatusLabel(b) }}</span>
         </header>
-        @if (hasDuplicateWarning(b)) {
+        @if (hasDuplicateWarning(b) && !isBlockBooking(b)) {
           <button type="button" class="fw-cal-modal__dup-hint" (click)="openDuplicateResolve(b)">
             <span class="fw-cal-modal__dup-badge" aria-hidden="true">!</span>
             Mehrere Termine dieses Kunden am selben Tag — bitte prüfen
@@ -111,7 +125,7 @@
         }
         <dl class="fw-cal-modal__meta">
           <div><dt>Termin</dt><dd>{{ formatDate(b.date) }}, {{ b.slot }} Uhr</dd></div>
-          <div><dt>Leistung</dt><dd>{{ bookings.serviceLabel(b.serviceId, serviceLabels()) }}</dd></div>
+          <div><dt>Leistung</dt><dd>{{ bookingServiceLabel(b) }}</dd></div>
           @if (b.email) { <div><dt>E-Mail</dt><dd>{{ b.email }}</dd></div> }
           @if (b.phone) { <div><dt>Telefon</dt><dd>{{ b.phone }}</dd></div> }
         </dl>
@@ -130,10 +144,41 @@
             @if (b.status === 'pending') {
               <button type="button" class="fw-btn fw-btn--gold" [disabled]="actionBusy()" (click)="confirmBooking()">Zusagen</button>
             }
-            <button type="button" class="fw-btn fw-btn--soft" [disabled]="actionBusy()" (click)="openReschedule()">Verschieben</button>
-            <button type="button" class="fw-btn fw-btn--soft" [disabled]="actionBusy()" (click)="cancelBooking()">Absagen</button>
+            @if (!isBlockBooking(b)) {
+              <button type="button" class="fw-btn fw-btn--soft" [disabled]="actionBusy()" (click)="openReschedule()">Verschieben</button>
+            }
+            <button type="button" class="fw-btn fw-btn--soft" [disabled]="actionBusy()" (click)="cancelBooking()">
+              {{ isBlockBooking(b) ? 'Sperre beenden' : 'Absagen' }}
+            </button>
           </div>
         }
+      }
+
+      @if (modalMode() === 'block') {
+        <header class="fw-cal-modal__head"><h3>Zeit sperren</h3></header>
+        <p class="fw-cal-modal__lead">
+          Wählen Sie die Dauer. Ohne Auswahl wird in
+          <strong>{{ blockModalSeconds() }} Sek.</strong>
+          automatisch
+          <strong>{{ blockPickMinutes() }} Minuten</strong>
+          gesperrt.
+        </p>
+        <div class="fw-cal-block-pick">
+          @for (mins of blockDurationOptions; track mins) {
+            <button
+              type="button"
+              class="fw-btn fw-btn--block-pick"
+              [class.is-selected]="blockPickMinutes() === mins"
+              [disabled]="actionBusy()"
+              (click)="pickBlockMinutes(mins)"
+            >
+              {{ mins }} Min.
+            </button>
+          }
+        </div>
+        <div class="fw-cal-modal__actions">
+          <button type="button" class="fw-btn fw-btn--soft" (click)="closeModal()">Abbrechen</button>
+        </div>
       }
 
       @if (modalMode() === 'create') {
@@ -290,6 +335,21 @@
               {{ settingsDraft().gapBeforeBookingMinutes }} Min.
             </button>
           </div>
+          <label>
+            <span>Standarddauer Schnellsperre (Minuten)</span>
+            <select
+              [ngModel]="settingsDraft().blockDefaultMinutes"
+              (ngModelChange)="updateSettingsDraft({ blockDefaultMinutes: +$event })"
+              name="blockDefault"
+            >
+              @for (mins of blockDurationOptions; track mins) {
+                <option [value]="mins">{{ mins }} Minuten</option>
+              }
+            </select>
+          </label>
+          <p class="fw-cal-modal__lead">
+            Wird im Sperr-Popup nach 30 Sekunden ohne Auswahl automatisch übernommen.
+          </p>
           <p class="fw-cal-modal__lead">
             Ausgegraute Zeiten sind für Kunden gesperrt — im Studio können Sie dort trotzdem Termine eintragen.
           </p>
