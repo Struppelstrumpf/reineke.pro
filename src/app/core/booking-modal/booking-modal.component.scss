@@ -65,18 +65,22 @@
   padding-right: 1.75rem;
 }
 
-.pv-booking__logo img {
-  display: block;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
+.pv-booking__logo {
+  flex-shrink: 0;
+  width: 3.25rem;
+  height: 3.25rem;
+  padding: 0.25rem;
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.28);
 }
 
-.pv-booking__eyebrow {
-  margin: 0 0 0.2rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #9ca598;
+.pv-booking__logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .pv-booking__title {

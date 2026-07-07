@@ -6,7 +6,7 @@ export type PreviewSiteId = 'pizzeria' | 'weisser-schaefer' | 'nasebaer' | 'fuss
 
 export const PREVIEW_STUDIO = {
   name: 'Reineke GbR',
-  role: 'Webdesign-Studio · Individuelle Websites',
+  role: 'Webentwickler',
   email: 'info@reineke.pro',
   phone: '015561 048098',
   phoneTel: '+4915561048098',

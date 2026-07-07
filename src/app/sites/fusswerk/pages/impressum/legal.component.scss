@@ -41,6 +41,13 @@
   margin-top: 1.5rem;
 }
 
+.legal__back-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
 @media (max-width: 600px) {
   .legal {
     padding: clamp(1.5rem, 5vw, 2rem) 0.85rem max(2.5rem, env(safe-area-inset-bottom));

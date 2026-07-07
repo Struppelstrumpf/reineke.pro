@@ -6,8 +6,11 @@
   <header class="pitch__bar">
     <a class="pitch__back" routerLink="/demo/fusswerk">Live-Demo ansehen</a>
     <div class="pitch__brand">
-      <img src="/reineke-fox-icon.svg" width="36" height="36" alt="" />
-      <span>Reineke GbR</span>
+      <img class="pitch__brand-mark" src="/reineke-fox-icon.svg" width="40" height="40" alt="" />
+      <div class="pitch__brand-copy">
+        <span class="pitch__brand-name">Reineke GbR</span>
+        <span class="pitch__brand-role">{{ studio.role }}</span>
+      </div>
     </div>
     <span class="pitch__doc">Vertrauliches Angebot</span>
   </header>
@@ -217,6 +220,12 @@
         <a class="pitch__cta pitch__cta--gold" [href]="'mailto:' + studio.email">Angebot besprechen</a>
         <a class="pitch__cta pitch__cta--ghost" [href]="studio.phoneTel">{{ studio.phone }}</a>
       </div>
+      <nav class="pitch__legal-nav" aria-label="Rechtliches">
+        <a routerLink="/demo/fusswerk/impressum">Impressum</a>
+        <a routerLink="/demo/fusswerk/datenschutz">Datenschutz</a>
+        <a routerLink="/demo/fusswerk">Live-Demo</a>
+        <a [href]="'mailto:' + studio.email">Kontakt</a>
+      </nav>
       <p class="pitch__legal">
         Reineke GbR · Matthias &amp; Jane Reineke · Elisabethstraße 31 · 49201 Dissen ·
         {{ studio.email }} · Einmalpreise zzgl. gesetzlicher MwSt., sofern anwendbar.
