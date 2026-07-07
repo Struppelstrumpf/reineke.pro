@@ -80,7 +80,7 @@ export class FwAngebotComponent {
       id: 'studio-installment',
       tier: 'Paket C',
       name: 'Komplettsystem — Ratenzahlung',
-      tagline: 'Wie Paket B — sanfter Einstieg mit Anzahlung & 5 Folgeraten',
+      tagline: 'Gleiche Leistung wie Paket B — bezahlt in 6 Monatsraten',
       price: 869,
       referencePrice: 2490,
       monthlyRef: '29 €',
@@ -92,11 +92,10 @@ export class FwAngebotComponent {
       installmentAmount: 134,
       features: [
         'Identische Leistung wie Paket B (Komplettsystem)',
-        '199 € Anzahlung bei Auftragsstart — dann 5 × 134 €',
-        'Gesamt 869 € statt 750 € einmalig (+119 € Ratenzahlungsaufschlag)',
-        'Für Sie: kein großer Betrag auf einmal · für uns: fairer Ausgleich',
         'Studio-Login, Kalender, Chat & Inhalte inklusive',
-        'Nach Zahlung der Raten nur noch Hosting & Betreuung',
+        'Domain, Server & SSL-Einrichtung',
+        'Ideal beim Geschäftsstart — ohne große Einmalzahlung',
+        'Nach den 6 Monaten nur noch Hosting & Betreuung',
       ],
     },
   ];

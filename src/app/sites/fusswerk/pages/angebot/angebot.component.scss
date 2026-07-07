@@ -290,27 +290,52 @@
   font-family: 'Cormorant Garamond', serif;
   font-size: clamp(1.85rem, 3vw, 2.35rem);
   font-weight: 600;
+  line-height: 1.1;
+}
+
+.pitch__card-title-main {
+  display: block;
+}
+
+.pitch__card-title-sub {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(184, 212, 232, 0.85);
 }
 
 .pitch__card-tag {
-  margin: 0.35rem 0 1.25rem;
-  font-size: 0.92rem;
+  margin: 0.5rem 0 1.15rem;
+  font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.55);
   line-height: 1.5;
 }
 
 .pitch__price-hero {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 1rem;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 0.85rem;
   margin-bottom: 1rem;
 }
 
+.pitch__price-hero--installment {
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
 .pitch__price-main {
-  padding: 1.25rem;
+  padding: 1.15rem 1.2rem;
   border-radius: 1rem;
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pitch__price-main--full {
+  text-align: center;
 }
 
 .pitch__price-from {
@@ -346,6 +371,19 @@
   padding: 1rem 1.15rem;
   border-radius: 1rem;
   border: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+.pitch__price-ref--wide {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
+}
+
+.pitch__price-ref--wide .pitch__save {
+  margin-top: 0;
+  margin-left: auto;
 }
 
 .pitch__ref-label {
@@ -396,33 +434,91 @@
   opacity: 0.85;
 }
 
-.pitch__installment-note {
-  margin: -0.35rem 0 1rem;
-  padding: 0.85rem 1rem;
-  border-radius: 0.85rem;
-  background: rgba(106, 143, 168, 0.12);
+.pitch__plan {
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(106, 143, 168, 0.1);
   border: 1px solid rgba(142, 180, 204, 0.22);
-  font-size: 0.82rem;
-  line-height: 1.45;
-  color: rgba(255, 255, 255, 0.78);
 }
 
-.pitch__installment-note strong {
-  display: block;
-  margin-top: 0.35rem;
-  margin-bottom: 0.15rem;
-  color: #b8d4e8;
-  font-size: 0.92rem;
+.pitch__plan-kicker {
+  margin: 0 0 0.75rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(184, 212, 232, 0.8);
 }
 
-.pitch__installment-note strong:first-child {
-  margin-top: 0;
+.pitch__plan-grid {
+  display: grid;
+  gap: 0.55rem;
 }
 
-.pitch__installment-note span {
-  display: block;
-  font-size: 0.75rem;
+.pitch__plan-step {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 0.9fr) 1fr;
+  grid-template-rows: auto auto;
+  gap: 0.1rem 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.75rem;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pitch__plan-step--start {
+  border-color: rgba(142, 180, 204, 0.28);
+  background: rgba(106, 143, 168, 0.14);
+}
+
+.pitch__plan-step-label {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: rgba(255, 255, 255, 0.5);
+}
+
+.pitch__plan-step-value {
+  grid-column: 2;
+  grid-row: 1;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #e8f2f8;
+}
+
+.pitch__plan-step-detail {
+  grid-column: 2;
+  grid-row: 2;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.pitch__plan-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.65rem;
+  margin: 0.75rem 0 0;
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.pitch__plan-badge {
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(142, 180, 204, 0.14);
+  border: 1px solid rgba(142, 180, 204, 0.28);
+  color: #b8d4e8;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 .pitch__features {
@@ -486,6 +582,17 @@
 
 .pitch__cta--gold:hover {
   box-shadow: 0 20px 50px rgba(184, 149, 107, 0.45);
+}
+
+.pitch__cta--soft {
+  border-color: rgba(142, 180, 204, 0.35);
+  background: linear-gradient(135deg, rgba(142, 180, 204, 0.28) 0%, rgba(90, 138, 168, 0.42) 100%);
+  color: #f2f8fc;
+  box-shadow: 0 14px 36px rgba(90, 138, 168, 0.22);
+}
+
+.pitch__cta--soft:hover {
+  box-shadow: 0 18px 44px rgba(90, 138, 168, 0.32);
 }
 
 .pitch__cta--ghost {

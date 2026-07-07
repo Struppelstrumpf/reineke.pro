@@ -37,8 +37,8 @@
       </div>
       <div class="pitch__hero-stats-divider" aria-hidden="true"></div>
       <div>
-        <strong>199 € + 5×134 €</strong>
-        <span>Paket C — Ratenzahlung</span>
+        <strong>869 €</strong>
+        <span>Paket C — in 6 Monaten</span>
       </div>
       <div class="pitch__hero-stats-divider" aria-hidden="true"></div>
       <div>
@@ -61,44 +61,68 @@
           <span class="pitch__ribbon pitch__ribbon--soft">Sanfter Start</span>
         }
         <p class="pitch__tier">{{ pkg.tier }}</p>
-        <h2>{{ pkg.name }}</h2>
+        <h2>
+          @if (isInstallment(pkg)) {
+            <span class="pitch__card-title-main">Ratenzahlung</span>
+            <span class="pitch__card-title-sub">Komplettsystem wie Paket B</span>
+          } @else {
+            {{ pkg.name }}
+          }
+        </h2>
         <p class="pitch__card-tag">{{ pkg.tagline }}</p>
 
-        <div class="pitch__price-hero">
-          <div class="pitch__price-main">
-            @if (isInstallment(pkg)) {
-              <span class="pitch__price-from">Ratenzahlung</span>
-              <span class="pitch__price-num">
-                {{ formatEuro(pkg.installmentDownPayment!) }} + {{ pkg.installmentCount }} × {{ formatEuro(pkg.installmentAmount!) }}
-              </span>
-              <span class="pitch__price-once">
-                gesamt {{ formatEuro(pkg.price) }} · Paket B einmalig {{ formatEuro(pkg.onceComparePrice!) }}
-                · {{ studio.vatNote }}
-              </span>
-            } @else {
+        <div class="pitch__price-hero" [class.pitch__price-hero--installment]="isInstallment(pkg)">
+          @if (isInstallment(pkg) && installmentPremium(pkg); as premium) {
+            <div class="pitch__price-main pitch__price-main--full">
+              <span class="pitch__price-from">Gesamtpreis</span>
+              <span class="pitch__price-num">{{ formatEuro(pkg.price) }}</span>
+              <span class="pitch__price-once">{{ studio.priceOnceNote }}</span>
+            </div>
+
+            <div class="pitch__plan" aria-label="Zahlungsplan">
+              <p class="pitch__plan-kicker">Zahlungsplan · 6 Monate</p>
+              <div class="pitch__plan-grid">
+                <div class="pitch__plan-step pitch__plan-step--start">
+                  <span class="pitch__plan-step-label">Monat 1</span>
+                  <strong class="pitch__plan-step-value">{{ formatEuro(installmentFirstMonthTotal(pkg)!) }}</strong>
+                  <span class="pitch__plan-step-detail">
+                    {{ formatEuro(pkg.installmentDownPayment!) }} Anzahlung + {{ pkg.monthlyRef }} Hosting
+                  </span>
+                </div>
+                <div class="pitch__plan-step">
+                  <span class="pitch__plan-step-label">Monate 2–6</span>
+                  <strong class="pitch__plan-step-value">{{ formatEuro(installmentFollowUpTotal(pkg)!) }} / Mo.</strong>
+                  <span class="pitch__plan-step-detail">
+                    {{ formatEuro(pkg.installmentAmount!) }} Rate + {{ pkg.monthlyRef }} Hosting
+                  </span>
+                </div>
+              </div>
+              <p class="pitch__plan-foot">
+                Statt {{ formatEuro(pkg.onceComparePrice!) }} einmalig
+                <span class="pitch__plan-badge">+{{ formatEuro(premium) }} Ratenzahlung</span>
+              </p>
+            </div>
+          } @else {
+            <div class="pitch__price-main">
               <span class="pitch__price-from">Ihr Preis</span>
               <span class="pitch__price-num">{{ formatEuro(pkg.price) }}</span>
               <span class="pitch__price-once">{{ studio.priceOnceNote }}</span>
-            }
-          </div>
-          <div class="pitch__price-ref">
+            </div>
+          }
+
+          <div class="pitch__price-ref" [class.pitch__price-ref--wide]="isInstallment(pkg)">
             <span class="pitch__ref-label">Marktüblich</span>
             <s>{{ formatEuro(pkg.referencePrice) }}</s>
             <span class="pitch__save">Sie sparen {{ formatEuro(savings(pkg)) }}</span>
           </div>
         </div>
 
-        @if (isInstallment(pkg) && installmentPremium(pkg); as premium) {
-          <div class="pitch__installment-note">
-            <strong>Monat 1: ca. {{ formatEuro(installmentFirstMonthTotal(pkg)!) }}</strong>
-            <span>Anzahlung {{ formatEuro(pkg.installmentDownPayment!) }} + Hosting {{ pkg.monthlyRef }}</span>
-            <strong>Monate 2–6: ca. {{ formatEuro(installmentFollowUpTotal(pkg)!) }} / Monat</strong>
-            <span>Rate {{ formatEuro(pkg.installmentAmount!) }} + Hosting · +{{ formatEuro(premium) }} vs. Einmalzahlung</span>
-          </div>
-        }
-
         <div class="pitch__monthly">
-          <span>Laufende Kosten (Referenz)</span>
+          @if (isInstallment(pkg)) {
+            <span>Danach · laufende Kosten</span>
+          } @else {
+            <span>Laufende Kosten (Referenz)</span>
+          }
           <strong>{{ pkg.monthlyRef }} / Monat</strong>
           <small>inkl. Domain, Server &amp; Betreuung · ab Monat 13: {{ pkg.monthlyAfter }}</small>
         </div>
@@ -109,8 +133,12 @@
           }
         </ul>
 
-        <a class="pitch__cta" [class.pitch__cta--gold]="pkg.highlight" [href]="mailto(pkg)">
-          {{ pkg.name }} anfragen
+        <a class="pitch__cta" [class.pitch__cta--gold]="pkg.highlight" [class.pitch__cta--soft]="isInstallment(pkg)" [href]="mailto(pkg)">
+          @if (isInstallment(pkg)) {
+            Ratenzahlung anfragen
+          } @else {
+            {{ pkg.name }} anfragen
+          }
         </a>
       </article>
     }
