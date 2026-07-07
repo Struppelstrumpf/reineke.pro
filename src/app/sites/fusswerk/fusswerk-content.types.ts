@@ -38,6 +38,13 @@ export type FwBookingSettings = {
   closingBufferSlots: number;
   /** Mindestabstand vor einem bestehenden Termin — Kunden dürfen nicht näher buchen (Minuten). */
   gapBeforeBookingMinutes: number;
+  /**
+   * Doppelte Kundenanfragen zur gleichen Uhrzeit:
+   * - blocked: belegte Zeit ist für Kunden gesperrt
+   * - pending_only: nur bei offenen Anfragen (orange) erlaubt
+   * - always: auch bei bestätigten Terminen erlaubt
+   */
+  customerParallelPolicy: 'blocked' | 'pending_only' | 'always';
   /** Standarddauer für Schnellsperre, wenn im Popup nichts gewählt wird (Sekunden: 30). */
   blockDefaultMinutes: number;
 };

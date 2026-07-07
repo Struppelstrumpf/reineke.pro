@@ -37,12 +37,28 @@ const DEFAULT_SETTINGS = {
   closingBufferSlots: 0,
   gapBeforeBookingMinutes: 45,
   blockDefaultMinutes: 30,
+  customerParallelPolicy: 'blocked',
 };
 
 function clampGapBeforeBookingMinutes(value) {
   const n = Number(value);
   if (!Number.isFinite(n)) return 45;
   return Math.min(120, Math.max(5, Math.round(n)));
+}
+
+function normalizeCustomerParallelPolicy(value) {
+  if (value === 'pending_only' || value === 'always') return value;
+  return 'blocked';
+}
+
+/** Blockiert ein bestehender Termin neue Kundenanfragen (nicht für Studio). */
+function existingBookingBlocksCustomer(booking, policy, audience) {
+  if (audience !== 'customer') return true;
+  if (booking.serviceId === 'block') return true;
+  const mode = normalizeCustomerParallelPolicy(policy);
+  if (mode === 'blocked') return true;
+  if (mode === 'pending_only') return booking.status === 'confirmed';
+  return false;
 }
 
 function parseDurationMinutes(raw, fallback = 45) {
@@ -336,9 +352,11 @@ function isSlotAvailable(
     blockedUntil: start + duration + settings.bufferMinutes,
   };
   const gapBefore = clampGapBeforeBookingMinutes(settings.gapBeforeBookingMinutes ?? 45);
+  const parallelPolicy = settings.customerParallelPolicy;
   for (const booking of bookings) {
     if (booking.date !== date) continue;
     if (booking.status !== 'pending' && booking.status !== 'confirmed') continue;
+    if (!existingBookingBlocksCustomer(booking, parallelPolicy, audience)) continue;
     const existing = bookingIntervalsFromBooking(booking, schedule);
     if (appointmentsClash(candidate, existing, gapBefore, audience)) return false;
   }
@@ -347,6 +365,7 @@ function isSlotAvailable(
 
 function computeSlots(date, schedule, bookings, serviceId, now = new Date()) {
   const starts = slotStartsForDate(date, schedule, serviceId);
+  const { settings } = normalizeSchedule(schedule);
   const active = (bookings || []).filter(
     (b) => b.date === date && (b.status === 'pending' || b.status === 'confirmed'),
   );
@@ -355,9 +374,11 @@ function computeSlots(date, schedule, bookings, serviceId, now = new Date()) {
     const customerOk = isSlotAvailable(date, time, serviceId, schedule, active, now, 'customer');
     const staffOk = isSlotAvailable(date, time, serviceId, schedule, active, now, 'staff');
     const showBooking = covering && timeToMinutes(time) === timeToMinutes(covering.slot) ? covering : null;
+    const slotBlocksCustomer =
+      covering && existingBookingBlocksCustomer(covering, settings.customerParallelPolicy, 'customer');
     return {
       time,
-      available: customerOk && !covering,
+      available: customerOk && !slotBlocksCustomer,
       staffBookable: staffOk && !covering,
       booking: showBooking
         ? {

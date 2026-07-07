@@ -48,6 +48,7 @@ export class AppComponent {
   readonly hideFiverrSidebar = computed(() => {
     const url = this.routeUrl();
     if (url.includes('embed=studio')) return true;
+    if (url.includes('/fusswerk/angebot')) return true;
     return this.isMobileViewport() && url.includes('/fusswerk/studio');
   });
 

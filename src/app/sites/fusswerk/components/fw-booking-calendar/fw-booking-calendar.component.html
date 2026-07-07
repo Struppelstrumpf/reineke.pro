@@ -348,6 +348,53 @@
               {{ settingsDraft().gapBeforeBookingMinutes }} Min.
             </button>
           </div>
+          <fieldset class="fw-cal-settings-group fw-cal-radio">
+            <legend>Gleiche Uhrzeit mehrfach anfragen</legend>
+            <p class="fw-cal-setting-row__hint">
+              Was passiert, wenn zur Uhrzeit schon ein Eintrag im Kalender steht?
+            </p>
+            <label>
+              <input
+                type="radio"
+                name="parallelPolicy"
+                value="blocked"
+                [ngModel]="settingsDraft().customerParallelPolicy ?? 'blocked'"
+                (ngModelChange)="updateSettingsDraft({ customerParallelPolicy: 'blocked' })"
+              />
+              <span>Nicht erlauben — belegte Uhrzeit ist für Kunden nicht buchbar</span>
+            </label>
+            <p class="fw-cal-setting-row__hint fw-cal-setting-row__hint--option">
+              Standard: Offene Anfragen und bestätigte Termine sperren die Uhrzeit im Online-Kalender.
+            </p>
+            <label>
+              <input
+                type="radio"
+                name="parallelPolicy"
+                value="pending_only"
+                [ngModel]="settingsDraft().customerParallelPolicy ?? 'blocked'"
+                (ngModelChange)="updateSettingsDraft({ customerParallelPolicy: 'pending_only' })"
+              />
+              <span>Erlauben, wenn dort nur eine offene Anfrage liegt</span>
+            </label>
+            <p class="fw-cal-setting-row__hint fw-cal-setting-row__hint--option">
+              Orange Anfragen blockieren nicht — weitere Kunden können dieselbe Uhrzeit wählen. Bestätigte Termine
+              bleiben gesperrt.
+            </p>
+            <label>
+              <input
+                type="radio"
+                name="parallelPolicy"
+                value="always"
+                [ngModel]="settingsDraft().customerParallelPolicy ?? 'blocked'"
+                (ngModelChange)="updateSettingsDraft({ customerParallelPolicy: 'always' })"
+              />
+              <span>Immer erlauben — auch wenn der Termin schon bestätigt ist</span>
+            </label>
+            <p class="fw-cal-setting-row__hint fw-cal-setting-row__hint--option">
+              Mehrere Kunden können zur gleichen Zeit anfragen. Sie entscheiden später im Kalender, welcher Termin
+              bleibt.
+            </p>
+          </fieldset>
           <label>
             <span>Standarddauer Schnellsperre (Minuten)</span>
             <select

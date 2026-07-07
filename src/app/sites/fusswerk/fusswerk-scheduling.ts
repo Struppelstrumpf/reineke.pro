@@ -40,6 +40,29 @@ export function clampGapBeforeBookingMinutes(value: number): number {
   return Math.min(120, Math.max(5, Math.round(value)));
 }
 
+export type FwCustomerParallelPolicy = FwBookingSettings['customerParallelPolicy'];
+
+export function normalizeCustomerParallelPolicy(
+  value: FwCustomerParallelPolicy | string | undefined,
+): FwCustomerParallelPolicy {
+  if (value === 'pending_only' || value === 'always') return value;
+  return 'blocked';
+}
+
+/** Blockiert ein bestehender Termin neue Kundenanfragen (nicht für Studio). */
+export function existingBookingBlocksCustomer(
+  booking: Pick<FwBookingRecord, 'status' | 'serviceId'>,
+  policy: FwCustomerParallelPolicy | string | undefined,
+  audience: FwSlotAudience,
+): boolean {
+  if (audience !== 'customer') return true;
+  if (booking.serviceId === 'block') return true;
+  const mode = normalizeCustomerParallelPolicy(policy);
+  if (mode === 'blocked') return true;
+  if (mode === 'pending_only') return booking.status === 'confirmed';
+  return false;
+}
+
 export function getServiceDurationMinutes(
   serviceId: string | undefined,
   schedule: FwSchedulePayload,
@@ -210,10 +233,12 @@ export function isSlotAvailable(
   };
 
   const gapBefore = clampGapBeforeBookingMinutes(schedule.settings.gapBeforeBookingMinutes ?? 45);
+  const parallelPolicy = schedule.settings.customerParallelPolicy;
 
   for (const booking of bookings) {
     if (booking.date !== date) continue;
     if (booking.status !== 'pending' && booking.status !== 'confirmed') continue;
+    if (!existingBookingBlocksCustomer(booking, parallelPolicy, audience)) continue;
     const existing = bookingIntervalsFromBooking(booking, schedule);
     if (appointmentsClash(candidate, existing, gapBefore, audience)) {
       return false;
@@ -240,9 +265,12 @@ export function computeSlots(
     const customerOk = isSlotAvailable(date, time, serviceId, schedule, active, now, 'customer');
     const staffOk = isSlotAvailable(date, time, serviceId, schedule, active, now, 'staff');
     const showBooking = covering && timeToMinutes(time) === timeToMinutes(covering.slot) ? covering : null;
+    const slotBlocksCustomer =
+      covering &&
+      existingBookingBlocksCustomer(covering, schedule.settings.customerParallelPolicy, 'customer');
     return {
       time,
-      available: customerOk && !covering,
+      available: customerOk && !slotBlocksCustomer,
       staffBookable: staffOk && !covering,
       booking: showBooking
         ? {

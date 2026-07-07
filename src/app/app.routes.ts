@@ -71,6 +71,11 @@ export const routes: Routes = [
           import('./sites/fusswerk/pages/studio/studio.component').then((m) => m.FwStudioComponent),
       },
       {
+        path: 'angebot',
+        loadComponent: () =>
+          import('./sites/fusswerk/pages/angebot/angebot.component').then((m) => m.FwAngebotComponent),
+      },
+      {
         path: 'impressum',
         loadComponent: () =>
           import('./sites/fusswerk/pages/impressum/impressum.component').then((m) => m.FwImpressumComponent),

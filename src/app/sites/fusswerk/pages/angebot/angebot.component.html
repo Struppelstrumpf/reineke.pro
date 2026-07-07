@@ -1,0 +1,228 @@
+<article class="pitch">
+  <div class="pitch__glow pitch__glow--a" aria-hidden="true"></div>
+  <div class="pitch__glow pitch__glow--b" aria-hidden="true"></div>
+  <div class="pitch__grid-bg" aria-hidden="true"></div>
+
+  <header class="pitch__bar">
+    <a class="pitch__back" routerLink="/demo/fusswerk">Live-Demo ansehen</a>
+    <div class="pitch__brand">
+      <img src="/reineke-fox-icon.svg" width="36" height="36" alt="" />
+      <span>Reineke GbR</span>
+    </div>
+    <span class="pitch__doc">Vertrauliches Angebot</span>
+  </header>
+
+  <section class="pitch__hero">
+    <p class="pitch__kicker">Exklusiv für {{ recipient }}</p>
+    <h1>
+      Ihr digitaler Auftritt.<br />
+      <em>Maßgeschneidert.</em> Nicht aus der Box.
+    </h1>
+    <p class="pitch__hero-lead">
+      Kein Baukasten. Kein Template von der Stange. Eine Website, die so professionell wirkt wie Ihr
+      Studio — mit optional vollem Termin- und Verwaltungssystem wie in dieser Demo.
+    </p>
+    <div class="pitch__hero-stats">
+      <div>
+        <strong>300 €</strong>
+        <span>Landingpage einmalig</span>
+      </div>
+      <div class="pitch__hero-stats-divider" aria-hidden="true"></div>
+      <div>
+        <strong>750 €</strong>
+        <span>Komplettsystem einmalig</span>
+      </div>
+      <div class="pitch__hero-stats-divider" aria-hidden="true"></div>
+      <div>
+        <strong>ab 19 €</strong>
+        <span>Hosting &amp; Betreuung / Monat</span>
+      </div>
+    </div>
+    <p class="pitch__valid">Gültig bis {{ validUntil }} · Referenz: <a routerLink="/demo/fusswerk">reineke.pro/demo/fusswerk</a></p>
+  </section>
+
+  <section class="pitch__packages">
+    @for (pkg of packages; track pkg.id) {
+      <article class="pitch__card" [class.pitch__card--featured]="pkg.highlight">
+        @if (pkg.highlight) {
+          <span class="pitch__ribbon">Empfehlung</span>
+        }
+        <p class="pitch__tier">{{ pkg.tier }}</p>
+        <h2>{{ pkg.name }}</h2>
+        <p class="pitch__card-tag">{{ pkg.tagline }}</p>
+
+        <div class="pitch__price-hero">
+          <div class="pitch__price-main">
+            <span class="pitch__price-from">Ihr Preis</span>
+            <span class="pitch__price-num">{{ formatEuro(pkg.price) }}</span>
+            <span class="pitch__price-once">einmalig · zzgl. 19&nbsp;% MwSt.</span>
+          </div>
+          <div class="pitch__price-ref">
+            <span class="pitch__ref-label">Marktüblich</span>
+            <s>{{ formatEuro(pkg.referencePrice) }}</s>
+            <span class="pitch__save">Sie sparen {{ formatEuro(savings(pkg)) }}</span>
+          </div>
+        </div>
+
+        <div class="pitch__monthly">
+          <span>Laufende Kosten (Referenz)</span>
+          <strong>{{ pkg.monthlyRef }} / Monat</strong>
+          <small>inkl. Domain, Server &amp; Betreuung · ab Monat 13: {{ pkg.monthlyAfter }}</small>
+        </div>
+
+        <ul class="pitch__features">
+          @for (f of pkg.features; track f) {
+            <li>{{ f }}</li>
+          }
+        </ul>
+
+        <a class="pitch__cta" [class.pitch__cta--gold]="pkg.highlight" [href]="mailto(pkg)">
+          {{ pkg.name }} anfragen
+        </a>
+      </article>
+    }
+  </section>
+
+  <section class="pitch__section pitch__section--dark">
+    <p class="pitch__section-kicker">Volle Flexibilität</p>
+    <h2>Alles anpassbar — von uns umgesetzt</h2>
+    <p class="pitch__section-lead">
+      Farben, Stile, neue Seiten, geänderte Texte, andere Bilder: Wir bauen nicht „fertig und
+      vergessen“, sondern eine Website, die mit Ihrem Studio mitwächst. Kein Baukasten-Limit.
+    </p>
+    <div class="pitch__freedom">
+      @for (point of freedomPoints; track point.title) {
+        <article>
+          <span class="pitch__freedom-icon" aria-hidden="true">{{ point.icon }}</span>
+          <h3>{{ point.title }}</h3>
+          <p>{{ point.text }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="pitch__section">
+    <p class="pitch__section-kicker">Warum nicht Wix, Jimdo &amp; Co.?</p>
+    <h2>Maßanfertigung schlägt Baukasten</h2>
+    <div class="pitch__versus">
+      <div class="pitch__versus-col pitch__versus-col--bad">
+        <h3>Baukasten</h3>
+        <ul>
+          @for (item of builderPain; track item) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      </div>
+      <div class="pitch__versus-mid" aria-hidden="true">vs</div>
+      <div class="pitch__versus-col pitch__versus-col--good">
+        <h3>Reineke GbR</h3>
+        <ul>
+          @for (item of customWins; track item) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="pitch__section pitch__section--accent">
+    <p class="pitch__section-kicker">Marktvergleich</p>
+    <h2>Referenzpreise — transparent</h2>
+    <p class="pitch__section-lead">
+      Unsere Einmalpreise liegen deutlich unter dem, was Agenturen und Studios für vergleichbare
+      Leistungen üblicherweise verlangen. Die monatlichen Beträge orientieren sich an realen
+      Infrastrukturkosten plus fairer Wartung.
+    </p>
+    <div class="pitch__market">
+      @for (ref of marketRefs; track ref.label) {
+        <div class="pitch__market-row">
+          <span>{{ ref.label }}</span>
+          <strong>{{ ref.range }}</strong>
+        </div>
+      }
+    </div>
+    <div class="pitch__market-highlight">
+      <div>
+        <span>Ihr Angebot Landingpage</span>
+        <strong>300 €</strong>
+        <em>statt marktüblich ca. 990 €</em>
+      </div>
+      <div>
+        <span>Ihr Angebot Komplettsystem</span>
+        <strong>750 €</strong>
+        <em>statt marktüblich ca. 2.490 €</em>
+      </div>
+    </div>
+  </section>
+
+  <section class="pitch__section">
+    <p class="pitch__section-kicker">Monatliche Kosten</p>
+    <h2>Was Hosting &amp; Betreuung kosten</h2>
+    <p class="pitch__section-lead">
+      Die laufenden Kosten setzen sich aus Domain (IONOS), Server (Hetzner CX23) und unserer
+      technischen Betreuung zusammen. Alle Beträge als Referenz — transparent aufgeschlüsselt.
+    </p>
+    <div class="pitch__infra-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Posten</th>
+            <th>Details</th>
+            <th>Netto / Monat</th>
+            <th>Brutto (19&nbsp;%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of infraLines; track line.label) {
+            <tr>
+              <td>{{ line.label }}</td>
+              <td>{{ line.detail }}</td>
+              <td>{{ line.net.toLocaleString('de-DE', { minimumFractionDigits: 2 }) }} €</td>
+              <td>{{ (line.net * 1.19).toLocaleString('de-DE', { minimumFractionDigits: 2 }) }} €</td>
+            </tr>
+          }
+          <tr>
+            <td>Wartung &amp; kleine Anpassungen</td>
+            <td>Updates, Sicherheit, Support</td>
+            <td>ab 9,00 €</td>
+            <td>ab 10,71 €</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2"><strong>Gesamt-Referenz (Landingpage)</strong></td>
+            <td colspan="2"><strong>ca. 16 € netto · ca. 19 € brutto / Monat</strong></td>
+          </tr>
+          <tr>
+            <td colspan="2"><strong>Gesamt-Referenz (Komplettsystem)</strong></td>
+            <td colspan="2"><strong>ca. 24 € netto · ca. 29 € brutto / Monat</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="pitch__infra-note">
+      Nach 12 Monaten kann sich der Domain-Preis bei IONOS erhöhen (Aktionspreis endet). Hetzner
+      berechnet nach Nutzung, maximal der Monatspreis. Unser Betreuungsanteil steigt moderat (ca.
+      +4 €/Monat), damit Updates und Support dauerhaft abgedeckt sind.
+    </p>
+  </section>
+
+  <footer class="pitch__footer">
+    <div class="pitch__footer-inner">
+      <h2>Bereit für den nächsten Schritt?</h2>
+      <p>
+        Wir freuen uns auf ein kurzes Gespräch — unverbindlich und ohne Druck.
+      </p>
+      <div class="pitch__footer-cta">
+        <a class="pitch__cta pitch__cta--gold" [href]="'mailto:' + studio.email">Angebot besprechen</a>
+        <a class="pitch__cta pitch__cta--ghost" [href]="studio.phoneTel">{{ studio.phone }}</a>
+      </div>
+      <p class="pitch__legal">
+        Reineke GbR · Matthias &amp; Jane Reineke · Elisabethstraße 31 · 49201 Dissen ·
+        {{ studio.email }} · Einmalpreise zzgl. gesetzlicher MwSt., sofern anwendbar.
+        Monatliche Referenzpreise inkl. MwSt.-Hinweis auf Fremdleistungen. Größere Erweiterungen
+        (Fotoshooting, zusätzliche Systeme) nach Absprache.
+      </p>
+    </div>
+  </footer>
+</article>
