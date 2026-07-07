@@ -1,25 +1,26 @@
 <section class="fw-cal">
   <header class="fw-cal__head">
-    <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" (click)="bookings.refresh()" aria-label="Aktualisieren">↻</button>
-    <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" (click)="openSettings()">
-      <span aria-hidden="true">⚙</span>
-      <span class="fw-cal__settings-label">Einstellungen</span>
-    </button>
+    <div class="fw-cal__head-start">
+      @if (liveBlock(); as block) {
+        <div class="fw-cal__block-active" role="status" aria-live="polite">
+          <span class="fw-cal__block-label">Sperre aktiv</span>
+          <span class="fw-cal__block-timer">{{ formatBlockRemaining(block.remainingSec) }}</span>
+          <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" [disabled]="actionBusy()" (click)="endActiveBlock()">
+            Beenden
+          </button>
+        </div>
+      } @else {
+        <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" (click)="openBlockModal()">Sperren</button>
+      }
+    </div>
+    <div class="fw-cal__head-end">
+      <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" (click)="bookings.refresh()" aria-label="Aktualisieren">↻</button>
+      <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" (click)="openSettings()">
+        <span aria-hidden="true">⚙</span>
+        <span class="fw-cal__settings-label">Einstellungen</span>
+      </button>
+    </div>
   </header>
-
-  <div class="fw-cal__block">
-    @if (liveBlock(); as block) {
-      <div class="fw-cal__block-active" role="status" aria-live="polite">
-        <span class="fw-cal__block-label">Sperre aktiv</span>
-        <span class="fw-cal__block-timer">{{ formatBlockRemaining(block.remainingSec) }}</span>
-        <button type="button" class="fw-btn fw-btn--soft fw-btn--xs" [disabled]="actionBusy()" (click)="endActiveBlock()">
-          Beenden
-        </button>
-      </div>
-    } @else {
-      <button type="button" class="fw-btn fw-btn--block" (click)="openBlockModal()">Sperren</button>
-    }
-  </div>
 
   @if (bookings.loadError()) {
     <p class="fw-cal__error">{{ bookings.loadError() }}</p>
@@ -45,17 +46,29 @@
             [class.is-out]="!cell.inMonth"
             [class.is-past]="cell.isPast"
             [class.is-selected]="cell.date === selectedDate()"
-            [class.has-bookings]="bookingCount(cell.date) > 0"
+            [class.has-confirmed]="confirmedCount(cell.date) > 0"
             [class.has-pending]="pendingCount(cell.date) > 0"
+            [attr.aria-label]="dayAriaLabel(cell)"
             (click)="selectDate(cell.date)"
           >
-            <span>{{ cell.day }}</span>
-            @if (bookingCount(cell.date) > 0) {
-              <em>{{ bookingCount(cell.date) }}</em>
+            <span class="fw-cal__day-num">{{ cell.day }}</span>
+            @if (confirmedCount(cell.date) > 0 || pendingCount(cell.date) > 0) {
+              <span class="fw-cal__day-markers" aria-hidden="true">
+                @if (pendingCount(cell.date) > 0) {
+                  <span class="fw-cal__day-badge is-pending">{{ pendingCount(cell.date) }}</span>
+                }
+                @if (confirmedCount(cell.date) > 0) {
+                  <span class="fw-cal__day-badge is-confirmed">{{ confirmedCount(cell.date) }}</span>
+                }
+              </span>
             }
           </button>
         }
       </div>
+      <p class="fw-cal__month-legend" aria-hidden="true">
+        <span class="dot is-pending"></span> Anfrage
+        <span class="dot is-booked"></span> Bestätigt
+      </p>
     </div>
 
     <div class="fw-cal__slots fw-card">

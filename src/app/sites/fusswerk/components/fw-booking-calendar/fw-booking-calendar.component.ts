@@ -180,12 +180,30 @@ export class FwBookingCalendarComponent implements OnDestroy {
     return this.bookings.byDate().get(date) ?? [];
   }
 
-  bookingCount(date: string): number {
-    return this.bookingsOn(date).length;
+  appointmentsOn(date: string): FwBookingRecord[] {
+    return this.bookingsOn(date).filter((b) => b.serviceId !== 'block' && b.source !== 'block');
+  }
+
+  confirmedCount(date: string): number {
+    return this.appointmentsOn(date).filter((b) => b.status === 'confirmed').length;
   }
 
   pendingCount(date: string): number {
-    return this.bookingsOn(date).filter((b) => b.status === 'pending').length;
+    return this.appointmentsOn(date).filter((b) => b.status === 'pending').length;
+  }
+
+  dayAriaLabel(cell: { day: number; date: string; inMonth: boolean }): string {
+    const parts = [`${cell.day}.`];
+    if (!cell.inMonth) parts.push('außerhalb des Monats');
+    const pending = this.pendingCount(cell.date);
+    const confirmed = this.confirmedCount(cell.date);
+    if (pending > 0) {
+      parts.push(`${pending} Anfrage${pending === 1 ? '' : 'n'}`);
+    }
+    if (confirmed > 0) {
+      parts.push(`${confirmed} bestätigt`);
+    }
+    return parts.join(', ');
   }
 
   hasDuplicateWarning(booking: FwBookingRecord): boolean {
