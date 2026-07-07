@@ -435,6 +435,7 @@
   padding-top: clamp(3.5rem, 8vw, 5.5rem);
   padding-bottom: clamp(3.5rem, 8vw, 5.5rem);
   max-width: none;
+  text-align: center;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
   border-block: 1px solid rgba(255, 255, 255, 0.06);
 }
@@ -442,6 +443,7 @@
 .pitch__section--accent {
   background: linear-gradient(135deg, rgba(106, 143, 168, 0.12) 0%, rgba(184, 149, 107, 0.08) 100%);
   max-width: none;
+  text-align: center;
   border-block: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -456,7 +458,7 @@
 
 .pitch__section--accent .pitch__section-lead,
 .pitch__section--dark .pitch__section-lead {
-  max-width: 76rem;
+  max-width: 42rem;
   margin-left: auto;
   margin-right: auto;
 }
@@ -500,6 +502,7 @@
   border-radius: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(0, 0, 0, 0.2);
+  text-align: left;
 }
 
 .pitch__freedom-icon {
@@ -606,7 +609,8 @@
 
 .pitch__market {
   max-width: 40rem;
-  margin-bottom: 2rem;
+  margin: 0 auto 2rem;
+  text-align: left;
 }
 
 .pitch__market-row {
