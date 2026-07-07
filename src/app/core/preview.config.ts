@@ -10,6 +10,9 @@ export const PREVIEW_STUDIO = {
   email: 'info@reineke.pro',
   phone: '015561 048098',
   phoneTel: '+4915561048098',
+  /** Kleinunternehmerregelung — Endpreise ohne ausgewiesene Umsatzsteuer. */
+  vatNote: 'Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.',
+  priceOnceNote: 'einmalig · Endpreis ohne Umsatzsteuer',
 } as const;
 
 export const PREVIEW_SITES: ReadonlyArray<{

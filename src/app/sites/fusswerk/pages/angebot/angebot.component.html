@@ -41,7 +41,10 @@
         <span>Hosting &amp; Betreuung / Monat</span>
       </div>
     </div>
-    <p class="pitch__valid">Gültig bis {{ validUntil }} · Referenz: <a routerLink="/demo/fusswerk">reineke.pro/demo/fusswerk</a></p>
+    <p class="pitch__valid">
+      Gültig bis {{ validUntil }} · {{ studio.vatNote }} · Referenz:
+      <a routerLink="/demo/fusswerk">reineke.pro/demo/fusswerk</a>
+    </p>
   </section>
 
   <section class="pitch__packages">
@@ -58,7 +61,7 @@
           <div class="pitch__price-main">
             <span class="pitch__price-from">Ihr Preis</span>
             <span class="pitch__price-num">{{ formatEuro(pkg.price) }}</span>
-            <span class="pitch__price-once">einmalig · zzgl. 19&nbsp;% MwSt.</span>
+            <span class="pitch__price-once">{{ studio.priceOnceNote }}</span>
           </div>
           <div class="pitch__price-ref">
             <span class="pitch__ref-label">Marktüblich</span>
@@ -228,9 +231,9 @@
       </nav>
       <p class="pitch__legal">
         Reineke GbR · Matthias &amp; Jane Reineke · Elisabethstraße 31 · 49201 Dissen ·
-        {{ studio.email }} · Einmalpreise zzgl. gesetzlicher MwSt., sofern anwendbar.
-        Monatliche Referenzpreise inkl. MwSt.-Hinweis auf Fremdleistungen. Größere Erweiterungen
-        (Fotoshooting, zusätzliche Systeme) nach Absprache.
+        {{ studio.email }} · {{ studio.vatNote }}
+        Monatliche Referenzpreise für Domain, Server und Betreuung (Anbieterkosten).
+        Größere Erweiterungen (Fotoshooting, zusätzliche Systeme) nach Absprache.
       </p>
     </div>
   </footer>

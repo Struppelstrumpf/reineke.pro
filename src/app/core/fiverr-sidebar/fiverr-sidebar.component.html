@@ -31,8 +31,9 @@
           </div>
 
           <p class="fiverr__badge">Pakete &amp; Preise</p>
+          <p class="fiverr__vat-hint">{{ studio.vatNote }}</p>
           <p class="fiverr__monthly-hint">
-            Monatlich: Domain (IONOS), Server (Hetzner) &amp; Betreuung — deutlich unter typischen Agentur-Tarifen.
+            Monatliche Gebühren bei laufender Betreuung, Hosting und Wartung.
           </p>
           <ul class="fiverr__packages" aria-label="Website-Pakete">
             @for (pkg of packages; track pkg.id) {
