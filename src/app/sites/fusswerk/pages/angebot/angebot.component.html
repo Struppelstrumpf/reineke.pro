@@ -37,6 +37,11 @@
       </div>
       <div class="pitch__hero-stats-divider" aria-hidden="true"></div>
       <div>
+        <strong>199 € + 5×134 €</strong>
+        <span>Paket C — Ratenzahlung</span>
+      </div>
+      <div class="pitch__hero-stats-divider" aria-hidden="true"></div>
+      <div>
         <strong>ab 19 €</strong>
         <span>Hosting &amp; Betreuung / Monat</span>
       </div>
@@ -49,9 +54,11 @@
 
   <section class="pitch__packages">
     @for (pkg of packages; track pkg.id) {
-      <article class="pitch__card" [class.pitch__card--featured]="pkg.highlight">
+      <article class="pitch__card" [class.pitch__card--featured]="pkg.highlight" [class.pitch__card--installment]="isInstallment(pkg)">
         @if (pkg.highlight) {
           <span class="pitch__ribbon">Empfehlung</span>
+        } @else if (isInstallment(pkg)) {
+          <span class="pitch__ribbon pitch__ribbon--soft">Sanfter Start</span>
         }
         <p class="pitch__tier">{{ pkg.tier }}</p>
         <h2>{{ pkg.name }}</h2>
@@ -59,9 +66,20 @@
 
         <div class="pitch__price-hero">
           <div class="pitch__price-main">
-            <span class="pitch__price-from">Ihr Preis</span>
-            <span class="pitch__price-num">{{ formatEuro(pkg.price) }}</span>
-            <span class="pitch__price-once">{{ studio.priceOnceNote }}</span>
+            @if (isInstallment(pkg)) {
+              <span class="pitch__price-from">Ratenzahlung</span>
+              <span class="pitch__price-num">
+                {{ formatEuro(pkg.installmentDownPayment!) }} + {{ pkg.installmentCount }} × {{ formatEuro(pkg.installmentAmount!) }}
+              </span>
+              <span class="pitch__price-once">
+                gesamt {{ formatEuro(pkg.price) }} · Paket B einmalig {{ formatEuro(pkg.onceComparePrice!) }}
+                · {{ studio.vatNote }}
+              </span>
+            } @else {
+              <span class="pitch__price-from">Ihr Preis</span>
+              <span class="pitch__price-num">{{ formatEuro(pkg.price) }}</span>
+              <span class="pitch__price-once">{{ studio.priceOnceNote }}</span>
+            }
           </div>
           <div class="pitch__price-ref">
             <span class="pitch__ref-label">Marktüblich</span>
@@ -69,6 +87,15 @@
             <span class="pitch__save">Sie sparen {{ formatEuro(savings(pkg)) }}</span>
           </div>
         </div>
+
+        @if (isInstallment(pkg) && installmentPremium(pkg); as premium) {
+          <div class="pitch__installment-note">
+            <strong>Monat 1: ca. {{ formatEuro(installmentFirstMonthTotal(pkg)!) }}</strong>
+            <span>Anzahlung {{ formatEuro(pkg.installmentDownPayment!) }} + Hosting {{ pkg.monthlyRef }}</span>
+            <strong>Monate 2–6: ca. {{ formatEuro(installmentFollowUpTotal(pkg)!) }} / Monat</strong>
+            <span>Rate {{ formatEuro(pkg.installmentAmount!) }} + Hosting · +{{ formatEuro(premium) }} vs. Einmalzahlung</span>
+          </div>
+        }
 
         <div class="pitch__monthly">
           <span>Laufende Kosten (Referenz)</span>
@@ -157,6 +184,11 @@
         <span>Ihr Angebot Komplettsystem</span>
         <strong>750 €</strong>
         <em>statt marktüblich ca. 2.490 €</em>
+      </div>
+      <div>
+        <span>Paket C — Ratenzahlung</span>
+        <strong>869 € gesamt</strong>
+        <em>199 € Start + 5 × 134 € (statt 750 € einmalig)</em>
       </div>
     </div>
   </section>

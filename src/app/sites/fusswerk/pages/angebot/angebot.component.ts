@@ -12,6 +12,15 @@ type OfferPackage = {
   monthlyRef: string;
   monthlyAfter: string;
   highlight?: boolean;
+  paymentMode?: 'once' | 'installment';
+  /** Erste Rate / Anzahlung (höher — Projektstart & Setup). */
+  installmentDownPayment?: number;
+  /** Anzahl weiterer Monatsraten nach der Anzahlung. */
+  installmentCount?: number;
+  /** Betrag je Folgerate. */
+  installmentAmount?: number;
+  /** Einmalpreis zum Vergleich (z. B. Paket B). */
+  onceComparePrice?: number;
   features: string[];
 };
 
@@ -67,6 +76,29 @@ export class FwAngebotComponent {
         'Ihre Daten auf eigenem Server (Hetzner DE)',
       ],
     },
+    {
+      id: 'studio-installment',
+      tier: 'Paket C',
+      name: 'Komplettsystem — Ratenzahlung',
+      tagline: 'Wie Paket B — sanfter Einstieg mit Anzahlung & 5 Folgeraten',
+      price: 869,
+      referencePrice: 2490,
+      monthlyRef: '29 €',
+      monthlyAfter: '33 €',
+      onceComparePrice: 750,
+      paymentMode: 'installment',
+      installmentDownPayment: 199,
+      installmentCount: 5,
+      installmentAmount: 134,
+      features: [
+        'Identische Leistung wie Paket B (Komplettsystem)',
+        '199 € Anzahlung bei Auftragsstart — dann 5 × 134 €',
+        'Gesamt 869 € statt 750 € einmalig (+119 € Ratenzahlungsaufschlag)',
+        'Für Sie: kein großer Betrag auf einmal · für uns: fairer Ausgleich',
+        'Studio-Login, Kalender, Chat & Inhalte inklusive',
+        'Nach Zahlung der Raten nur noch Hosting & Betreuung',
+      ],
+    },
   ];
 
   readonly freedomPoints = [
@@ -114,10 +146,42 @@ export class FwAngebotComponent {
     return n.toLocaleString('de-DE') + ' €';
   }
 
+  isInstallment(pkg: OfferPackage): boolean {
+    return (
+      pkg.paymentMode === 'installment' &&
+      pkg.installmentDownPayment != null &&
+      !!pkg.installmentCount &&
+      !!pkg.installmentAmount
+    );
+  }
+
+  installmentPremium(pkg: OfferPackage): number | null {
+    if (!this.isInstallment(pkg) || pkg.onceComparePrice == null) return null;
+    return pkg.price - pkg.onceComparePrice;
+  }
+
+  hostingMonthly(pkg: OfferPackage): number {
+    const hosting = Number.parseFloat(pkg.monthlyRef.replace(/[^\d,]/g, '').replace(',', '.'));
+    return Number.isFinite(hosting) ? hosting : 0;
+  }
+
+  installmentFirstMonthTotal(pkg: OfferPackage): number | null {
+    if (!this.isInstallment(pkg)) return null;
+    return (pkg.installmentDownPayment ?? 0) + this.hostingMonthly(pkg);
+  }
+
+  installmentFollowUpTotal(pkg: OfferPackage): number | null {
+    if (!this.isInstallment(pkg)) return null;
+    return (pkg.installmentAmount ?? 0) + this.hostingMonthly(pkg);
+  }
+
   mailto(pkg: OfferPackage): string {
+    const priceLabel = this.isInstallment(pkg)
+      ? `${this.formatEuro(pkg.installmentDownPayment!)} Anzahlung + ${pkg.installmentCount} × ${this.formatEuro(pkg.installmentAmount!)} (gesamt ${this.formatEuro(pkg.price)})`
+      : `${this.formatEuro(pkg.price)} einmalig`;
     const subject = encodeURIComponent(`Angebot ${pkg.name} — Fusswerk`);
     const body = encodeURIComponent(
-      `Guten Tag,\n\nich möchte das Angebot „${pkg.name}“ (${this.formatEuro(pkg.price)} einmalig) besprechen.\n\nMit freundlichen Grüßen`,
+      `Guten Tag,\n\nich möchte das Angebot „${pkg.name}“ (${priceLabel}) besprechen.\n\nMit freundlichen Grüßen`,
     );
     return `mailto:${this.studio.email}?subject=${subject}&body=${body}`;
   }
