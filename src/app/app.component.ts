@@ -8,6 +8,7 @@ import { DemoCodeModalComponent } from './core/demo-access/demo-code-modal.compo
 import { DemoThemeService } from './core/demo-access/demo-theme.service';
 import { FiverrSidebarComponent } from './core/fiverr-sidebar/fiverr-sidebar.component';
 import { WelcomeOverlayComponent } from './core/welcome-overlay/welcome-overlay.component';
+import { isZauberfuchsHost } from './core/site-host';
 
 @Component({
   selector: 'pv-root',
@@ -31,6 +32,7 @@ export class AppComponent {
   readonly demoTheme = inject(DemoThemeService);
 
   readonly isMobileViewport = signal(false);
+  private readonly standaloneSite = isZauberfuchsHost();
 
   private readonly routeUrl = toSignal(
     this.router.events.pipe(
@@ -41,12 +43,18 @@ export class AppComponent {
     { initialValue: this.router.url },
   );
 
-  /** Live-Vorschau im Fusswerk-Studio — ohne Portfolio-Leiste links. */
-  readonly hidePortfolioChrome = computed(() => this.routeUrl().includes('embed=studio'));
-
-  /** Fusswerk-Studio mobil: kein Portfolio-„Studio“-Handle links (mehr Platz für Kalender). */
-  readonly hideFiverrSidebar = computed(() => {
+  /** Live-Vorschau / Standalone-Sites — ohne Portfolio-Overlay. */
+  readonly hidePortfolioChrome = computed(() => {
+    if (this.standaloneSite) return true;
     const url = this.routeUrl();
+    return url.includes('embed=studio') || url.includes('/demo/zauberfuchs');
+  });
+
+  /** Fusswerk-Studio mobil / Standalone: kein Portfolio-Handle. */
+  readonly hideFiverrSidebar = computed(() => {
+    if (this.standaloneSite) return true;
+    const url = this.routeUrl();
+    if (url.includes('/demo/zauberfuchs')) return true;
     if (url.includes('embed=studio')) return true;
     if (url.includes('/fusswerk/angebot')) return true;
     return this.isMobileViewport() && url.includes('/fusswerk/studio');

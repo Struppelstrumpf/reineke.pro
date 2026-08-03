@@ -51,7 +51,6 @@ export class FwBookingWizardComponent {
   readonly canAdvance = signal(true);
   readonly submitting = signal(false);
   readonly submitError = signal('');
-  readonly usingDemoSlots = this.bookingApi.usingDemoSlots;
   readonly open = this.ui.open;
   private wasOpen = false;
 

@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { FusswerkConnectivityService } from './fusswerk-connectivity.service';
 import { FusswerkContentService } from './fusswerk-content.service';
 import { computeSlots } from './fusswerk-scheduling';
 import type { FwBookingResult, FwBookingRecord, FwBookingSlot } from './fusswerk-booking.types';
@@ -15,6 +16,7 @@ export type FwLoadSlotsOptions = {
 @Injectable({ providedIn: 'root' })
 export class FusswerkBookingService {
   private readonly content = inject(FusswerkContentService);
+  private readonly connectivity = inject(FusswerkConnectivityService);
 
   readonly loadingSlots = signal(false);
   readonly submitting = signal(false);
@@ -39,6 +41,7 @@ export class FusswerkBookingService {
       return data.slots as FwBookingSlot[];
     } catch {
       this.usingDemoSlots.set(true);
+      this.connectivity.notifyApiUnreachable();
       let bookings: FwBookingRecord[] = options?.bookings ?? [];
       if (!bookings.length) {
         try {
@@ -82,9 +85,11 @@ export class FusswerkBookingService {
       notifyFwBookingsChanged();
       return result;
     } catch {
+      this.connectivity.notifyApiUnreachable();
       const result = {
         ok: false,
-        error: 'Buchungsserver nicht erreichbar — bitte „npm run start:api“ starten oder telefonisch anfragen.',
+        error:
+          'Die Verbindung ist gerade nicht möglich. Bitte prüfen Sie Ihr Internet oder rufen Sie uns telefonisch an.',
       };
       this.lastResult.set(result);
       return result;

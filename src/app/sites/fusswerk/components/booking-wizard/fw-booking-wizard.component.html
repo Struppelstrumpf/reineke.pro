@@ -31,11 +31,6 @@
         @if (submitError() && step() >= 3 && step() <= 5) {
           <p class="fw-wiz-error-banner" role="alert">{{ submitError() }}</p>
         }
-        @if (usingDemoSlots() && step() === 4) {
-          <p class="fw-wiz-demo-banner" role="status">
-            Vorschau-Modus: Zeiten lokal berechnet. Für echte Buchungen bitte die API starten.
-          </p>
-        }
         @switch (step()) {
           @case (0) {
             <pv-fw-wizard-service (valid)="onValid($event)" />

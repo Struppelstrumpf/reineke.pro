@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
@@ -7,6 +7,7 @@ import { FwHoursListComponent } from '../../components/fw-hours-list/fw-hours-li
 import { FwLogoComponent } from '../../components/fw-logo.component';
 import { FwSocialComponent } from '../../components/fw-social.component';
 import { FusswerkBookingWizardUiService } from '../../fusswerk-booking-wizard-ui.service';
+import { FusswerkConnectivityService } from '../../fusswerk-connectivity.service';
 import { FW_PAYMENT_METHODS, FW_STEPS, FW_TESTIMONIALS } from '../../fusswerk.data';
 import { FW_IMAGES } from '../../fusswerk-booking.types';
 import { FusswerkContentService } from '../../fusswerk-content.service';
@@ -21,7 +22,14 @@ import { FusswerkContentService } from '../../fusswerk-content.service';
 export class FwHomeComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly wizardUi = inject(FusswerkBookingWizardUiService);
+  private readonly connectivity = inject(FusswerkConnectivityService);
   readonly content = inject(FusswerkContentService);
+
+  constructor() {
+    afterNextRender(() => {
+      void this.connectivity.checkForHomepage();
+    });
+  }
 
   /** Live-Vorschau im Studio-Inhalte-Editor (?embed=studio) */
   readonly isStudioEmbed = toSignal(

@@ -12,6 +12,8 @@
       <pv-welcome-overlay />
     }
   </div>
-  <pv-booking-modal />
-  <pv-demo-code-modal />
+  @if (!hidePortfolioChrome()) {
+    <pv-booking-modal />
+    <pv-demo-code-modal />
+  }
 </div>

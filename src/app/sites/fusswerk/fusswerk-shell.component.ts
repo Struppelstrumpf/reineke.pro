@@ -3,16 +3,18 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 import { FwBookingWizardComponent } from './components/booking-wizard/fw-booking-wizard.component';
+import { FwOfflineDialogComponent } from './components/fw-offline-dialog.component';
 import { FwSupportChatWidgetComponent } from './components/fw-support-chat-widget.component';
 import { FusswerkContentService } from './fusswerk-content.service';
 
 @Component({
   selector: 'pv-fusswerk-shell',
-  imports: [RouterOutlet, FwSupportChatWidgetComponent, FwBookingWizardComponent],
+  imports: [RouterOutlet, FwSupportChatWidgetComponent, FwBookingWizardComponent, FwOfflineDialogComponent],
   template: `
     <div class="fw-site" [style]="content.themeStyle()">
       <router-outlet />
       <pv-fw-booking-wizard />
+      <pv-fw-offline-dialog />
       @if (showChat()) {
         <pv-fw-support-chat-widget />
       }
