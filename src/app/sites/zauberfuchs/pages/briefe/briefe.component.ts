@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ZF_BRAND, ZF_LETTER_BEATS, ZF_SAMPLE_ISSUE } from '../../zauberfuchs.data';
+import { zfLink } from '../../zf-link';
 
 @Component({
   selector: 'pv-zf-briefe',
@@ -27,7 +28,7 @@ import { ZF_BRAND, ZF_LETTER_BEATS, ZF_SAMPLE_ISSUE } from '../../zauberfuchs.da
           <h2>{{ sample.subtitle }}</h2>
           <p class="zf-issue__teaser">{{ sample.teaser }}</p>
           <p class="zf-issue__price">13,90 € · Demo-Vormerkung</p>
-          <a class="zf-btn" routerLink="../abo">Diese Ausgabe vormerken</a>
+          <a class="zf-btn" [routerLink]="link('abo')">Diese Ausgabe vormerken</a>
         </article>
 
         <figure class="zf-still">
@@ -60,8 +61,8 @@ import { ZF_BRAND, ZF_LETTER_BEATS, ZF_SAMPLE_ISSUE } from '../../zauberfuchs.da
       </ol>
 
       <div class="zf-cta-row">
-        <a class="zf-btn" routerLink="../abo">Ausgabe vormerken</a>
-        <a class="zf-link" routerLink="../shop">Weitere Erinnerungsstücke</a>
+        <a class="zf-btn" [routerLink]="link('abo')">Ausgabe vormerken</a>
+        <a class="zf-link" [routerLink]="link('shop')">Weitere Erinnerungsstücke</a>
       </div>
     </section>
   `,
@@ -323,4 +324,5 @@ export class ZfBriefeComponent {
   readonly brand = ZF_BRAND;
   readonly beats = ZF_LETTER_BEATS;
   readonly sample = ZF_SAMPLE_ISSUE;
+  readonly link = zfLink;
 }

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ZF_BRAND } from '../../zauberfuchs.data';
+import { zfLink } from '../../zf-link';
 
 @Component({
   selector: 'pv-zf-impressum',
@@ -17,7 +18,7 @@ import { ZF_BRAND } from '../../zauberfuchs.data';
         Kontakt:
         <a [href]="'mailto:' + brand.email">{{ brand.email }}</a>
       </p>
-      <p><a routerLink="../">← Zurück</a></p>
+      <p><a [routerLink]="link()">← Zurück</a></p>
     </section>
   `,
   styles: [
@@ -46,4 +47,5 @@ import { ZF_BRAND } from '../../zauberfuchs.data';
 })
 export class ZfImpressumComponent {
   readonly brand = ZF_BRAND;
+  readonly link = zfLink;
 }

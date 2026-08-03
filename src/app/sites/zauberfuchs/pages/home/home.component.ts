@@ -13,6 +13,7 @@ import {
   ZF_RULES,
   ZF_SAMPLE_ISSUE,
 } from '../../zauberfuchs.data';
+import { zfLink } from '../../zf-link';
 
 @Component({
   selector: 'pv-zf-home',
@@ -31,8 +32,8 @@ import {
             aus derselben Welt.
           </p>
           <div class="zf-hero__actions">
-            <a class="zf-btn zf-btn--primary" routerLink="../briefe">In die Zauberpost schauen</a>
-            <a class="zf-btn zf-btn--ghost" routerLink="../abo">Ausgabe vormerken</a>
+            <a class="zf-btn zf-btn--primary" [routerLink]="link('briefe')">In die Zauberpost schauen</a>
+            <a class="zf-btn zf-btn--ghost" [routerLink]="link('abo')">Ausgabe vormerken</a>
           </div>
         </div>
       </div>
@@ -169,7 +170,7 @@ import {
             }
           </ul>
           <p class="zf-post__more">
-            <a routerLink="../briefe">Mehr zur Zauberpost →</a>
+            <a [routerLink]="link('briefe')">Mehr zur Zauberpost →</a>
           </p>
         </div>
       </div>
@@ -194,7 +195,7 @@ import {
         }
       </div>
       <div class="zf-parents__cta">
-        <a class="zf-btn zf-btn--primary" routerLink="../abo">Ausgaben ansehen</a>
+        <a class="zf-btn zf-btn--primary" [routerLink]="link('abo')">Ausgaben ansehen</a>
         <a class="zf-parents__mail" [href]="'mailto:' + brand.email">Fragen an {{ brand.email }}</a>
       </div>
     </section>
@@ -878,6 +879,7 @@ export class ZfHomeComponent {
   readonly sample = ZF_SAMPLE_ISSUE;
   readonly comic = ZF_COMIC_STORY;
   readonly parents = ZF_PARENTS;
+  readonly link = zfLink;
 
   scrollToWorld(): void {
     document.getElementById('zf-world')?.scrollIntoView({ behavior: 'smooth', block: 'start' });

@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { IsActiveMatchOptions, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ZF_BRAND } from './zauberfuchs.data';
+import { zfLink } from './zf-link';
 import { ZfViewportService } from './zf-viewport.service';
 
 @Component({
@@ -25,7 +26,7 @@ import { ZfViewportService } from './zf-viewport.service';
       <div class="zf-nav-host">
         <div class="zf-wrap">
             <header class="zf-nav" [class.zf-nav--open]="menuOpen()">
-            <a class="zf-brand" routerLink="./" (click)="closeMenu()">
+            <a class="zf-brand" [routerLink]="link()" (click)="closeMenu()">
               <img
                 class="zf-brand__mark"
                 src="/zauberfuchs/zauberfuchs-mark.webp"
@@ -61,30 +62,30 @@ import { ZfViewportService } from './zf-viewport.service';
             >
               <a
                 class="zf-nav__chip"
-                routerLink="./"
+                [routerLink]="link()"
                 routerLinkActive="active"
                 [routerLinkActiveOptions]="exactActive"
                 (click)="closeMenu()"
                 >Welt</a
               >
-              <a class="zf-nav__chip" routerLink="briefe" routerLinkActive="active" (click)="closeMenu()"
+              <a class="zf-nav__chip" [routerLink]="link('briefe')" routerLinkActive="active" (click)="closeMenu()"
                 >Zauberpost</a
               >
-              <a class="zf-nav__chip" routerLink="abo" routerLinkActive="active" (click)="closeMenu()"
+              <a class="zf-nav__chip" [routerLink]="link('abo')" routerLinkActive="active" (click)="closeMenu()"
                 >Ausgaben</a
               >
-              <a class="zf-nav__chip" routerLink="shop" routerLinkActive="active" (click)="closeMenu()"
+              <a class="zf-nav__chip" [routerLink]="link('shop')" routerLinkActive="active" (click)="closeMenu()"
                 >Erinnerungen</a
               >
               @if (isCompact()) {
-                <a class="zf-nav__cta zf-nav__cta--drawer" routerLink="briefe" (click)="closeMenu()"
+                <a class="zf-nav__cta zf-nav__cta--drawer" [routerLink]="link('briefe')" (click)="closeMenu()"
                   >Post öffnen</a
                 >
               }
             </nav>
 
             @if (!isCompact()) {
-              <a class="zf-nav__cta" routerLink="briefe">Post öffnen</a>
+              <a class="zf-nav__cta" [routerLink]="link('briefe')">Post öffnen</a>
             }
           </header>
         </div>
@@ -118,11 +119,11 @@ import { ZfViewportService } from './zf-viewport.service';
             </div>
 
             <nav class="zf-footer__links" aria-label="Fußnavigation">
-              <a routerLink="./">Welt</a>
-              <a routerLink="briefe">Zauberpost</a>
-              <a routerLink="abo">Ausgaben</a>
-              <a routerLink="shop">Erinnerungen</a>
-              <a routerLink="impressum">Impressum</a>
+              <a [routerLink]="link()">Welt</a>
+              <a [routerLink]="link('briefe')">Zauberpost</a>
+              <a [routerLink]="link('abo')">Ausgaben</a>
+              <a [routerLink]="link('shop')">Erinnerungen</a>
+              <a [routerLink]="link('impressum')">Impressum</a>
               <a [href]="'mailto:' + brand.email">{{ brand.email }}</a>
             </nav>
 
@@ -155,6 +156,7 @@ export class ZauberfuchsShellComponent {
   readonly vp = inject(ZfViewportService);
   readonly menuOpen = signal(false);
   readonly scrollDim = signal('0');
+  readonly link = zfLink;
 
   readonly isCompact = computed(() => this.vp.device() === 'mobile');
 

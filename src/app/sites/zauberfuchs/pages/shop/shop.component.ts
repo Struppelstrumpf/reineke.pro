@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ZF_SHOP } from '../../zauberfuchs.data';
+import { zfLink } from '../../zf-link';
 
 @Component({
   selector: 'pv-zf-shop',
@@ -48,10 +49,10 @@ import { ZF_SHOP } from '../../zauberfuchs.data';
           Preise sind Demo-Werte. Es gibt keinen versteckten Abo-Zwang — und wenn der echte Kauf
           kommt, bleibt er klar und ruhig.
         </p>
-        <a routerLink="../abo">Zu den Ausgaben & Eltern-Infos →</a>
+        <a [routerLink]="link('abo')">Zu den Ausgaben & Eltern-Infos →</a>
       </aside>
 
-      <p class="zf-back"><a routerLink="../">← Zurück in den Zauberwald</a></p>
+      <p class="zf-back"><a [routerLink]="link()">← Zurück in den Zauberwald</a></p>
     </section>
   `,
   styles: [
@@ -256,6 +257,7 @@ import { ZF_SHOP } from '../../zauberfuchs.data';
 export class ZfShopComponent {
   readonly items = ZF_SHOP;
   readonly toast = signal('');
+  readonly link = zfLink;
 
   fakeAdd(name: string): void {
     this.toast.set(`„${name}“ liegt bereit — Lumi würde es liefern. (Demo, kein Kauf.)`);

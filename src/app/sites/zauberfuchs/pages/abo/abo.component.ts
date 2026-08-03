@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ZF_BRAND, ZF_PARENTS, ZF_PLANS } from '../../zauberfuchs.data';
+import { zfLink } from '../../zf-link';
 
 @Component({
   selector: 'pv-zf-abo',
@@ -68,7 +69,7 @@ import { ZF_BRAND, ZF_PARENTS, ZF_PLANS } from '../../zauberfuchs.data';
         <a class="zf-mail" [href]="'mailto:' + brand.email">Fragen? {{ brand.email }}</a>
       </section>
 
-      <p class="zf-back"><a routerLink="../">← Zurück in den Zauberwald</a></p>
+      <p class="zf-back"><a [routerLink]="link()">← Zurück in den Zauberwald</a></p>
     </section>
   `,
   styles: [
@@ -336,6 +337,7 @@ export class ZfAboComponent {
   readonly parents = ZF_PARENTS;
   readonly selected = signal<string | null>(null);
   readonly note = signal('');
+  readonly link = zfLink;
 
   pretendSubscribe(name: string): void {
     this.selected.set(name);
