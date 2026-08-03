@@ -29,7 +29,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
       .zf-map__paint {
         position: absolute;
         inset: -3%;
-        background-image: url('/zauberfuchs/zauberwald-hero.png');
+        background-image: url('/zauberfuchs/zauberwald-hero.webp');
         background-position: 50% 46%;
         background-size: cover;
         background-repeat: no-repeat;

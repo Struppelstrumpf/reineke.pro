@@ -17,7 +17,7 @@ import { ZF_BRAND, ZF_PARENTS, ZF_PLANS } from '../../zauberfuchs.data';
       </header>
 
       <div class="zf-ornament" aria-hidden="true">
-        <img src="/zauberfuchs/divider-hat.png?v=5" alt="" width="160" height="48" />
+        <img src="/zauberfuchs/divider-hat.webp" alt="" width="160" height="48" loading="lazy" decoding="async" />
       </div>
 
       <div class="zf-plans">
@@ -48,7 +48,7 @@ import { ZF_BRAND, ZF_PARENTS, ZF_PLANS } from '../../zauberfuchs.data';
       }
 
       <div class="zf-ornament zf-ornament--wide" aria-hidden="true">
-        <img src="/zauberfuchs/divider-branch.png?v=5" alt="" width="420" height="64" />
+        <img src="/zauberfuchs/divider-branch.webp" alt="" width="420" height="64" loading="lazy" decoding="async" />
       </div>
 
       <section class="zf-parents" id="eltern">

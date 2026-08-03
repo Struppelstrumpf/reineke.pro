@@ -99,7 +99,7 @@ export const ZF_CHARACTERS: ZfCharacter[] = [
     home: 'Pilzwald',
     blurb: 'Kreativer Helfer mit Hut. Schreibt, sammelt und schickt die kleinen Alltagsabenteuer in die Welt.',
     emoji: '🦊',
-    portrait: '/zauberfuchs/characters/zauberfuchs.png',
+    portrait: '/zauberfuchs/characters/zauberfuchs.webp',
   },
   {
     id: 'lumi',
@@ -108,7 +108,7 @@ export const ZF_CHARACTERS: ZfCharacter[] = [
     home: 'überall',
     blurb: 'Verbindet alle Orte — langsam, zuverlässig und mit dem wichtigsten Auftrag: Vorfreude bringen.',
     emoji: '🐌',
-    portrait: '/zauberfuchs/characters/lumi.png',
+    portrait: '/zauberfuchs/characters/lumi.webp',
   },
   {
     id: 'nox',
@@ -117,7 +117,7 @@ export const ZF_CHARACTERS: ZfCharacter[] = [
     home: 'Mondlichtwald',
     blurb: 'Weise Eule in der ältesten Eiche. Kennt jede Geschichte und fliegt direkt ins Nest.',
     emoji: '🦉',
-    portrait: '/zauberfuchs/characters/nox.png',
+    portrait: '/zauberfuchs/characters/nox.webp',
   },
   {
     id: 'moss',
@@ -126,7 +126,7 @@ export const ZF_CHARACTERS: ZfCharacter[] = [
     home: 'Seerosenfluss',
     blurb: 'Moosiger Frosch am Fluss. Floß, Anleger und ein Herz für alles, was wächst.',
     emoji: '🐸',
-    portrait: '/zauberfuchs/characters/moss.png',
+    portrait: '/zauberfuchs/characters/moss.webp',
   },
   {
     id: 'sum',
@@ -135,7 +135,7 @@ export const ZF_CHARACTERS: ZfCharacter[] = [
     home: 'Blumenwiese',
     blurb: 'Fröhliche Biene. Bringt Farbe, Summen und kleine süße Überraschungen mit.',
     emoji: '🐝',
-    portrait: '/zauberfuchs/characters/sum.png',
+    portrait: '/zauberfuchs/characters/sum.webp',
   },
   {
     id: 'puff',
@@ -144,7 +144,7 @@ export const ZF_CHARACTERS: ZfCharacter[] = [
     home: 'Kräuterhain',
     blurb: 'Lebt in der verfallenen Burg. Magie, die manchmal daneben geht — und genau deshalb bleibt.',
     emoji: '👻',
-    portrait: '/zauberfuchs/characters/puff.png',
+    portrait: '/zauberfuchs/characters/puff.webp',
   },
   {
     id: 'xenufur',
@@ -153,7 +153,7 @@ export const ZF_CHARACTERS: ZfCharacter[] = [
     home: 'Sternenhügel',
     blurb: 'Hirsch hinter dem Nebelschleier. Nachts beobachtet er die Sterne mit seinem Teleskop.',
     emoji: '🦌',
-    portrait: '/zauberfuchs/characters/xenufur.png',
+    portrait: '/zauberfuchs/characters/xenufur.webp',
   },
 ];
 
@@ -289,35 +289,35 @@ export const ZF_COMIC_STORY = {
     {
       id: 'cover',
       kind: 'cover' as const,
-      image: '/zauberfuchs/comics/cover.png',
+      image: '/zauberfuchs/comics/cover.webp',
       label: 'Einband',
       alt: 'Zauberheft-Cover: Der erste Brief — Zauberfuchs hält einen versiegelten Brief im Pilzwald',
     },
     {
       id: 'spread-1',
       kind: 'spread' as const,
-      image: '/zauberfuchs/comics/spread-01.png',
+      image: '/zauberfuchs/comics/spread-01.webp',
       label: 'Aufschlag 1',
       alt: 'Zauberheft: Zauberfuchs schreibt den Brief, Lumi klopft an die Tür',
     },
     {
       id: 'spread-2',
       kind: 'spread' as const,
-      image: '/zauberfuchs/comics/spread-02.png',
+      image: '/zauberfuchs/comics/spread-02.webp',
       label: 'Aufschlag 2',
       alt: 'Zauberheft: Lumi trägt den Brief zum Seerosenfluss',
     },
     {
       id: 'spread-3',
       kind: 'spread' as const,
-      image: '/zauberfuchs/comics/spread-03.png',
+      image: '/zauberfuchs/comics/spread-03.webp',
       label: 'Aufschlag 3',
       alt: 'Zauberheft: Am Fluss und Nox öffnet den Brief in der Eiche',
     },
     {
       id: 'spread-4',
       kind: 'spread' as const,
-      image: '/zauberfuchs/comics/spread-04.png',
+      image: '/zauberfuchs/comics/spread-04.webp',
       label: 'Aufschlag 4',
       alt: 'Zauberheft: Abend in Moosheim — Ende der Geschichte',
     },

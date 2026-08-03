@@ -62,7 +62,7 @@ import {
     </section>
 
     <div class="zf-ornament" aria-hidden="true">
-      <img src="/zauberfuchs/divider-branch.png?v=5" alt="" width="520" height="80" />
+      <img src="/zauberfuchs/divider-branch.webp" alt="" width="520" height="80" loading="lazy" decoding="async" />
     </div>
 
     <section class="zf-world">
@@ -85,7 +85,7 @@ import {
     </section>
 
     <div class="zf-ornament zf-ornament--hat" aria-hidden="true">
-      <img src="/zauberfuchs/divider-hat.png?v=5" alt="" width="200" height="56" />
+      <img src="/zauberfuchs/divider-hat.webp" alt="" width="200" height="56" loading="lazy" decoding="async" />
     </div>
 
     <section class="zf-friends zf-wrap">
@@ -97,7 +97,15 @@ import {
       <div class="zf-critters">
         @for (c of characters; track c.id) {
           <article class="zf-critter">
-            <img class="zf-critter__portrait" [src]="c.portrait" [alt]="c.name" width="160" height="160" />
+            <img
+              class="zf-critter__portrait"
+              [src]="c.portrait"
+              [alt]="c.name"
+              width="160"
+              height="160"
+              loading="lazy"
+              decoding="async"
+            />
             <div class="zf-critter__body">
               <h3>{{ c.name }}</h3>
               <p class="zf-critter__role">{{ c.role }} · {{ c.home }}</p>
@@ -109,7 +117,7 @@ import {
     </section>
 
     <div class="zf-ornament" aria-hidden="true">
-      <img src="/zauberfuchs/divider-branch.png?v=5" alt="" width="520" height="80" />
+      <img src="/zauberfuchs/divider-branch.webp" alt="" width="520" height="80" loading="lazy" decoding="async" />
     </div>
 
     <section class="zf-comic zf-wrap">
@@ -122,17 +130,19 @@ import {
     </section>
 
     <div class="zf-ornament zf-ornament--hat" aria-hidden="true">
-      <img src="/zauberfuchs/divider-hat.png?v=5" alt="" width="200" height="56" />
+      <img src="/zauberfuchs/divider-hat.webp" alt="" width="140" height="44" loading="lazy" decoding="async" />
     </div>
 
     <section class="zf-post">
       <div class="zf-wrap zf-post__grid">
         <div class="zf-post__visual">
           <img
-            src="/zauberfuchs/zauberpost-stillleben.png"
+            src="/zauberfuchs/zauberpost-stillleben.webp"
             width="960"
             height="720"
             alt="Geöffnete Zauberpost mit Siegel, Stickern und Sammelkarte"
+            loading="lazy"
+            decoding="async"
           />
           <div class="zf-post__glow" aria-hidden="true"></div>
         </div>
@@ -166,7 +176,7 @@ import {
     </section>
 
     <div class="zf-ornament" aria-hidden="true">
-      <img src="/zauberfuchs/divider-branch.png?v=5" alt="" width="520" height="80" />
+      <img src="/zauberfuchs/divider-branch.webp" alt="" width="520" height="80" loading="lazy" decoding="async" />
     </div>
 
     <section class="zf-parents zf-wrap" id="eltern">
@@ -222,7 +232,7 @@ import {
         position: absolute;
         inset: 0;
         z-index: 0;
-        background: url('/zauberfuchs/zauberwald-hero.png') 35% 20% / cover no-repeat;
+        background: #050208;
       }
 
       .zf-hero__frame {

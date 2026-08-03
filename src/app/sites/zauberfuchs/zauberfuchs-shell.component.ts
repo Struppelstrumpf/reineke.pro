@@ -28,10 +28,11 @@ import { ZfViewportService } from './zf-viewport.service';
             <a class="zf-brand" routerLink="./" (click)="closeMenu()">
               <img
                 class="zf-brand__mark"
-                src="/zauberfuchs/zauberfuchs-mark.png"
+                src="/zauberfuchs/zauberfuchs-mark.webp"
                 width="44"
                 height="44"
                 alt=""
+                decoding="async"
               />
               <span class="zf-brand__text">
                 <span class="zf-brand__name">{{ brand.name }}</span>
@@ -102,10 +103,12 @@ import { ZfViewportService } from './zf-viewport.service';
             <div class="zf-footer__brand">
               <img
                 class="zf-footer__fox"
-                src="/zauberfuchs/zauberfuchs-mark.png"
+                src="/zauberfuchs/zauberfuchs-mark.webp"
                 width="72"
                 height="72"
                 alt="Zauberfuchs"
+                loading="lazy"
+                decoding="async"
               />
               <div>
                 <strong>{{ brand.name }}</strong>
@@ -167,7 +170,18 @@ export class ZauberfuchsShellComponent {
       document.title = `${ZF_BRAND.name} · ${ZF_BRAND.product}`;
       document.documentElement.lang = 'de';
       const icon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
-      if (icon) icon.href = '/zauberfuchs/zauberfuchs-mark.png';
+      if (icon) icon.href = '/zauberfuchs/zauberfuchs-mark.webp';
+
+      // Hero früh laden — größter First-Paint-Gewinn
+      if (!document.querySelector('link[data-zf-hero-preload]')) {
+        const preload = document.createElement('link');
+        preload.rel = 'preload';
+        preload.as = 'image';
+        preload.href = '/zauberfuchs/zauberwald-hero.webp';
+        preload.type = 'image/webp';
+        preload.setAttribute('data-zf-hero-preload', '1');
+        document.head.appendChild(preload);
+      }
     }
 
     afterNextRender(() => {

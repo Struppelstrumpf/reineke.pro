@@ -17,7 +17,7 @@ import { ZF_BRAND, ZF_LETTER_BEATS, ZF_SAMPLE_ISSUE } from '../../zauberfuchs.da
       </header>
 
       <div class="zf-ornament" aria-hidden="true">
-        <img src="/zauberfuchs/divider-hat.png?v=5" alt="" width="160" height="48" />
+        <img src="/zauberfuchs/divider-hat.webp" alt="" width="160" height="48" loading="lazy" decoding="async" />
       </div>
 
       <div class="zf-split">
@@ -32,7 +32,9 @@ import { ZF_BRAND, ZF_LETTER_BEATS, ZF_SAMPLE_ISSUE } from '../../zauberfuchs.da
 
         <figure class="zf-still">
           <img
-            src="/zauberfuchs/zauberpost-stillleben.png"
+            src="/zauberfuchs/zauberpost-stillleben.webp"
+            loading="lazy"
+            decoding="async"
             width="800"
             height="600"
             alt="Zauberpost Stillleben"
@@ -41,7 +43,7 @@ import { ZF_BRAND, ZF_LETTER_BEATS, ZF_SAMPLE_ISSUE } from '../../zauberfuchs.da
       </div>
 
       <div class="zf-ornament zf-ornament--wide" aria-hidden="true">
-        <img src="/zauberfuchs/divider-branch.png?v=5" alt="" width="420" height="64" />
+        <img src="/zauberfuchs/divider-branch.webp" alt="" width="420" height="64" loading="lazy" decoding="async" />
       </div>
 
       <h2 class="zf-section-title">Was im Päckchen wartet</h2>

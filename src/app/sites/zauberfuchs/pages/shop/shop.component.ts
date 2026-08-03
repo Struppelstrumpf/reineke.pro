@@ -17,7 +17,7 @@ import { ZF_SHOP } from '../../zauberfuchs.data';
       </header>
 
       <div class="zf-ornament" aria-hidden="true">
-        <img src="/zauberfuchs/divider-branch.png?v=5" alt="" width="380" height="64" />
+        <img src="/zauberfuchs/divider-branch.webp" alt="" width="380" height="64" loading="lazy" decoding="async" />
       </div>
 
       <div class="zf-shop">
@@ -39,7 +39,7 @@ import { ZF_SHOP } from '../../zauberfuchs.data';
       }
 
       <div class="zf-ornament zf-ornament--hat" aria-hidden="true">
-        <img src="/zauberfuchs/divider-hat.png?v=5" alt="" width="140" height="44" />
+        <img src="/zauberfuchs/divider-hat.webp" alt="" width="140" height="44" loading="lazy" decoding="async" />
       </div>
 
       <aside class="zf-shop-note">

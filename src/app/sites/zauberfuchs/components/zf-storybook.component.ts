@@ -22,7 +22,7 @@ import { ZF_COMIC_STORY, type ZfComicPage } from '../zauberfuchs.data';
           <div class="zf-tome__spine" aria-hidden="true"></div>
           <img
             class="zf-tome__bookmark"
-            src="/zauberfuchs/book/bookmark-ornate.png"
+            src="/zauberfuchs/book/bookmark-ornate.webp"
             alt=""
             aria-hidden="true"
           />
@@ -34,6 +34,8 @@ import { ZF_COMIC_STORY, type ZfComicPage } from '../zauberfuchs.data';
               [src]="page().image"
               [alt]="page().alt"
               draggable="false"
+              decoding="async"
+              fetchpriority="high"
             />
             <div class="zf-tome__age" aria-hidden="true"></div>
             <div class="zf-tome__crease" aria-hidden="true"></div>
