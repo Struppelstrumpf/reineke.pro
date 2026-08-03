@@ -34,14 +34,13 @@ const zauberfuchsChildren: Routes = [
 const zauberfuchsShellLoad = () =>
   import('./sites/zauberfuchs/zauberfuchs-shell.component').then((m) => m.ZauberfuchsShellComponent);
 
-/** Eigenständige Domain zauberfuchs.net — ohne Portfolio. */
+/** Eigenständige Domain zauberfuchs.net — Shell+Home ohne Lazy-Waterfall. */
 const zauberfuchsHostRoutes: Routes = [
   {
     path: '',
-    loadComponent: zauberfuchsShellLoad,
-    children: zauberfuchsChildren,
+    loadChildren: () =>
+      import('./sites/zauberfuchs/zauberfuchs.routes').then((m) => m.ZAUBERFUCHS_HOST_ROUTES),
   },
-  { path: '**', redirectTo: '' },
 ];
 
 const portfolioRoutes: Routes = [

@@ -172,7 +172,16 @@ export class ZauberfuchsShellComponent {
       const icon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
       if (icon) icon.href = '/zauberfuchs/zauberfuchs-mark.webp';
 
-      // Hero früh laden — größter First-Paint-Gewinn
+      // Nur die drei ZF-Fonts priorisieren (Text erscheint mit System-Fallback sofort)
+      if (!document.querySelector('link[data-zf-fonts]')) {
+        const fonts = document.createElement('link');
+        fonts.rel = 'stylesheet';
+        fonts.href =
+          'https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Great+Vibes&family=Nunito:wght@400;700;800&display=swap';
+        fonts.setAttribute('data-zf-fonts', '1');
+        document.head.appendChild(fonts);
+      }
+
       if (!document.querySelector('link[data-zf-hero-preload]')) {
         const preload = document.createElement('link');
         preload.rel = 'preload';

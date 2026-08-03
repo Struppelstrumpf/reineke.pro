@@ -248,7 +248,8 @@ import {
         z-index: 5;
         max-width: 36rem;
         text-align: center;
-        animation: zf-fade-up 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+        /* Sofort sichtbar — kein Opacity-Delay beim First Paint */
+        animation: none;
       }
 
       /* Weicher Nebelfleck — kein Kasten, nur Lesetiefe */
@@ -529,8 +530,6 @@ import {
         background: linear-gradient(160deg, rgba(36, 24, 58, 0.88), rgba(18, 10, 34, 0.92));
         border: 1px solid rgba(212, 184, 240, 0.14);
         overflow: hidden;
-        animation: zf-fade-up 0.9s both;
-        animation-delay: var(--d, 0ms);
         transition: transform 220ms ease, border-color 220ms ease;
       }
 
